@@ -16,7 +16,7 @@
         <li>
             <packageId>mcocdaa.RimMindCore</packageId>
             <displayName>RimMind - Core</displayName>
-            <downloadUrl>https://github.com/mcocdaa/RimMind-Core</downloadUrl>
+            <downloadUrl>https://github.com/mcocdaa/RimWorld-RimMind-Mod-Core</downloadUrl>
         </li>
     </modDependencies>
     <loadAfter>

@@ -143,6 +143,20 @@ A: RimMind Director 是独立的叙事者，选择它后替代原版叙事者。
 **Q: 配合 Memory 模组效果更好吗？**
 A: 是的。Memory 提供殖民地历史记忆，Storyteller 参考这些记忆做出更有叙事连贯性的事件选择。
 
+## 致谢
+
+本项目开发过程中参考了以下优秀的 RimWorld 模组：
+
+- [RimTalk](https://github.com/jlibrary/RimTalk.git) - 对话系统参考
+- [RimTalk-ExpandActions](https://github.com/sanguodxj-byte/RimTalk-ExpandActions.git) - 动作扩展参考
+- [NewRatkin](https://github.com/solaris0115/NewRatkin.git) - 种族模组架构参考
+- [VanillaExpandedFramework](https://github.com/Vanilla-Expanded/VanillaExpandedFramework.git) - 框架设计参考
+
+## 贡献
+
+欢迎提交 Issue 和 Pull Request！如果你有任何建议或发现 Bug，请通过 GitHub Issues 反馈。
+
+
 ---
 
 # RimMind - Storyteller (English)
@@ -231,3 +245,16 @@ A: RimMind Director is an independent storyteller. Selecting it replaces the van
 
 **Q: Does it work better with Memory?**
 A: Yes. Memory provides colony history, and Storyteller references these memories for more narratively coherent event selection.
+
+## Acknowledgments
+
+This project references the following excellent RimWorld mods:
+
+- [RimTalk](https://github.com/jlibrary/RimTalk.git) - Dialogue system reference
+- [RimTalk-ExpandActions](https://github.com/sanguodxj-byte/RimTalk-ExpandActions.git) - Action expansion reference
+- [NewRatkin](https://github.com/solaris0115/NewRatkin.git) - Race mod architecture reference
+- [VanillaExpandedFramework](https://github.com/Vanilla-Expanded/VanillaExpandedFramework.git) - Framework design reference
+
+## Contributing
+
+Issues and Pull Requests are welcome! If you have any suggestions or find bugs, please feedback via GitHub Issues.
