@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ThingDef ParentName="BuildingBase">
+    <defName>RimMind_StorytellerAltar</defName>
+    <label>storyteller altar</label>
+    <description>A mystical altar that allows communication with the AI storyteller controlling the colony's fate.</description>
+    <thingClass>Building</thingClass>
+    <category>Building</category>
+    <graphicData>
+      <texPath>Storyteller/RimMind_StorytellerAltar</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(2,2)</drawSize>
+    </graphicData>
+    <size>(2,2)</size>
+    <costStuffCount>75</costStuffCount>
+    <stuffCategories>
+      <li>Stony</li>
+      <li>Metallic</li>
+    </stuffCategories>
+    <costList>
+      <Jade>15</Jade>
+    </costList>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>PassThroughOnly</passability>
+    <pathCost>70</pathCost>
+    <fillPercent>0.5</fillPercent>
+    <canOverlapZones>false</canOverlapZones>
+    <statBases>
+      <MaxHitPoints>180</MaxHitPoints>
+      <WorkToBuild>8000</WorkToBuild>
+      <Flammability>1.0</Flammability>
+      <Beauty>5</Beauty>
+      <Mass>20</Mass>
+    </statBases>
+    <comps>
+      <li Class="RimMind.Storyteller.Comps.CompProperties_StorytellerAltar"/>
+    </comps>
+    <researchPrerequisites>
+      <li>Machining</li>
+    </researchPrerequisites>
+    <designationCategory>Misc</designationCategory>
+  </ThingDef>
+</Defs>

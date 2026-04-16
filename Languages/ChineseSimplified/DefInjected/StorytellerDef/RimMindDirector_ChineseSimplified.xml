@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <RimMindDirector.label>RimMind 叙事者</RimMindDirector.label>
+  <RimMindDirector.description>一个基于 AI 的叙事者，根据殖民地历史和当前情况创造连贯的叙事。它使用 AI 选择最具戏剧性的合适事件，当 AI 不可用时回退到经典叙事者行为。</RimMindDirector.description>
+</LanguageData>

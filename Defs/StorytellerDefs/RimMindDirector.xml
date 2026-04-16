@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <StorytellerDef ParentName="BaseStoryteller">
+    <defName>RimMindDirector</defName>
+    <label>RimMind Director</label>
+    <description>An AI-powered storyteller that creates coherent narratives based on colony history and current situation. It selects the most dramatically appropriate event using AI, with a fallback to classic storyteller behavior when AI is unavailable.</description>
+    <portraitLarge>Storyteller/RimMindDirector</portraitLarge>
+    <portraitTiny>Storyteller/RimMindDirector_Tiny</portraitTiny>
+    <listOrder>50</listOrder>
+    <comps>
+      <!-- AI 事件选择器（主要逻辑） -->
+      <li Class="RimMind.Storyteller.StorytellerCompProperties_RimMindDirector" />
+      <!-- Fallback：AI 不可用时接管 -->
+      <li Class="RimMind.Storyteller.StorytellerCompProperties_RimMindFallback" />
+      <!-- 疾病 -->
+      <li Class="StorytellerCompProperties_Disease">
+        <category>DiseaseHuman</category>
+        <minDaysPassed>9</minDaysPassed>
+      </li>
+      <li Class="StorytellerCompProperties_Disease">
+        <category>DiseaseAnimal</category>
+        <minDaysPassed>9</minDaysPassed>
+      </li>
+      <!-- 小事件 -->
+      <li Class="StorytellerCompProperties_CategoryMTB">
+        <category>Misc</category>
+        <allowedTargetTags><li>Map_PlayerHome</li></allowedTargetTags>
+        <minDaysPassed>5</minDaysPassed>
+        <mtbDays>6</mtbDays>
+      </li>
+      <!-- 初始加入者 -->
+      <li Class="StorytellerCompProperties_Triggered">
+        <incident>StrangerInBlackJoin</incident>
+        <delayTicks>180</delayTicks>
+      </li>
+    </comps>
+  </StorytellerDef>
+
+</Defs>
