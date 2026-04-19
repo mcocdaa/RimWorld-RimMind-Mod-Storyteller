@@ -2,6 +2,8 @@
 <LanguageData>
     <!-- RimMindStorytellerMod.cs -->
     <RimMind.Storyteller.UI.TabLabel>叙事者</RimMind.Storyteller.UI.TabLabel>
+    <RimMind.Storyteller.Prompt.StorytellerStateHeader>[RimMind 叙事者]</RimMind.Storyteller.Prompt.StorytellerStateHeader>
+    <RimMind.Storyteller.Dialogue.StorytellerDialogueHeader>[RimMind 叙事者对话]</RimMind.Storyteller.Dialogue.StorytellerDialogueHeader>
 
     <!-- StorytellerSettingsTab.cs -->
     <RimMind.Storyteller.UI.TriggerSources>触发来源</RimMind.Storyteller.UI.TriggerSources>
@@ -156,13 +158,13 @@
     <RimMind.Storyteller.Prompt.ChainHint>  AI提示：{0}</RimMind.Storyteller.Prompt.ChainHint>
 
     <!-- StorytellerComp_RimMindDirector.cs - Event Notification -->
-    <RimMind.Storyteller.Notification.DeclareTitle>叙事者宣告：{0}</RimMind.Storyteller.Notification.DeclareTitle>
-    <RimMind.Storyteller.Notification.WhisperTitle>叙事者低语：{0}</RimMind.Storyteller.Notification.WhisperTitle>
-    <RimMind.Storyteller.Notification.DefaultDesc>叙事者决定让 {0} 降临此地。</RimMind.Storyteller.Notification.DefaultDesc>
-    <RimMind.Storyteller.Notification.Shock>不是吧！</RimMind.Storyteller.Notification.Shock>
-    <RimMind.Storyteller.Notification.Excited>来的好！</RimMind.Storyteller.Notification.Excited>
-    <RimMind.Storyteller.Notification.Accept>了解</RimMind.Storyteller.Notification.Accept>
-    <RimMind.Storyteller.Notification.NoInterfere>你无权干涉叙事者的行动</RimMind.Storyteller.Notification.NoInterfere>
+    <RimMind.Storyteller.UI.DeclareTitle>叙事者宣告：{0}</RimMind.Storyteller.UI.DeclareTitle>
+    <RimMind.Storyteller.UI.WhisperTitle>叙事者低语：{0}</RimMind.Storyteller.UI.WhisperTitle>
+    <RimMind.Storyteller.UI.DefaultDesc>叙事者决定让 {0} 降临此地。</RimMind.Storyteller.UI.DefaultDesc>
+    <RimMind.Storyteller.UI.Shock>不是吧！</RimMind.Storyteller.UI.Shock>
+    <RimMind.Storyteller.UI.Excited>来的好！</RimMind.Storyteller.UI.Excited>
+    <RimMind.Storyteller.UI.Accept>了解</RimMind.Storyteller.UI.Accept>
+    <RimMind.Storyteller.UI.NoInterfere>你无权干涉叙事者的行动</RimMind.Storyteller.UI.NoInterfere>
 
     <!-- StorytellerPromptBuilder.cs - Player Reactions -->
     <RimMind.Storyteller.Prompt.PlayerReactions>[玩家情感反应]</RimMind.Storyteller.Prompt.PlayerReactions>

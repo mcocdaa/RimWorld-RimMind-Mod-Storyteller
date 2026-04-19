@@ -34,7 +34,7 @@ namespace RimMind.Storyteller
                 var mem = StorytellerMemory.Instance;
                 if (mem == null) return null;
 
-                var sb = new StringBuilder("[RimMind Storyteller]");
+                var sb = new StringBuilder("RimMind.Storyteller.Prompt.StorytellerStateHeader".Translate());
                 sb.AppendLine($" Tension: {mem.TensionLevel:F2}");
                 string summary = mem.GetRecentSummary(5);
                 if (!string.IsNullOrEmpty(summary))
@@ -50,7 +50,7 @@ namespace RimMind.Storyteller
                 var mem = StorytellerMemory.Instance;
                 if (mem == null) return (string?)null;
                 string dialogue = mem.GetRecentDialogueSummary(5);
-                return string.IsNullOrEmpty(dialogue) ? null : $"[RimMind Storyteller Dialogue]\n{dialogue}";
+                return string.IsNullOrEmpty(dialogue) ? null : $"{"RimMind.Storyteller.Dialogue.StorytellerDialogueHeader".Translate()}\n{dialogue}";
             }, PromptSection.PriorityAuxiliary, ModId);
         }
 

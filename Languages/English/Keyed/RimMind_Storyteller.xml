@@ -2,6 +2,8 @@
 <LanguageData>
     <!-- RimMindStorytellerMod.cs -->
     <RimMind.Storyteller.UI.TabLabel>Storyteller</RimMind.Storyteller.UI.TabLabel>
+    <RimMind.Storyteller.Prompt.StorytellerStateHeader>[RimMind Storyteller]</RimMind.Storyteller.Prompt.StorytellerStateHeader>
+    <RimMind.Storyteller.Dialogue.StorytellerDialogueHeader>[RimMind Storyteller Dialogue]</RimMind.Storyteller.Dialogue.StorytellerDialogueHeader>
 
     <!-- StorytellerSettingsTab.cs -->
     <RimMind.Storyteller.UI.TriggerSources>Trigger Sources</RimMind.Storyteller.UI.TriggerSources>
@@ -156,13 +158,13 @@
     <RimMind.Storyteller.Prompt.ChainHint>  AI hint: {0}</RimMind.Storyteller.Prompt.ChainHint>
 
     <!-- StorytellerComp_RimMindDirector.cs - Event Notification -->
-    <RimMind.Storyteller.Notification.DeclareTitle>Storyteller Declares: {0}</RimMind.Storyteller.Notification.DeclareTitle>
-    <RimMind.Storyteller.Notification.WhisperTitle>Storyteller Whispers: {0}</RimMind.Storyteller.Notification.WhisperTitle>
-    <RimMind.Storyteller.Notification.DefaultDesc>The storyteller has decided that {0} shall befall this place.</RimMind.Storyteller.Notification.DefaultDesc>
-    <RimMind.Storyteller.Notification.Shock>Oh no!</RimMind.Storyteller.Notification.Shock>
-    <RimMind.Storyteller.Notification.Excited>Bring it on!</RimMind.Storyteller.Notification.Excited>
-    <RimMind.Storyteller.Notification.Accept>Understood</RimMind.Storyteller.Notification.Accept>
-    <RimMind.Storyteller.Notification.NoInterfere>You have no authority to interfere with the storyteller's actions</RimMind.Storyteller.Notification.NoInterfere>
+    <RimMind.Storyteller.UI.DeclareTitle>Storyteller Declares: {0}</RimMind.Storyteller.UI.DeclareTitle>
+    <RimMind.Storyteller.UI.WhisperTitle>Storyteller Whispers: {0}</RimMind.Storyteller.UI.WhisperTitle>
+    <RimMind.Storyteller.UI.DefaultDesc>The storyteller has decided that {0} shall befall this place.</RimMind.Storyteller.UI.DefaultDesc>
+    <RimMind.Storyteller.UI.Shock>Oh no!</RimMind.Storyteller.UI.Shock>
+    <RimMind.Storyteller.UI.Excited>Bring it on!</RimMind.Storyteller.UI.Excited>
+    <RimMind.Storyteller.UI.Accept>Understood</RimMind.Storyteller.UI.Accept>
+    <RimMind.Storyteller.UI.NoInterfere>You have no authority to interfere with the storyteller's actions</RimMind.Storyteller.UI.NoInterfere>
 
     <!-- StorytellerPromptBuilder.cs - Player Reactions -->
     <RimMind.Storyteller.Prompt.PlayerReactions>[Player Emotional Reactions]</RimMind.Storyteller.Prompt.PlayerReactions>

@@ -77,10 +77,12 @@ namespace RimMind.Storyteller
             _hasPendingRequest = true;
             _cachedTarget = target;
 
+            int maxCandidates = RimMindStorytellerMod.Settings?.maxCandidates ?? Props.maxCandidates;
+
             var request = new AIRequest
             {
                 SystemPrompt = RimMindIncidentSelector.BuildSystemPrompt(_memory),
-                UserPrompt = RimMindIncidentSelector.BuildUserPrompt(map, _memory, Props.maxCandidates),
+                UserPrompt = RimMindIncidentSelector.BuildUserPrompt(map, _memory, maxCandidates),
                 MaxTokens = 200,
                 Temperature = 0.8f,
                 RequestId = "Storyteller_Director",
@@ -168,10 +170,12 @@ namespace RimMind.Storyteller
 
             Core.Internal.AIRequestQueue.Instance?.ClearCooldown("Storyteller");
 
+            int maxCandidates = RimMindStorytellerMod.Settings?.maxCandidates ?? Props.maxCandidates;
+
             var request = new AIRequest
             {
                 SystemPrompt = RimMindIncidentSelector.BuildSystemPrompt(_memory),
-                UserPrompt = RimMindIncidentSelector.BuildUserPrompt(map, _memory, Props.maxCandidates),
+                UserPrompt = RimMindIncidentSelector.BuildUserPrompt(map, _memory, maxCandidates),
                 MaxTokens = 200,
                 Temperature = 0.8f,
                 RequestId = "Storyteller_Director",
@@ -200,8 +204,8 @@ namespace RimMind.Storyteller
             bool isBigThreat = incident.def.category == IncidentCategoryDefOf.ThreatBig;
 
             string titleKey = isBigThreat
-                ? "RimMind.Storyteller.Notification.DeclareTitle"
-                : "RimMind.Storyteller.Notification.WhisperTitle";
+                ? "RimMind.Storyteller.UI.DeclareTitle"
+                : "RimMind.Storyteller.UI.WhisperTitle";
             string title = titleKey.Translate(incident.def.LabelCap);
 
             string description;
@@ -217,14 +221,14 @@ namespace RimMind.Storyteller
             }
             else
             {
-                description = "RimMind.Storyteller.Notification.DefaultDesc".Translate(incident.def.LabelCap);
+                description = "RimMind.Storyteller.UI.DefaultDesc".Translate(incident.def.LabelCap);
             }
 
-            string optShock    = "RimMind.Storyteller.Notification.Shock".Translate();
-            string optExcited  = "RimMind.Storyteller.Notification.Excited".Translate();
-            string optAccept   = "RimMind.Storyteller.Notification.Accept".Translate();
+            string optShock    = "RimMind.Storyteller.UI.Shock".Translate();
+            string optExcited  = "RimMind.Storyteller.UI.Excited".Translate();
+            string optAccept   = "RimMind.Storyteller.UI.Accept".Translate();
 
-            string tooltip = "RimMind.Storyteller.Notification.NoInterfere".Translate();
+            string tooltip = "RimMind.Storyteller.UI.NoInterfere".Translate();
 
             var capturedMemory = _memory;
             var capturedDefName = incident.def.defName;
