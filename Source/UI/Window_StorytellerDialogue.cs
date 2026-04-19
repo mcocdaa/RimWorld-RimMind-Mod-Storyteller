@@ -184,6 +184,7 @@ namespace RimMind.Storyteller.UI
                 ModId = "Storyteller",
                 ExpireAtTicks = Find.TickManager.TicksGame + 6000,
                 UseJsonMode = false,
+                Priority = AIRequestPriority.High,
             };
 
             RimMindAPI.RequestImmediate(request, response =>

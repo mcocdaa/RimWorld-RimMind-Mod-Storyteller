@@ -1,5 +1,8 @@
+using System.Text;
 using HarmonyLib;
 using RimMind.Core;
+using RimMind.Core.Prompt;
+using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
 using UnityEngine;
 using Verse;
@@ -9,6 +12,7 @@ namespace RimMind.Storyteller
     public class RimMindStorytellerMod : Mod
     {
         public static RimMindStorytellerSettings Settings = null!;
+        private const string ModId = "RimMind.Storyteller";
 
         public RimMindStorytellerMod(ModContentPack content) : base(content)
         {
@@ -17,7 +21,37 @@ namespace RimMind.Storyteller
 
             RimMindAPI.RegisterSettingsTab("storyteller", () => "RimMind.Storyteller.UI.TabLabel".Translate(), StorytellerSettingsTab.Draw);
             RimMindAPI.RegisterModCooldown("Storyteller", () => (int)(Settings.mtbDays * 60000f));
+
+            RegisterProviders();
+
             Log.Message("[RimMind-Storyteller] Initialized.");
+        }
+
+        private void RegisterProviders()
+        {
+            RimMindAPI.RegisterPawnContextProvider("storyteller_state", pawn =>
+            {
+                var mem = StorytellerMemory.Instance;
+                if (mem == null) return null;
+
+                var sb = new StringBuilder("RimMind.Storyteller.Prompt.StorytellerStateHeader".Translate());
+                sb.AppendLine($" Tension: {mem.TensionLevel:F2}");
+                string summary = mem.GetRecentSummary(5);
+                if (!string.IsNullOrEmpty(summary))
+                    sb.AppendLine(summary);
+                string chains = mem.GetActiveChainsSummary();
+                if (!string.IsNullOrEmpty(chains))
+                    sb.AppendLine(chains);
+                return sb.ToString().TrimEnd();
+            }, PromptSection.PriorityAuxiliary, ModId);
+
+            RimMindAPI.RegisterStaticProvider("storyteller_dialogue", () =>
+            {
+                var mem = StorytellerMemory.Instance;
+                if (mem == null) return (string?)null;
+                string dialogue = mem.GetRecentDialogueSummary(5);
+                return string.IsNullOrEmpty(dialogue) ? null : $"{"RimMind.Storyteller.Dialogue.StorytellerDialogueHeader".Translate()}\n{dialogue}";
+            }, PromptSection.PriorityAuxiliary, ModId);
         }
 
         public override string SettingsCategory() => "RimMind - Storyteller";

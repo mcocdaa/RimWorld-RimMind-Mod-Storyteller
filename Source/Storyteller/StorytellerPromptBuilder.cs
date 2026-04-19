@@ -55,6 +55,7 @@ namespace RimMind.Storyteller
             AddNarrativeMemorySection(sections);
             AddHistorySection(sections, memory);
             AddDialogueMemorySection(sections, memory);
+            AddPlayerReactionsSection(sections, memory);
 
             var budget = new PromptBudget(6000, 800);
             return budget.ComposeToString(sections);
@@ -166,6 +167,15 @@ namespace RimMind.Storyteller
             if (!string.IsNullOrEmpty(dialogueSummary))
                 sections.Add(new PromptSection("dialogue_memory",
                     "RimMind.Storyteller.Prompt.DialogueMemory".Translate() + "\n" + dialogueSummary,
+                    PromptSection.PriorityAuxiliary));
+        }
+
+        private static void AddPlayerReactionsSection(List<PromptSection> sections, StorytellerMemory memory)
+        {
+            string reactionsSummary = memory.GetRecentReactionsSummary(5);
+            if (!string.IsNullOrEmpty(reactionsSummary))
+                sections.Add(new PromptSection("player_reactions",
+                    "RimMind.Storyteller.Prompt.PlayerReactions".Translate() + "\n" + reactionsSummary,
                     PromptSection.PriorityAuxiliary));
         }
 

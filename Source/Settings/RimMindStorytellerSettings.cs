@@ -20,6 +20,7 @@ namespace RimMind.Storyteller.Settings
         public int requestExpireTicks = 30000;
         public int maxEventRecords = 50;
         public int maxDialogueRecords = 30;
+        public bool enableEventNotification = true;
 
         public override void ExposeData()
         {
@@ -32,6 +33,7 @@ namespace RimMind.Storyteller.Settings
             Scribe_Values.Look(ref requestExpireTicks, "requestExpireTicks", 30000);
             Scribe_Values.Look(ref maxEventRecords, "maxEventRecords", 50);
             Scribe_Values.Look(ref maxDialogueRecords, "maxDialogueRecords", 30);
+            Scribe_Values.Look(ref enableEventNotification, "enableEventNotification", true);
         }
     }
 }

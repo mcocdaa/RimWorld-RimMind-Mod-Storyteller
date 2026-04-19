@@ -29,13 +29,10 @@ namespace RimMind.Storyteller.Settings
             var settings = RimMindStorytellerMod.Settings;
 
             SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.TriggerSources".Translate());
-            listing.CheckboxLabeled("RimMind.Storyteller.UI.EnableIntervalTrigger".Translate(), ref settings.enableIntervalTrigger);
-            if (settings.enableIntervalTrigger)
-            {
-                GUI.color = Color.gray;
-                listing.Label("  " + "RimMind.Storyteller.UI.IntervalTriggerDesc".Translate());
-                GUI.color = Color.white;
-            }
+            listing.CheckboxLabeled("RimMind.Storyteller.UI.EnableIntervalTrigger".Translate(), ref settings.enableIntervalTrigger,
+                "RimMind.Storyteller.UI.EnableIntervalTrigger.Desc".Translate());
+            listing.CheckboxLabeled("RimMind.Storyteller.UI.EnableEventNotification".Translate(), ref settings.enableEventNotification,
+                "RimMind.Storyteller.UI.EnableEventNotification.Desc".Translate());
 
             listing.Label("RimMind.Storyteller.UI.MaxCandidates".Translate(settings.maxCandidates));
             GUI.color = Color.gray;
@@ -68,6 +65,9 @@ namespace RimMind.Storyteller.Settings
 
             SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Request".Translate());
             listing.Label("RimMind.Storyteller.UI.MTBDays".Translate($"{settings.mtbDays:F1}"));
+            GUI.color = Color.gray;
+            listing.Label("  " + "RimMind.Storyteller.UI.MTBDays.Desc".Translate());
+            GUI.color = Color.white;
             settings.mtbDays = listing.Slider(settings.mtbDays, 0.5f, 10f);
             settings.mtbDays = (float)System.Math.Round(settings.mtbDays, 1);
 
@@ -102,7 +102,7 @@ namespace RimMind.Storyteller.Settings
             }
             else
             {
-                listing.Label("RimMind.Storyteller.UI.MemoryRecordCount".Translate(memory.Records.Count));
+                listing.Label("RimMind.Storyteller.UI.MemoryRecordCount".Translate(memory.Records.Count, settings.maxEventRecords));
                 listing.Label("RimMind.Storyteller.UI.DialogueRecordCount".Translate(memory.DialogueRecords.Count));
                 int now = Find.TickManager.TicksGame;
                 for (int i = memory.Records.Count - 1; i >= 0 && i >= memory.Records.Count - 10; i--)
@@ -131,6 +131,7 @@ namespace RimMind.Storyteller.Settings
                 settings.requestExpireTicks = 30000;
                 settings.maxEventRecords = 50;
                 settings.maxDialogueRecords = 30;
+                settings.enableEventNotification = true;
                 _promptText = string.Empty;
                 SavePrompt();
             });
