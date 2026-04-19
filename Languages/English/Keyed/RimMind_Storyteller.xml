@@ -5,21 +5,24 @@
 
     <!-- StorytellerSettingsTab.cs -->
     <RimMind.Storyteller.UI.TriggerSources>Trigger Sources</RimMind.Storyteller.UI.TriggerSources>
-    <RimMind.Storyteller.UI.EnableIntervalTrigger>Interval Trigger (request AI to select events at fixed intervals)</RimMind.Storyteller.UI.EnableIntervalTrigger>
-    <RimMind.Storyteller.UI.IntervalTriggerDesc>When disabled, the storyteller won't auto-trigger AI requests, but manual trigger still works</RimMind.Storyteller.UI.IntervalTriggerDesc>
+    <RimMind.Storyteller.UI.EnableIntervalTrigger>Interval Trigger</RimMind.Storyteller.UI.EnableIntervalTrigger>
+    <RimMind.Storyteller.UI.EnableIntervalTrigger.Desc>Request AI to select events at random intervals based on MTB (Mean Time Between). When disabled, the storyteller won't auto-trigger AI requests, but manual trigger still works.</RimMind.Storyteller.UI.EnableIntervalTrigger.Desc>
+    <RimMind.Storyteller.UI.EnableEventNotification>Event Notification</RimMind.Storyteller.UI.EnableEventNotification>
+    <RimMind.Storyteller.UI.EnableEventNotification.Desc>When the storyteller selects a threat event, send a notification to the request overlay. Players can choose an emotional reaction, which affects narrative tension and future event selection.</RimMind.Storyteller.UI.EnableEventNotification.Desc>
     <RimMind.Storyteller.UI.StylePromptLabel>Storyteller Style Prompt (appended to system prompt, leave empty to skip):</RimMind.Storyteller.UI.StylePromptLabel>
     <RimMind.Storyteller.UI.ResetDefault>Reset to Default</RimMind.Storyteller.UI.ResetDefault>
     <RimMind.Storyteller.UI.FallbackModeLabel>Fallback Mode (behavior when AI unavailable): {0}</RimMind.Storyteller.UI.FallbackModeLabel>
-    <RimMind.Storyteller.UI.FallbackModeDesc>When AI request is cooling down or fails, use vanilla storyteller logic to select events</RimMind.Storyteller.UI.FallbackModeDesc>
+    <RimMind.Storyteller.UI.FallbackModeDesc>When AI request is cooling down, fails, or the Director is unhealthy (no recent success or recent failure), use vanilla storyteller logic to select events</RimMind.Storyteller.UI.FallbackModeDesc>
     <RimMind.Storyteller.UI.SwitchFallback>Switch Fallback Mode</RimMind.Storyteller.UI.SwitchFallback>
-    <RimMind.Storyteller.UI.MTBDays>Average event interval: {0} game days (MTB random trigger, similar to vanilla storytellers)</RimMind.Storyteller.UI.MTBDays>
+    <RimMind.Storyteller.UI.MTBDays>Average event interval: {0} game days</RimMind.Storyteller.UI.MTBDays>
+    <RimMind.Storyteller.UI.MTBDays.Desc>Average interval in game days for the AI storyteller to trigger events, using MTB random trigger mechanism similar to vanilla storytellers. Lower values mean more frequent events.</RimMind.Storyteller.UI.MTBDays.Desc>
     <RimMind.Storyteller.UI.MaxCandidates>Max Candidates: {0}</RimMind.Storyteller.UI.MaxCandidates>
     <RimMind.Storyteller.UI.MaxCandidatesDesc>Maximum number of candidate events selected from available incidents per AI request. More candidates = wider AI selection range but more tokens consumed.</RimMind.Storyteller.UI.MaxCandidatesDesc>
     <RimMind.Storyteller.UI.DebugLogging>Verbose Logging</RimMind.Storyteller.UI.DebugLogging>
     <RimMind.Storyteller.UI.DebugLogging.Desc>Output detailed AI request and response info to Player.log for troubleshooting.</RimMind.Storyteller.UI.DebugLogging.Desc>
     <RimMind.Storyteller.UI.MemoryTitle>Storyteller Memory (read-only):</RimMind.Storyteller.UI.MemoryTitle>
     <RimMind.Storyteller.UI.MemoryNeedLoad>  Load a game to view</RimMind.Storyteller.UI.MemoryNeedLoad>
-    <RimMind.Storyteller.UI.MemoryRecordCount>  Records: {0}/50</RimMind.Storyteller.UI.MemoryRecordCount>
+    <RimMind.Storyteller.UI.MemoryRecordCount>  Records: {0}/{1}</RimMind.Storyteller.UI.MemoryRecordCount>
     <RimMind.Storyteller.UI.MemoryDayEntry>  Day {0}: {1} ({2})</RimMind.Storyteller.UI.MemoryDayEntry>
     <RimMind.Storyteller.UI.ClearMemory>Clear Memory</RimMind.Storyteller.UI.ClearMemory>
     <RimMind.Storyteller.UI.Section.Fallback>Fallback Mode</RimMind.Storyteller.UI.Section.Fallback>
@@ -41,7 +44,7 @@
     <!-- RimMindIncidentSelector.cs - Prompt -->
     <RimMind.Storyteller.Prompt.System>You are the narrator of the RimWorld game, responsible for creating interesting stories for the player.\nBased on the current game state, select the event from the candidate list that best advances the story.</RimMind.Storyteller.Prompt.System>
     <RimMind.Storyteller.Prompt.SystemRequirements>Requirements: Consider narrative coherence, balance of challenge and reward, and the dramatic potential of the current situation.</RimMind.Storyteller.Prompt.SystemRequirements>
-    <RimMind.Storyteller.Prompt.SystemJsonFormat>Return only the following JSON format, no other output:\n{{"defName":"IncidentDef defName from the candidate list","reason":"Brief reason for selecting this event","params":{{"points_multiplier":0.6,"faction_hint":"Pirate","raid_strategy_hint":"ImmediateAttack"}},"chain":{{"chain_id":"pirate_threat_1","chain_step":1,"chain_total":3,"next_hint":"If the raid is repelled, pirates may send negotiators or retaliate"}}}}\nparams and chain are optional fields.</RimMind.Storyteller.Prompt.SystemJsonFormat>
+    <RimMind.Storyteller.Prompt.SystemJsonFormat>Return only the following JSON format, no other output:\n{{"defName":"IncidentDef defName from the candidate list","reason":"Brief reason for selecting this event","announce":"Announcement to the player (max 20 chars, narrator voice describing what's about to happen)","params":{{"points_multiplier":0.6,"faction_hint":"Pirate","raid_strategy_hint":"ImmediateAttack"}},"chain":{{"chain_id":"pirate_threat_1","chain_step":1,"chain_total":3,"next_hint":"If the raid is repelled, pirates may send negotiators or retaliate"}}}}\nannounce, params and chain are optional fields.</RimMind.Storyteller.Prompt.SystemJsonFormat>
     <RimMind.Storyteller.Prompt.CustomStyleHeader>[Player Custom Style]</RimMind.Storyteller.Prompt.CustomStyleHeader>
     <RimMind.Storyteller.Prompt.CurrentSituation>[Current Situation]</RimMind.Storyteller.Prompt.CurrentSituation>
     <RimMind.Storyteller.Prompt.NarrativeMemory>[Narrative Memory]</RimMind.Storyteller.Prompt.NarrativeMemory>
@@ -119,8 +122,8 @@
     <RimMind.Storyteller.Prompt.System.Goal>[Goal] Based on the current game state and candidate event list, select the event that best advances the story.</RimMind.Storyteller.Prompt.System.Goal>
     <RimMind.Storyteller.Prompt.System.Process>[Process]\n1. Evaluate current narrative tension — prefer calming events when tension is high, challenging events when tension is low\n2. Check for active event chains — advance them unless the situation demands interruption\n3. Adjust event intensity based on difficulty settings\n4. Select the most appropriate event from the candidate list</RimMind.Storyteller.Prompt.System.Process>
     <RimMind.Storyteller.Prompt.System.Constraint>[Constraint]\n- Do not select events on cooldown\n- Do not select events that don't match current difficulty\n- Do not reveal confidential information to the player\n- If the player requested a specific event via dialogue, consider it but don't blindly follow\n- You can fine-tune event parameters via the params field</RimMind.Storyteller.Prompt.System.Constraint>
-    <RimMind.Storyteller.Prompt.System.Example>[Example]\nInput: tension=0.2, candidates=[RaidEnemy(ThreatBig), TraderCaravan(Misc)]\nOutput: {"defName":"RaidEnemy","reason":"Tension very low, colony needs a small raid to create tension","params":{"points_multiplier":0.6}}</RimMind.Storyteller.Prompt.System.Example>
-    <RimMind.Storyteller.Prompt.System.Output>[Output] Only return the following JSON format, nothing else:\n{"defName":"...","reason":"...","params":{...},"chain":{...}}\nparams and chain are optional fields.</RimMind.Storyteller.Prompt.System.Output>
+    <RimMind.Storyteller.Prompt.System.Example>[Example]\nInput: tension=0.2, candidates=[RaidEnemy(ThreatBig), TraderCaravan(Misc)]\nOutput: {{"defName":"RaidEnemy","reason":"Tension very low, colony needs a small raid to create tension","announce":"Steel approaches on the horizon","params":{{"points_multiplier":0.6}}}}</RimMind.Storyteller.Prompt.System.Example>
+    <RimMind.Storyteller.Prompt.System.Output>[Output] Only return the following JSON format, nothing else:\n{{"defName":"...","reason":"...","announce":"...","params":{{...}},"chain":{{...}}}}\nannounce (max 20 chars narrator announcement), params and chain are optional fields.</RimMind.Storyteller.Prompt.System.Output>
     <RimMind.Storyteller.Prompt.System.Fallback>[Fallback] If unable to select, return the first candidate event with reason "random selection".</RimMind.Storyteller.Prompt.System.Fallback>
 
     <!-- Five-section System Prompt - Dialogue -->
@@ -151,4 +154,17 @@
     <RimMind.Storyteller.Prompt.DialogueRecordLine>Day {0} {1}: {2}</RimMind.Storyteller.Prompt.DialogueRecordLine>
     <RimMind.Storyteller.Prompt.ChainProgress>{0} (step {1}/{2}, triggered: {3})</RimMind.Storyteller.Prompt.ChainProgress>
     <RimMind.Storyteller.Prompt.ChainHint>  AI hint: {0}</RimMind.Storyteller.Prompt.ChainHint>
+
+    <!-- StorytellerComp_RimMindDirector.cs - Event Notification -->
+    <RimMind.Storyteller.Notification.DeclareTitle>Storyteller Declares: {0}</RimMind.Storyteller.Notification.DeclareTitle>
+    <RimMind.Storyteller.Notification.WhisperTitle>Storyteller Whispers: {0}</RimMind.Storyteller.Notification.WhisperTitle>
+    <RimMind.Storyteller.Notification.DefaultDesc>The storyteller has decided that {0} shall befall this place.</RimMind.Storyteller.Notification.DefaultDesc>
+    <RimMind.Storyteller.Notification.Shock>Oh no!</RimMind.Storyteller.Notification.Shock>
+    <RimMind.Storyteller.Notification.Excited>Bring it on!</RimMind.Storyteller.Notification.Excited>
+    <RimMind.Storyteller.Notification.Accept>Understood</RimMind.Storyteller.Notification.Accept>
+    <RimMind.Storyteller.Notification.NoInterfere>You have no authority to interfere with the storyteller's actions</RimMind.Storyteller.Notification.NoInterfere>
+
+    <!-- StorytellerPromptBuilder.cs - Player Reactions -->
+    <RimMind.Storyteller.Prompt.PlayerReactions>[Player Emotional Reactions]</RimMind.Storyteller.Prompt.PlayerReactions>
+    <RimMind.Storyteller.Prompt.ReactionRecordLine>Day {0} {1} → Player: {2}</RimMind.Storyteller.Prompt.ReactionRecordLine>
 </LanguageData>

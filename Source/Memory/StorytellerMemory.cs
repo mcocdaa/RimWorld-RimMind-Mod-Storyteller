@@ -66,6 +66,24 @@ namespace RimMind.Storyteller.Memory
         }
     }
 
+    public class PlayerReactionRecord : IExposable
+    {
+        public string incidentDefName = string.Empty;
+        public string incidentLabel = string.Empty;
+        public string reaction = string.Empty;
+        public string reactionLabel = string.Empty;
+        public int tick;
+
+        public void ExposeData()
+        {
+            Scribe_Values.Look(ref incidentDefName, "incidentDefName", string.Empty);
+            Scribe_Values.Look(ref incidentLabel, "incidentLabel", string.Empty);
+            Scribe_Values.Look(ref reaction, "reaction", string.Empty);
+            Scribe_Values.Look(ref reactionLabel, "reactionLabel", string.Empty);
+            Scribe_Values.Look(ref tick, "tick");
+        }
+    }
+
     public class StorytellerMemory : WorldComponent
     {
         private List<IncidentHistoryRecord> _records = new List<IncidentHistoryRecord>();
@@ -73,6 +91,9 @@ namespace RimMind.Storyteller.Memory
 
         private List<DialogueRecord> _dialogueRecords = new List<DialogueRecord>();
         private int _maxDialogueRecords = 30;
+
+        private List<PlayerReactionRecord> _playerReactions = new List<PlayerReactionRecord>();
+        private int _maxPlayerReactions = 20;
 
         public string CustomSystemPrompt = string.Empty;
 
@@ -97,6 +118,7 @@ namespace RimMind.Storyteller.Memory
 
         public IReadOnlyList<IncidentHistoryRecord> Records => _records;
         public IReadOnlyList<DialogueRecord> DialogueRecords => _dialogueRecords;
+        public IReadOnlyList<PlayerReactionRecord> PlayerReactions => _playerReactions;
         public int ActiveChainsCount => _activeChains.Count;
 
         public int MaxRecords
@@ -181,6 +203,36 @@ namespace RimMind.Storyteller.Memory
 
         public void ClearDialogueRecords() => _dialogueRecords.Clear();
 
+        public void RecordPlayerReaction(string incidentDefName, string incidentLabel, string reaction, string reactionLabel, int tick)
+        {
+            _playerReactions.Add(new PlayerReactionRecord
+            {
+                incidentDefName = incidentDefName,
+                incidentLabel = incidentLabel,
+                reaction = reaction,
+                reactionLabel = reactionLabel,
+                tick = tick,
+            });
+            while (_playerReactions.Count > _maxPlayerReactions)
+                _playerReactions.RemoveAt(0);
+        }
+
+        public string GetRecentReactionsSummary(int count)
+        {
+            if (_playerReactions.Count == 0) return string.Empty;
+
+            var sb = new StringBuilder();
+            var recent = _playerReactions.Skip(System.Math.Max(0, _playerReactions.Count - count)).ToList();
+            foreach (var r in recent)
+            {
+                int day = r.tick / 60000 + 1;
+                sb.AppendLine("RimMind.Storyteller.Prompt.ReactionRecordLine".Translate($"{day}", r.incidentLabel, r.reactionLabel));
+            }
+            return sb.ToString().TrimEnd();
+        }
+
+        public void ClearPlayerReactions() => _playerReactions.Clear();
+
         public void UpdateTension(IncidentCategoryDef category)
         {
             float delta = category switch
@@ -208,6 +260,11 @@ namespace RimMind.Storyteller.Memory
             float decayPerDay = 0.03f;
             float daysElapsed = ticksElapsed / 60000f;
             _tensionLevel = Mathf.Clamp01(_tensionLevel - decayPerDay * daysElapsed);
+        }
+
+        public void ApplyTensionDelta(float delta)
+        {
+            _tensionLevel = Mathf.Clamp01(_tensionLevel + delta);
         }
 
         public void RecordChainStep(string chainId, int chainStep, int chainTotal, string nextHint, string incidentDefName, int tick, float points, string factionDefName)
@@ -297,6 +354,8 @@ namespace RimMind.Storyteller.Memory
             _records ??= new List<IncidentHistoryRecord>();
             Scribe_Collections.Look(ref _dialogueRecords, "dialogueRecords", LookMode.Deep);
             _dialogueRecords ??= new List<DialogueRecord>();
+            Scribe_Collections.Look(ref _playerReactions, "playerReactions", LookMode.Deep);
+            _playerReactions ??= new List<PlayerReactionRecord>();
 #pragma warning disable CS8601
             Scribe_Values.Look(ref CustomSystemPrompt, "customSystemPrompt", string.Empty);
 #pragma warning restore CS8601

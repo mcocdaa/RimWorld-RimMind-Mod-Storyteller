@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RimMind.Core;
 using RimMind.Core.Client;
+using RimMind.Core.UI;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
 using RimWorld;
@@ -66,6 +67,9 @@ namespace RimMind.Storyteller
             if (!(RimMindStorytellerMod.Settings?.enableIntervalTrigger ?? false))
                 yield break;
 
+            if (RimMindAPI.ShouldSkipStorytellerIncident())
+                yield break;
+
             float mtb = RimMindStorytellerMod.Settings?.mtbDays ?? Props.mtbDays;
             if (!Rand.MTBEventOccurs(mtb, 60000f, 1000f))
                 yield break;
@@ -83,6 +87,7 @@ namespace RimMind.Storyteller
                 ModId = "Storyteller",
                 ExpireAtTicks = Find.TickManager.TicksGame + (RimMindStorytellerMod.Settings?.requestExpireTicks ?? 30000),
                 UseJsonMode = true,
+                Priority = AIRequestPriority.Normal,
             };
 
             RimMindAPI.RequestAsync(request, response => OnAIResponseReceived(response, target));
@@ -131,6 +136,9 @@ namespace RimMind.Storyteller
                         incident.parms.faction?.def?.defName ?? string.Empty);
                 }
                 _memory.UpdateTension(incident.def.category);
+
+                if (ShouldNotifyPlayer(incident.def))
+                    RegisterEventNotification(incident, incidentResponse);
             }
 
             Log.Message($"[RimMind-Storyteller] AI selected event: {incident.def.defName}, pending fire on next interval");
@@ -170,11 +178,104 @@ namespace RimMind.Storyteller
                 ModId = "Storyteller",
                 ExpireAtTicks = Find.TickManager.TicksGame + RimMindStorytellerMod.Settings.requestExpireTicks,
                 UseJsonMode = true,
+                Priority = AIRequestPriority.Normal,
             };
 
             Log.Message("[RimMind-Storyteller] ForceRequest: sending immediate AI request");
             RimMindAPI.RequestImmediate(request, response => OnAIResponseReceived(response, target));
             return true;
+        }
+
+        private bool ShouldNotifyPlayer(IncidentDef incidentDef)
+        {
+            if (!(RimMindStorytellerMod.Settings?.enableEventNotification ?? true))
+                return false;
+
+            return incidentDef.category == IncidentCategoryDefOf.ThreatBig
+                || incidentDef.category == IncidentCategoryDefOf.ThreatSmall;
+        }
+
+        private void RegisterEventNotification(FiringIncident incident, IncidentResponse incidentResponse)
+        {
+            bool isBigThreat = incident.def.category == IncidentCategoryDefOf.ThreatBig;
+
+            string titleKey = isBigThreat
+                ? "RimMind.Storyteller.Notification.DeclareTitle"
+                : "RimMind.Storyteller.Notification.WhisperTitle";
+            string title = titleKey.Translate(incident.def.LabelCap);
+
+            string description;
+            if (!string.IsNullOrEmpty(incidentResponse.announce))
+            {
+                description = incidentResponse.announce!;
+            }
+            else if (!string.IsNullOrEmpty(incidentResponse.reason))
+            {
+                description = incidentResponse.reason.Length > 20
+                    ? incidentResponse.reason.Substring(0, 20) + "..."
+                    : incidentResponse.reason;
+            }
+            else
+            {
+                description = "RimMind.Storyteller.Notification.DefaultDesc".Translate(incident.def.LabelCap);
+            }
+
+            string optShock    = "RimMind.Storyteller.Notification.Shock".Translate();
+            string optExcited  = "RimMind.Storyteller.Notification.Excited".Translate();
+            string optAccept   = "RimMind.Storyteller.Notification.Accept".Translate();
+
+            string tooltip = "RimMind.Storyteller.Notification.NoInterfere".Translate();
+
+            var capturedMemory = _memory;
+            var capturedDefName = incident.def.defName;
+            var capturedLabel = incident.def.LabelCap.ToString();
+
+            var entry = new RequestEntry
+            {
+                source = "storyteller",
+                title = title,
+                description = description,
+                options = new[] { optShock, optExcited, optAccept },
+                optionTooltips = new[] { tooltip, tooltip, tooltip },
+                expireTicks = 60000,
+                callback = choice =>
+                {
+                    string reaction;
+                    string reactionLabel;
+                    float tensionDelta;
+
+                    if (choice == optShock)
+                    {
+                        reaction = "shock";
+                        reactionLabel = optShock;
+                        tensionDelta = 0.05f;
+                    }
+                    else if (choice == optExcited)
+                    {
+                        reaction = "excited";
+                        reactionLabel = optExcited;
+                        tensionDelta = -0.05f;
+                    }
+                    else
+                    {
+                        reaction = "accept";
+                        reactionLabel = optAccept;
+                        tensionDelta = 0f;
+                    }
+
+                    capturedMemory.RecordPlayerReaction(
+                        capturedDefName,
+                        capturedLabel,
+                        reaction,
+                        reactionLabel,
+                        Find.TickManager.TicksGame);
+
+                    if (tensionDelta != 0f)
+                        capturedMemory.ApplyTensionDelta(tensionDelta);
+                }
+            };
+
+            RimMindAPI.RegisterPendingRequest(entry);
         }
 
         private void EnsureMemory()

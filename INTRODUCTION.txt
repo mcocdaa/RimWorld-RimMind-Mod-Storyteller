@@ -1,0 +1,85 @@
+[h1]RimMind - Storyteller[/h1]
+AI 叙事导演，根据殖民地历史编织连贯的故事线。基于殖民地历史和当前局势，通过 LLM 选择最具戏剧性的随机事件，创造连贯的叙事体验。
+
+[h2] RimMind 是什么 [/h2]
+RimMind 是一套 AI 驱动的 RimWorld 模组套件，通过接入大语言模型 (LLM)，让殖民者拥有人格、记忆、对话和自主决策能力。
+
+[h2] 子模组列表与依赖关系 [/h2]
+[table][tr][td][b] 模组 [/b][/td][td][b] 职责 [/b][/td][td][b] 依赖 [/b][/td][td][b] GitHub [/b][/td][/tr][tr][td] RimMind-Core [/td][td] API 客户端、请求调度、上下文打包 [/td][td] Harmony [/td][td][url=https://github.com/mcocdaa/RimWorld-RimMind-Mod-Core] 链接 [/url][/td][/tr][tr][td] RimMind-Actions [/td][td] AI 控制小人的动作执行库 [/td][td] Core [/td][td][url=https://github.com/mcocdaa/RimWorld-RimMind-Mod-Actions] 链接 [/url][/td][/tr][tr][td] RimMind-Advisor [/td][td] AI 扮演小人做出工作决策 [/td][td] Core, Actions [/td][td][url=https://github.com/mcocdaa/RimWorld-RimMind-Mod-Advisor] 链接 [/url][/td][/tr][tr][td] RimMind-Dialogue [/td][td] AI 驱动的对话系统 [/td][td] Core [/td][td][url=https://github.com/mcocdaa/RimWorld-RimMind-Mod-Dialogue] 链接 [/url][/td][/tr][tr][td] RimMind-Memory [/td][td] 记忆采集与上下文注入 [/td][td] Core [/td][td][url=https://github.com/mcocdaa/RimWorld-RimMind-Mod-Memory] 链接 [/url][/td][/tr][tr][td] RimMind-Personality [/td][td] AI 生成人格与想法 [/td][td] Core [/td][td][url=https://github.com/mcocdaa/RimWorld-RimMind-Mod-Personality] 链接 [/url][/td][/tr][tr][td][b] RimMind-Storyteller [/b][/td][td] AI 叙事者，智能选择事件 [/td][td] Core [/td][td][url=https://github.com/mcocdaa/RimWorld-RimMind-Mod-Storyteller] 链接 [/url][/td][/tr][/table]
+[code]Core ── Actions ── Advisor
+  ├── Dialogue
+  ├── Memory
+  ├── Personality
+  └── Storyteller[/code]
+
+[h2] 核心能力 [/h2]
+[b] 历史感知事件选择 [/b] - AI 了解殖民地过去发生了什么，据此选择有叙事连贯性的下一个事件，而非纯随机。
+[b] 事件链系统 [/b] - AI 可以创建多步连锁事件（通过 chain_id / chain_step），编织有起承转合的故事弧线。超过 10 游戏天未推进的链自动过期。
+[b] 张力系统 [/b] - 追踪殖民地紧张程度（0~1，初始 0.5），事件触发时增减（ThreatBig +0.25, ThreatSmall +0.12, Misc -0.05, FactionArrival -0.08），自然衰减 0.03/天，实现张弛有度的叙事节奏。
+[b] 事件记忆系统 [/b] - 记录已发生事件的历史，包括时间、类型、地图，为 AI 决策提供时间线上下文。
+[b] 智能候选生成 [/b] - 向 AI 展示当前可触发事件列表（按 FallbackMode 加权排序），让 AI 从中选择最符合叙事逻辑的一个。
+[b] 难度感知 [/b] - AI 根据游戏难度设置（threatScale、allowBigThreats 等）调整事件选择强度，从和平到极限六档行为指导。
+[b] Fallback 机制 [/b] - AI 不可用或 Director 不健康时自动切换到经典叙事者（Cassandra / Randy / Phoebe / None），游戏不会中断。
+[b] 叙事者对话 [/b] - 通过祭坛建筑与叙事者对话，AI 以神秘睿智的口吻回应，可暗示但不透露即将发生的事件。对话含机密信息段落（下次事件时间、难度参数），AI 严格遵守不泄露约束。
+[b] 殖民地快照 [/b] - 追踪人口和财富变化，事件后果差异注入 Prompt 供 AI 参考。
+[b] 自定义叙事风格 [/b] - 通过 Prompt 自定义 AI 的叙事偏好，从冷酷到温和任你选择。
+
+[h2] 叙事特色 [/h2]
+[list]
+[*] 悲剧之后可能迎来希望
+[*] 长期平静后酝酿风暴
+[*] 根据殖民地特点定制事件（农业殖民地遭遇作物病害）
+[*] 避免重复同类事件造成疲劳
+[*] 连锁事件创造有记忆点的故事线
+[*] 难度自适应：和平模式温和友善，极限模式冷酷无情
+[/list]
+
+[h2] 核心功能 [/h2]
+[b] AI 事件选择 [/b]
+RimMind Director 是一个全新的叙事者，取代传统的 Cassandra/Randy/Phoebe：
+[list]
+[*] [b]MTB 随机触发[/b]：按平均间隔随机向 AI 发送当前局势
+[*] [b]候选事件[/b]：从可触发事件中筛选候选，按 FallbackMode 加权排序
+[*] [b]智能选择[/b]：AI 根据剧情连贯性、挑战平衡、戏剧性选择最佳事件
+[*] [b]历史记忆[/b]：记录已触发事件，避免重复和冷却期冲突
+[*] [b]难度感知[/b]：根据 threatScale、allowBigThreats 等六档难度指导 AI 行为
+[/list]
+
+[b] 事件链系统 [/b]
+AI 可以创建多步连锁事件，通过 chain_id 和 chain_step 控制。例如：先来一波小袭击试探，再来一波大袭击收尾。超过 10 游戏天未推进的链自动过期。
+
+[b] 张力系统 [/b]
+追踪殖民地当前的紧张程度（0~1，初始 0.5），事件触发时增减，自然衰减 0.03/天。AI 根据张力水平调整事件强度，实现张弛有度的叙事节奏。
+[table][tr][td][b] 张力等级 [/b][/td][td][b] 范围 [/b][/td][/tr][tr][td] 极低 [/td][td] < 0.2 [/td][/tr][tr][td] 低 [/td][td] 0.2~0.4 [/td][/tr][tr][td] 中 [/td][td] 0.4~0.6 [/td][/tr][tr][td] 高 [/td][td] 0.6~0.8 [/td][/tr][tr][td] 极高 [/td][td] >= 0.8 [/td][/tr][/table]
+
+[b] Fallback 机制 [/b]
+AI 不可用或 Director 不健康（近期无成功或刚失败）时，自动切换到经典叙事者模式：
+[table][tr][td][b] Fallback 模式 [/b][/td][td][b] MTB 天数 [/b][/td][td][b] 特点 [/b][/td][/tr][tr][td] Cassandra [/td][td] 4.6 [/td][td] 渐进式难度，固定 ThreatBig [/td][/tr][tr][td] Randy [/td][td] 1.35 [/td][td] 完全随机，30% ThreatBig / 30% ThreatSmall / 40% Misc [/td][/tr][tr][td] Phoebe [/td][td] 8.0 [/td][td] 友好型，40% FactionArrival / 60% ThreatSmall [/td][/tr][tr][td] None [/td][td] - [/td][td] 禁用 Fallback，纯 AI 驱动 [/td][/tr][/table]
+
+[b] 叙事者对话 [/b]
+通过祭坛建筑与叙事者对话，AI 以神秘睿智的口吻回应。对话含机密信息段落（下次事件时间、难度参数），AI 严格遵守不泄露约束。对话记录自动推送到 StorytellerMemory 和 RimMind-Memory（如已安装）。
+
+[b] 自定义叙事风格 [/b]
+通过设置页的"叙事者风格 Prompt"自定义 AI 行为，例如"你是一个冷酷的叙事者，喜欢制造极端困境"。
+
+[h2] 设置项 [/h2]
+[table][tr][td][b] 设置 [/b][/td][td][b] 默认值 [/b][/td][td][b] 说明 [/b][/td][/tr][tr][td] 定时触发 [/td][td] 开启 [/td][td] 按 MTB 随机间隔触发 AI 事件选择，关闭后仍可手动触发 [/td][/tr][tr][td] Fallback 模式 [/td][td] Cassandra [/td][td] AI 冷却/失败/Director 不健康时的备用行为 [/td][/tr][tr][td] 事件平均间隔 [/td][td] 1.5 游戏天 [/td][td] AI 评估频率（MTB 随机触发，0.5~10 天可调） [/td][/tr][tr][td] 候选事件数上限 [/td][td] 15 [/td][td] 每次评估的候选事件数量（5~25 可调） [/td][/tr][tr][td] 请求过期 [/td][td] 0.5 游戏天 [/td][td] AI 请求超时自动取消（0.06~2 天可调） [/td][/tr][tr][td] 事件记录上限 [/td][td] 50 [/td][td] 保留的最近事件记录数量（10~100 可调） [/td][/tr][tr][td] 对话记录上限 [/td][td] 30 [/td][td] 保留的最近对话记录数量（5~60 可调） [/td][/tr][tr][td] 叙事者风格 Prompt [/td][td] - [/td][td] 追加到系统 Prompt 的自定义指令 [/td][/tr][tr][td] 详细日志 [/td][td] 关闭 [/td][td] 输出 AI 选择过程到 Player.log [/td][/tr][/table]
+
+[h2] 常见问题 [/h2]
+[b] Q: 必须新建游戏才能用吗？ [/b]
+A: 不需要。载入已有存档后，在叙事者选择界面切换为 RimMind Director 即可。
+
+[b] Q: AI 不可用时会怎样？ [/b]
+A: 自动切换到 Fallback 模式（默认 Cassandra），游戏不会中断。配置好 API 后 AI 自动接管。
+
+[b] Q: AI 会选择过于极端的事件吗？ [/b]
+A: AI 会根据殖民地当前状态和难度设置调整事件强度。张力系统确保不会连续触发灾难性事件。你也可以通过自定义 Prompt 限制 AI 行为。
+
+[b] Q: 可以和原版叙事者共存吗？ [/b]
+A: RimMind Director 是独立的叙事者，选择它后替代原版叙事者。切换回原版叙事者即可恢复。
+
+[b] Q: 配合 Memory 模组效果更好吗？ [/b]
+A: 是的。Memory 提供殖民地历史记忆，Storyteller 参考这些记忆做出更有叙事连贯性的事件选择。对话记录也会自动推送到 Memory 模组。
+
+[b] Q: 触发间隔是固定的吗？ [/b]
+A: 不是。使用 MTB（Mean Time Between）随机触发机制，类似原版叙事者。1.5 天是平均间隔，实际触发时间有随机波动。

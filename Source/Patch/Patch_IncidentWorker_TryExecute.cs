@@ -21,6 +21,8 @@ namespace RimMind.Storyteller.Patch
             memory.RecordIncident(__instance.def, parms.target, Find.TickManager.TicksGame);
             memory.UpdateTension(__instance.def.category);
 
+            RimMindAPI.NotifyIncidentExecuted();
+
             if (RimMindAPI.CanTriggerDialogue)
             {
                 var map = parms.target as Map;

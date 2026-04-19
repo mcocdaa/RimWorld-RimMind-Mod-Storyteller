@@ -172,6 +172,7 @@ namespace RimMind.Storyteller
     {
         public string defName = string.Empty;
         public string reason = string.Empty;
+        public string? announce;
         public IncidentParams? @params;
         public ChainInfo? chain;
     }

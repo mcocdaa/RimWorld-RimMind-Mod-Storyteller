@@ -5,21 +5,24 @@
 
     <!-- StorytellerSettingsTab.cs -->
     <RimMind.Storyteller.UI.TriggerSources>触发来源</RimMind.Storyteller.UI.TriggerSources>
-    <RimMind.Storyteller.UI.EnableIntervalTrigger>定时触发（按固定间隔请求 AI 选择事件）</RimMind.Storyteller.UI.EnableIntervalTrigger>
-    <RimMind.Storyteller.UI.IntervalTriggerDesc>关闭后叙事者不会自动触发 AI 请求，但仍可手动触发</RimMind.Storyteller.UI.IntervalTriggerDesc>
+    <RimMind.Storyteller.UI.EnableIntervalTrigger>定时触发</RimMind.Storyteller.UI.EnableIntervalTrigger>
+    <RimMind.Storyteller.UI.EnableIntervalTrigger.Desc>按 MTB（平均间隔）随机触发请求 AI 选择事件。关闭后叙事者不会自动触发 AI 请求，但仍可手动触发。</RimMind.Storyteller.UI.EnableIntervalTrigger.Desc>
+    <RimMind.Storyteller.UI.EnableEventNotification>事件通知</RimMind.Storyteller.UI.EnableEventNotification>
+    <RimMind.Storyteller.UI.EnableEventNotification.Desc>当叙事者选择了威胁事件时，在审批页面发送通知。玩家可选择情感反应，反应将影响叙事张力和未来事件选择。</RimMind.Storyteller.UI.EnableEventNotification.Desc>
     <RimMind.Storyteller.UI.StylePromptLabel>叙事者风格 Prompt（追加在系统 Prompt 末尾，留空则不追加）：</RimMind.Storyteller.UI.StylePromptLabel>
     <RimMind.Storyteller.UI.ResetDefault>重置为默认</RimMind.Storyteller.UI.ResetDefault>
     <RimMind.Storyteller.UI.FallbackModeLabel>Fallback 模式（AI 不可用时的行为）：{0}</RimMind.Storyteller.UI.FallbackModeLabel>
-    <RimMind.Storyteller.UI.FallbackModeDesc>当 AI 请求冷却中或失败时，使用原版叙事者逻辑选择事件</RimMind.Storyteller.UI.FallbackModeDesc>
+    <RimMind.Storyteller.UI.FallbackModeDesc>当 AI 请求冷却中、失败，或 Director 不健康（近期无成功或刚失败）时，使用原版叙事者逻辑选择事件</RimMind.Storyteller.UI.FallbackModeDesc>
     <RimMind.Storyteller.UI.SwitchFallback>切换 Fallback 模式</RimMind.Storyteller.UI.SwitchFallback>
-    <RimMind.Storyteller.UI.MTBDays>事件平均间隔：{0} 游戏天（MTB 随机触发，类似原版叙事者）</RimMind.Storyteller.UI.MTBDays>
+    <RimMind.Storyteller.UI.MTBDays>事件平均间隔：{0} 游戏天</RimMind.Storyteller.UI.MTBDays>
+    <RimMind.Storyteller.UI.MTBDays.Desc>AI 叙事者触发事件的平均间隔天数，使用 MTB 随机触发机制，类似原版叙事者。减小则事件更频繁。</RimMind.Storyteller.UI.MTBDays.Desc>
     <RimMind.Storyteller.UI.MaxCandidates>候选事件数上限：{0}</RimMind.Storyteller.UI.MaxCandidates>
     <RimMind.Storyteller.UI.MaxCandidatesDesc>每次请求 AI 时，从当前可用事件中选取的最大候选数量。数量越多 AI 选择范围越大，但消耗 Token 越多。</RimMind.Storyteller.UI.MaxCandidatesDesc>
     <RimMind.Storyteller.UI.DebugLogging>详细日志</RimMind.Storyteller.UI.DebugLogging>
     <RimMind.Storyteller.UI.DebugLogging.Desc>在 Player.log 中输出详细的 AI 请求和响应信息，用于排查问题。</RimMind.Storyteller.UI.DebugLogging.Desc>
     <RimMind.Storyteller.UI.MemoryTitle>叙事者历史记忆（只读）：</RimMind.Storyteller.UI.MemoryTitle>
     <RimMind.Storyteller.UI.MemoryNeedLoad>  需要载入游戏后查看</RimMind.Storyteller.UI.MemoryNeedLoad>
-    <RimMind.Storyteller.UI.MemoryRecordCount>  记录数：{0}/50</RimMind.Storyteller.UI.MemoryRecordCount>
+    <RimMind.Storyteller.UI.MemoryRecordCount>  记录数：{0}/{1}</RimMind.Storyteller.UI.MemoryRecordCount>
     <RimMind.Storyteller.UI.MemoryDayEntry>  第{0}天：{1}（{2}）</RimMind.Storyteller.UI.MemoryDayEntry>
     <RimMind.Storyteller.UI.ClearMemory>清空历史记忆</RimMind.Storyteller.UI.ClearMemory>
     <RimMind.Storyteller.UI.Section.Fallback>Fallback 模式</RimMind.Storyteller.UI.Section.Fallback>
@@ -41,7 +44,7 @@
     <!-- RimMindIncidentSelector.cs - Prompt -->
     <RimMind.Storyteller.Prompt.System>你是 RimWorld 游戏的叙事者，负责为玩家创造有趣的故事。\n根据当前游戏状态，从候选事件列表中选择最能推进故事的一个事件。</RimMind.Storyteller.Prompt.System>
     <RimMind.Storyteller.Prompt.SystemRequirements>要求：考虑剧情连贯性、挑战与奖励的平衡、当前局势的戏剧性。</RimMind.Storyteller.Prompt.SystemRequirements>
-    <RimMind.Storyteller.Prompt.SystemJsonFormat>只返回以下 JSON 格式，不要输出其他内容：\n{{"defName":"候选列表中的 IncidentDef defName","reason":"选择该事件的简短理由","params":{{"points_multiplier":0.6,"faction_hint":"Pirate","raid_strategy_hint":"ImmediateAttack"}},"chain":{{"chain_id":"pirate_threat_1","chain_step":1,"chain_total":3,"next_hint":"如果袭击被击退，海盗可能派人来谈判或报复"}}}}\n其中 params 和 chain 为可选字段。</RimMind.Storyteller.Prompt.SystemJsonFormat>
+    <RimMind.Storyteller.Prompt.SystemJsonFormat>只返回以下 JSON 格式，不要输出其他内容：\n{{"defName":"候选列表中的 IncidentDef defName","reason":"选择该事件的简短理由","announce":"对玩家的宣告语（20字以内，以叙事者口吻简述即将发生的事）","params":{{"points_multiplier":0.6,"faction_hint":"Pirate","raid_strategy_hint":"ImmediateAttack"}},"chain":{{"chain_id":"pirate_threat_1","chain_step":1,"chain_total":3,"next_hint":"如果袭击被击退，海盗可能派人来谈判或报复"}}}}\n其中 announce、params 和 chain 为可选字段。</RimMind.Storyteller.Prompt.SystemJsonFormat>
     <RimMind.Storyteller.Prompt.CustomStyleHeader>[玩家自定义风格]</RimMind.Storyteller.Prompt.CustomStyleHeader>
     <RimMind.Storyteller.Prompt.CurrentSituation>[当前局势]</RimMind.Storyteller.Prompt.CurrentSituation>
     <RimMind.Storyteller.Prompt.NarrativeMemory>[叙事记忆]</RimMind.Storyteller.Prompt.NarrativeMemory>
@@ -119,8 +122,8 @@
     <RimMind.Storyteller.Prompt.System.Goal>[目标] 根据当前游戏状态和候选事件列表，选择最能推进故事的一个事件。</RimMind.Storyteller.Prompt.System.Goal>
     <RimMind.Storyteller.Prompt.System.Process>[流程]\n1. 评估当前叙事张力——高张力时优先缓解性事件，低张力时优先挑战性事件\n2. 检查是否有进行中的事件链——有则优先推进，除非局势需要中断\n3. 参考难度设置调整事件强度\n4. 从候选列表中选择最合适的事件</RimMind.Storyteller.Prompt.System.Process>
     <RimMind.Storyteller.Prompt.System.Constraint>[约束]\n- 不得选择冷却中的事件\n- 不得选择与当前难度不匹配的事件\n- 不得泄露机密信息给玩家\n- 如果玩家通过对话请求了特定事件，优先考虑但不必盲从\n- 你可以通过 params 字段微调事件参数</RimMind.Storyteller.Prompt.System.Constraint>
-    <RimMind.Storyteller.Prompt.System.Example>[示例]\n输入：张力=0.2, 候选=[RaidEnemy(ThreatBig), TraderCaravan(Misc)]\n输出：{"defName":"RaidEnemy","reason":"张力极低，殖民地久无威胁，需要一次小规模袭击制造紧张","params":{"points_multiplier":0.6}}</RimMind.Storyteller.Prompt.System.Example>
-    <RimMind.Storyteller.Prompt.System.Output>[输出] 只返回以下 JSON 格式，不要输出其他内容：\n{"defName":"...","reason":"...","params":{...},"chain":{...}}\n其中 params 和 chain 为可选字段。</RimMind.Storyteller.Prompt.System.Output>
+    <RimMind.Storyteller.Prompt.System.Example>[示例]\n输入：张力=0.2, 候选=[RaidEnemy(ThreatBig), TraderCaravan(Misc)]\n输出：{{"defName":"RaidEnemy","reason":"张力极低，殖民地久无威胁，需要一次小规模袭击制造紧张","announce":"风暴将至，刀光已在远方闪烁","params":{{"points_multiplier":0.6}}}}</RimMind.Storyteller.Prompt.System.Example>
+    <RimMind.Storyteller.Prompt.System.Output>[输出] 只返回以下 JSON 格式，不要输出其他内容：\n{{"defName":"...","reason":"...","announce":"...","params":{{...}},"chain":{{...}}}}\n其中 announce（20字以内的叙事者宣告语）、params 和 chain 为可选字段。</RimMind.Storyteller.Prompt.System.Output>
     <RimMind.Storyteller.Prompt.System.Fallback>[兜底] 如果无法选择，返回候选列表第一个事件，reason 填写"随机选择"。</RimMind.Storyteller.Prompt.System.Fallback>
 
     <!-- Five-section System Prompt - Dialogue -->
@@ -151,4 +154,17 @@
     <RimMind.Storyteller.Prompt.DialogueRecordLine>第{0}天 {1}: {2}</RimMind.Storyteller.Prompt.DialogueRecordLine>
     <RimMind.Storyteller.Prompt.ChainProgress>{0}（步骤 {1}/{2}，已触发：{3}）</RimMind.Storyteller.Prompt.ChainProgress>
     <RimMind.Storyteller.Prompt.ChainHint>  AI提示：{0}</RimMind.Storyteller.Prompt.ChainHint>
+
+    <!-- StorytellerComp_RimMindDirector.cs - Event Notification -->
+    <RimMind.Storyteller.Notification.DeclareTitle>叙事者宣告：{0}</RimMind.Storyteller.Notification.DeclareTitle>
+    <RimMind.Storyteller.Notification.WhisperTitle>叙事者低语：{0}</RimMind.Storyteller.Notification.WhisperTitle>
+    <RimMind.Storyteller.Notification.DefaultDesc>叙事者决定让 {0} 降临此地。</RimMind.Storyteller.Notification.DefaultDesc>
+    <RimMind.Storyteller.Notification.Shock>不是吧！</RimMind.Storyteller.Notification.Shock>
+    <RimMind.Storyteller.Notification.Excited>来的好！</RimMind.Storyteller.Notification.Excited>
+    <RimMind.Storyteller.Notification.Accept>了解</RimMind.Storyteller.Notification.Accept>
+    <RimMind.Storyteller.Notification.NoInterfere>你无权干涉叙事者的行动</RimMind.Storyteller.Notification.NoInterfere>
+
+    <!-- StorytellerPromptBuilder.cs - Player Reactions -->
+    <RimMind.Storyteller.Prompt.PlayerReactions>[玩家情感反应]</RimMind.Storyteller.Prompt.PlayerReactions>
+    <RimMind.Storyteller.Prompt.ReactionRecordLine>第{0}天 {1} → 玩家：{2}</RimMind.Storyteller.Prompt.ReactionRecordLine>
 </LanguageData>
