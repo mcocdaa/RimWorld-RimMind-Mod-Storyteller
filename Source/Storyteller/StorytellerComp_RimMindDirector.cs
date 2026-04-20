@@ -180,7 +180,7 @@ namespace RimMind.Storyteller
                 Temperature = 0.8f,
                 RequestId = "Storyteller_Director",
                 ModId = "Storyteller",
-                ExpireAtTicks = Find.TickManager.TicksGame + RimMindStorytellerMod.Settings.requestExpireTicks,
+                ExpireAtTicks = Find.TickManager.TicksGame + RimMindStorytellerMod.Settings!.requestExpireTicks,
                 UseJsonMode = true,
                 Priority = AIRequestPriority.Normal,
             };
