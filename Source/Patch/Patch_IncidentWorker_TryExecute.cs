@@ -18,6 +18,10 @@ namespace RimMind.Storyteller.Patch
             var memory = StorytellerMemory.Instance;
             if (memory == null) return;
 
+            var settings = RimMindStorytellerMod.Settings;
+            if (settings != null)
+                memory.MaxRecords = settings.maxEventRecords;
+
             memory.RecordIncident(__instance.def, parms.target, Find.TickManager.TicksGame);
             memory.UpdateTension(__instance.def.category);
 

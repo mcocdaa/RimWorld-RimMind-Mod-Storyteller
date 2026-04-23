@@ -106,11 +106,6 @@ namespace RimMind.Storyteller.Memory
 
         private List<EventChain> _activeChains = new List<EventChain>();
 
-        private ColonySnapshot? _lastSnapshot;
-
-        private static readonly IncidentCategoryDef FactionArrivalCat =
-            DefDatabase<IncidentCategoryDef>.GetNamedSilentFail("FactionArrival");
-
         public StorytellerMemory(World world) : base(world)
         {
             _instance = this;
@@ -118,7 +113,7 @@ namespace RimMind.Storyteller.Memory
 
         public IReadOnlyList<IncidentHistoryRecord> Records => _records;
         public IReadOnlyList<DialogueRecord> DialogueRecords => _dialogueRecords;
-        public IReadOnlyList<PlayerReactionRecord> PlayerReactions => _playerReactions;
+        private IReadOnlyList<PlayerReactionRecord> PlayerReactions => _playerReactions;
         public int ActiveChainsCount => _activeChains.Count;
 
         public int MaxRecords
@@ -205,6 +200,9 @@ namespace RimMind.Storyteller.Memory
 
         public void RecordPlayerReaction(string incidentDefName, string incidentLabel, string reaction, string reactionLabel, int tick)
         {
+            var settings = RimMind.Storyteller.RimMindStorytellerMod.Settings;
+            if (settings != null)
+                _maxPlayerReactions = settings.maxPlayerReactions;
             _playerReactions.Add(new PlayerReactionRecord
             {
                 incidentDefName = incidentDefName,
@@ -217,30 +215,15 @@ namespace RimMind.Storyteller.Memory
                 _playerReactions.RemoveAt(0);
         }
 
-        public string GetRecentReactionsSummary(int count)
-        {
-            if (_playerReactions.Count == 0) return string.Empty;
-
-            var sb = new StringBuilder();
-            var recent = _playerReactions.Skip(System.Math.Max(0, _playerReactions.Count - count)).ToList();
-            foreach (var r in recent)
-            {
-                int day = r.tick / 60000 + 1;
-                sb.AppendLine("RimMind.Storyteller.Prompt.ReactionRecordLine".Translate($"{day}", r.incidentLabel, r.reactionLabel));
-            }
-            return sb.ToString().TrimEnd();
-        }
-
-        public void ClearPlayerReactions() => _playerReactions.Clear();
-
         public void UpdateTension(IncidentCategoryDef category)
         {
+            var factionArrival = DefDatabase<IncidentCategoryDef>.GetNamedSilentFail("FactionArrival");
             float delta = category switch
             {
                 var c when c == IncidentCategoryDefOf.ThreatBig => 0.25f,
                 var c when c == IncidentCategoryDefOf.ThreatSmall => 0.12f,
                 var c when c == IncidentCategoryDefOf.Misc => -0.05f,
-                var c when c == FactionArrivalCat => -0.08f,
+                var c when c == factionArrival => -0.08f,
                 _ => 0f
             };
             _tensionLevel = Mathf.Clamp01(_tensionLevel + delta);
@@ -249,6 +232,8 @@ namespace RimMind.Storyteller.Memory
         public void ApplyDecayAndCleanup()
         {
             int now = Find.TickManager.TicksGame;
+            if (_lastTensionDecayTick <= 0)
+                _lastTensionDecayTick = now;
             DecayTension(now - _lastTensionDecayTick);
             _lastTensionDecayTick = now;
             CleanupExpiredChains();
@@ -257,7 +242,7 @@ namespace RimMind.Storyteller.Memory
         public void DecayTension(int ticksElapsed)
         {
             if (ticksElapsed <= 0) return;
-            float decayPerDay = 0.03f;
+            float decayPerDay = RimMind.Storyteller.RimMindStorytellerMod.Settings?.tensionDecayPerDay ?? 0.03f;
             float daysElapsed = ticksElapsed / 60000f;
             _tensionLevel = Mathf.Clamp01(_tensionLevel - decayPerDay * daysElapsed);
         }
@@ -298,7 +283,9 @@ namespace RimMind.Storyteller.Memory
         public void CleanupExpiredChains()
         {
             int now = Find.TickManager.TicksGame;
-            _activeChains.RemoveAll(c => now - c.lastAdvancedTick > 600000);
+            float expireDays = RimMind.Storyteller.RimMindStorytellerMod.Settings?.chainExpireDays ?? 10.0f;
+            int expireTicks = (int)(expireDays * 60000f);
+            _activeChains.RemoveAll(c => now - c.lastAdvancedTick > expireTicks);
         }
 
         public string GetActiveChainsSummary()
@@ -315,38 +302,6 @@ namespace RimMind.Storyteller.Memory
             return sb.ToString().TrimEnd();
         }
 
-        public ColonySnapshot TakeSnapshot(Map map)
-        {
-            return new ColonySnapshot
-            {
-                colonistCount = map.mapPawns.FreeColonistsSpawnedCount,
-                wealth = map.wealthWatcher.WealthTotal,
-                tick = Find.TickManager.TicksGame
-            };
-        }
-
-        public string GetSnapshotDiff(Map map)
-        {
-            var current = TakeSnapshot(map);
-            if (_lastSnapshot == null)
-            {
-                _lastSnapshot = current;
-                return string.Empty;
-            }
-
-            var sb = new StringBuilder();
-            int colonistDelta = current.colonistCount - _lastSnapshot.colonistCount;
-            float wealthDelta = current.wealth - _lastSnapshot.wealth;
-
-            if (colonistDelta != 0)
-                sb.AppendLine("RimMind.Storyteller.Prompt.ColonistDelta".Translate(colonistDelta));
-            if (System.Math.Abs(wealthDelta) > 100)
-                sb.AppendLine("RimMind.Storyteller.Prompt.WealthDelta".Translate(wealthDelta));
-
-            _lastSnapshot = current;
-            return sb.ToString().TrimEnd();
-        }
-
         public override void ExposeData()
         {
             base.ExposeData();
@@ -360,49 +315,10 @@ namespace RimMind.Storyteller.Memory
             Scribe_Values.Look(ref CustomSystemPrompt, "customSystemPrompt", string.Empty);
 #pragma warning restore CS8601
             Scribe_Values.Look(ref _tensionLevel, "tensionLevel", 0.5f);
-            Scribe_Values.Look(ref _lastTensionDecayTick, "lastTensionDecayTick");
+            Scribe_Values.Look(ref _lastTensionDecayTick, "lastTensionDecayTick", -1);
             Scribe_Collections.Look(ref _activeChains, "activeChains", LookMode.Deep);
             _activeChains ??= new List<EventChain>();
 
-            if (Scribe.mode == LoadSaveMode.Saving)
-            {
-                if (_lastSnapshot != null)
-                {
-                    var snapColonist = _lastSnapshot.colonistCount;
-                    var snapWealth = _lastSnapshot.wealth;
-                    var snapTick = _lastSnapshot.tick;
-                    Scribe_Values.Look(ref snapColonist, "snapshotColonistCount");
-                    Scribe_Values.Look(ref snapWealth, "snapshotWealth");
-                    Scribe_Values.Look(ref snapTick, "snapshotTick");
-                }
-            }
-            else
-            {
-                int snapColonist = 0;
-                float snapWealth = 0f;
-                int snapTick = 0;
-                Scribe_Values.Look(ref snapColonist, "snapshotColonistCount");
-                Scribe_Values.Look(ref snapWealth, "snapshotWealth");
-                Scribe_Values.Look(ref snapTick, "snapshotTick");
-                if (snapTick > 0)
-                {
-                    _lastSnapshot = new ColonySnapshot { colonistCount = snapColonist, wealth = snapWealth, tick = snapTick };
-                }
-            }
-        }
-    }
-
-    public class ColonySnapshot : IExposable
-    {
-        public int colonistCount;
-        public float wealth;
-        public int tick;
-
-        public void ExposeData()
-        {
-            Scribe_Values.Look(ref colonistCount, "colonistCount");
-            Scribe_Values.Look(ref wealth, "wealth");
-            Scribe_Values.Look(ref tick, "tick");
         }
     }
 }

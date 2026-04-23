@@ -37,6 +37,12 @@
     <RimMind.Storyteller.UI.MaxEventRecords.Desc>叙事者保留的最近事件记录数量，用于 AI 选择事件时参考。</RimMind.Storyteller.UI.MaxEventRecords.Desc>
     <RimMind.Storyteller.UI.MaxDialogueRecords>对话记录上限：{0}</RimMind.Storyteller.UI.MaxDialogueRecords>
     <RimMind.Storyteller.UI.MaxDialogueRecords.Desc>叙事者保留的最近对话记录数量，用于 AI 回应玩家时参考。</RimMind.Storyteller.UI.MaxDialogueRecords.Desc>
+    <RimMind.Storyteller.UI.MaxPlayerReactions>玩家反应记录上限：{0}</RimMind.Storyteller.UI.MaxPlayerReactions>
+    <RimMind.Storyteller.UI.MaxPlayerReactions.Desc>保留的玩家情感反应记录数量。</RimMind.Storyteller.UI.MaxPlayerReactions.Desc>
+    <RimMind.Storyteller.UI.ChainExpireDays>事件链过期：{0} 天</RimMind.Storyteller.UI.ChainExpireDays>
+    <RimMind.Storyteller.UI.ChainExpireDays.Desc>超过此时间未推进的事件链自动移除。</RimMind.Storyteller.UI.ChainExpireDays.Desc>
+    <RimMind.Storyteller.UI.TensionDecayPerDay>张力衰减：{0}/天</RimMind.Storyteller.UI.TensionDecayPerDay>
+    <RimMind.Storyteller.UI.TensionDecayPerDay.Desc>每游戏日衰减的叙事张力值。数值越大张力下降越快。</RimMind.Storyteller.UI.TensionDecayPerDay.Desc>
     <RimMind.Storyteller.UI.DialogueRecordCount>  对话记录数：{0}</RimMind.Storyteller.UI.DialogueRecordCount>
 
     <!-- IncidentHistoryRecord.cs -->
@@ -54,8 +60,6 @@
     <RimMind.Storyteller.Prompt.NoHistory>（暂无历史记录）</RimMind.Storyteller.Prompt.NoHistory>
     <RimMind.Storyteller.Prompt.DialogueMemory>[对话记忆]</RimMind.Storyteller.Prompt.DialogueMemory>
     <RimMind.Storyteller.Prompt.CandidateEvents>[候选事件]</RimMind.Storyteller.Prompt.CandidateEvents>
-    <RimMind.Storyteller.Prompt.NoCandidates>（无可用候选事件）</RimMind.Storyteller.Prompt.NoCandidates>
-    <RimMind.Storyteller.Prompt.CandidateFormat>{0}（{1}，威胁度：{2}，baseChance={3}）— {4}</RimMind.Storyteller.Prompt.CandidateFormat>
 
     <!-- StorytellerMemory.cs - Prompt context -->
     <RimMind.Storyteller.Prompt.DaySummary>游戏第{0}天：{1}（{2}）</RimMind.Storyteller.Prompt.DaySummary>
@@ -65,16 +69,7 @@
     <RimMind.Storyteller.Prompt.SystemChainGuidance>如果存在进行中的事件链，优先选择能推进该链的下一个事件。但你也可以根据当前局势判断是否需要中断链（如殖民地正处于危机中）。</RimMind.Storyteller.Prompt.SystemChainGuidance>
     <RimMind.Storyteller.Prompt.SystemParamsGuidance>你可以通过 params 字段微调事件参数（如降低袭击规模、指定派系）。</RimMind.Storyteller.Prompt.SystemParamsGuidance>
     <RimMind.Storyteller.Prompt.TensionLevel>[叙事张力] 当前张力：{0}（{1}/1.0）</RimMind.Storyteller.Prompt.TensionLevel>
-    <RimMind.Storyteller.Prompt.EventConsequences>[事件后果]</RimMind.Storyteller.Prompt.EventConsequences>
     <RimMind.Storyteller.Prompt.ActiveChains>[进行中的事件链]</RimMind.Storyteller.Prompt.ActiveChains>
-    <RimMind.Storyteller.Prompt.ColonistDelta>殖民者 {0:+#;-#;0}</RimMind.Storyteller.Prompt.ColonistDelta>
-    <RimMind.Storyteller.Prompt.WealthDelta>财富 {0:+#;-#;0}</RimMind.Storyteller.Prompt.WealthDelta>
-
-    <!-- Threat levels -->
-    <RimMind.Storyteller.Prompt.ThreatHigh>高</RimMind.Storyteller.Prompt.ThreatHigh>
-    <RimMind.Storyteller.Prompt.ThreatMedium>中</RimMind.Storyteller.Prompt.ThreatMedium>
-    <RimMind.Storyteller.Prompt.ThreatLow>低</RimMind.Storyteller.Prompt.ThreatLow>
-    <RimMind.Storyteller.Prompt.ThreatNone>无</RimMind.Storyteller.Prompt.ThreatNone>
 
     <!-- Tension labels -->
     <RimMind.Storyteller.Prompt.TensionVeryHigh>极高</RimMind.Storyteller.Prompt.TensionVeryHigh>
@@ -166,7 +161,4 @@
     <RimMind.Storyteller.UI.Accept>了解</RimMind.Storyteller.UI.Accept>
     <RimMind.Storyteller.UI.NoInterfere>你无权干涉叙事者的行动</RimMind.Storyteller.UI.NoInterfere>
 
-    <!-- StorytellerPromptBuilder.cs - Player Reactions -->
-    <RimMind.Storyteller.Prompt.PlayerReactions>[玩家情感反应]</RimMind.Storyteller.Prompt.PlayerReactions>
-    <RimMind.Storyteller.Prompt.ReactionRecordLine>第{0}天 {1} → 玩家：{2}</RimMind.Storyteller.Prompt.ReactionRecordLine>
 </LanguageData>

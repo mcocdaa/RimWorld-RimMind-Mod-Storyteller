@@ -37,6 +37,12 @@
     <RimMind.Storyteller.UI.MaxEventRecords.Desc>Number of recent event records kept for AI reference when selecting events.</RimMind.Storyteller.UI.MaxEventRecords.Desc>
     <RimMind.Storyteller.UI.MaxDialogueRecords>Max dialogue records: {0}</RimMind.Storyteller.UI.MaxDialogueRecords>
     <RimMind.Storyteller.UI.MaxDialogueRecords.Desc>Number of recent dialogue records kept for AI reference when responding to players.</RimMind.Storyteller.UI.MaxDialogueRecords.Desc>
+    <RimMind.Storyteller.UI.MaxPlayerReactions>Max player reactions: {0}</RimMind.Storyteller.UI.MaxPlayerReactions>
+    <RimMind.Storyteller.UI.MaxPlayerReactions.Desc>Maximum number of player emotional reaction records kept.</RimMind.Storyteller.UI.MaxPlayerReactions.Desc>
+    <RimMind.Storyteller.UI.ChainExpireDays>Chain expiry: {0} days</RimMind.Storyteller.UI.ChainExpireDays>
+    <RimMind.Storyteller.UI.ChainExpireDays.Desc>Event chains not advanced within this time are automatically removed.</RimMind.Storyteller.UI.ChainExpireDays.Desc>
+    <RimMind.Storyteller.UI.TensionDecayPerDay>Tension decay: {0}/day</RimMind.Storyteller.UI.TensionDecayPerDay>
+    <RimMind.Storyteller.UI.TensionDecayPerDay.Desc>Amount of narrative tension that decays per game day. Higher values mean tension drops faster.</RimMind.Storyteller.UI.TensionDecayPerDay.Desc>
     <RimMind.Storyteller.UI.DialogueRecordCount>  Dialogue records: {0}</RimMind.Storyteller.UI.DialogueRecordCount>
 
     <!-- IncidentHistoryRecord.cs -->
@@ -54,8 +60,6 @@
     <RimMind.Storyteller.Prompt.NoHistory>(No history yet)</RimMind.Storyteller.Prompt.NoHistory>
     <RimMind.Storyteller.Prompt.DialogueMemory>[Dialogue Memory]</RimMind.Storyteller.Prompt.DialogueMemory>
     <RimMind.Storyteller.Prompt.CandidateEvents>[Candidate Events]</RimMind.Storyteller.Prompt.CandidateEvents>
-    <RimMind.Storyteller.Prompt.NoCandidates>(No available candidate events)</RimMind.Storyteller.Prompt.NoCandidates>
-    <RimMind.Storyteller.Prompt.CandidateFormat>{0} ({1}, threat: {2}, baseChance={3}) — {4}</RimMind.Storyteller.Prompt.CandidateFormat>
 
     <!-- StorytellerMemory.cs - Prompt context -->
     <RimMind.Storyteller.Prompt.DaySummary>Day {0}: {1} ({2})</RimMind.Storyteller.Prompt.DaySummary>
@@ -65,16 +69,7 @@
     <RimMind.Storyteller.Prompt.SystemChainGuidance>If there are active event chains, prefer events that advance the chain. However, you may break the chain if the current situation demands it (e.g., the colony is in crisis).</RimMind.Storyteller.Prompt.SystemChainGuidance>
     <RimMind.Storyteller.Prompt.SystemParamsGuidance>You can fine-tune event parameters via the params field (e.g., reduce raid size, specify faction).</RimMind.Storyteller.Prompt.SystemParamsGuidance>
     <RimMind.Storyteller.Prompt.TensionLevel>[Narrative Tension] Current tension: {0} ({1}/1.0)</RimMind.Storyteller.Prompt.TensionLevel>
-    <RimMind.Storyteller.Prompt.EventConsequences>[Event Consequences]</RimMind.Storyteller.Prompt.EventConsequences>
     <RimMind.Storyteller.Prompt.ActiveChains>[Active Event Chains]</RimMind.Storyteller.Prompt.ActiveChains>
-    <RimMind.Storyteller.Prompt.ColonistDelta>Colonists {0:+#;-#;0}</RimMind.Storyteller.Prompt.ColonistDelta>
-    <RimMind.Storyteller.Prompt.WealthDelta>Wealth {0:+#;-#;0}</RimMind.Storyteller.Prompt.WealthDelta>
-
-    <!-- Threat levels -->
-    <RimMind.Storyteller.Prompt.ThreatHigh>High</RimMind.Storyteller.Prompt.ThreatHigh>
-    <RimMind.Storyteller.Prompt.ThreatMedium>Medium</RimMind.Storyteller.Prompt.ThreatMedium>
-    <RimMind.Storyteller.Prompt.ThreatLow>Low</RimMind.Storyteller.Prompt.ThreatLow>
-    <RimMind.Storyteller.Prompt.ThreatNone>None</RimMind.Storyteller.Prompt.ThreatNone>
 
     <!-- Tension labels -->
     <RimMind.Storyteller.Prompt.TensionVeryHigh>Very High</RimMind.Storyteller.Prompt.TensionVeryHigh>
@@ -166,7 +161,4 @@
     <RimMind.Storyteller.UI.Accept>Understood</RimMind.Storyteller.UI.Accept>
     <RimMind.Storyteller.UI.NoInterfere>You have no authority to interfere with the storyteller's actions</RimMind.Storyteller.UI.NoInterfere>
 
-    <!-- StorytellerPromptBuilder.cs - Player Reactions -->
-    <RimMind.Storyteller.Prompt.PlayerReactions>[Player Emotional Reactions]</RimMind.Storyteller.Prompt.PlayerReactions>
-    <RimMind.Storyteller.Prompt.ReactionRecordLine>Day {0} {1} → Player: {2}</RimMind.Storyteller.Prompt.ReactionRecordLine>
 </LanguageData>

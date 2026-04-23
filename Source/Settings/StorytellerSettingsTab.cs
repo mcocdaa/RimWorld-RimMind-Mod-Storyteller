@@ -94,6 +94,26 @@ namespace RimMind.Storyteller.Settings
             GUI.color = Color.white;
             settings.maxDialogueRecords = (int)listing.Slider(settings.maxDialogueRecords, 5f, 60f);
 
+            listing.Label("RimMind.Storyteller.UI.MaxPlayerReactions".Translate(settings.maxPlayerReactions));
+            GUI.color = Color.gray;
+            listing.Label("  " + "RimMind.Storyteller.UI.MaxPlayerReactions.Desc".Translate());
+            GUI.color = Color.white;
+            settings.maxPlayerReactions = (int)listing.Slider(settings.maxPlayerReactions, 5f, 50f);
+
+            listing.Label("RimMind.Storyteller.UI.ChainExpireDays".Translate($"{settings.chainExpireDays:F1}"));
+            GUI.color = Color.gray;
+            listing.Label("  " + "RimMind.Storyteller.UI.ChainExpireDays.Desc".Translate());
+            GUI.color = Color.white;
+            settings.chainExpireDays = listing.Slider(settings.chainExpireDays, 3f, 30f);
+            settings.chainExpireDays = (float)System.Math.Round(settings.chainExpireDays * 2f) / 2f;
+
+            listing.Label("RimMind.Storyteller.UI.TensionDecayPerDay".Translate($"{settings.tensionDecayPerDay:F3}"));
+            GUI.color = Color.gray;
+            listing.Label("  " + "RimMind.Storyteller.UI.TensionDecayPerDay.Desc".Translate());
+            GUI.color = Color.white;
+            settings.tensionDecayPerDay = listing.Slider(settings.tensionDecayPerDay, 0.01f, 0.10f);
+            settings.tensionDecayPerDay = (float)System.Math.Round(settings.tensionDecayPerDay * 200f) / 200f;
+
             SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.MemoryTitle".Translate());
             var memory = StorytellerMemory.Instance;
             if (memory == null)
@@ -132,6 +152,9 @@ namespace RimMind.Storyteller.Settings
                 settings.maxEventRecords = 50;
                 settings.maxDialogueRecords = 30;
                 settings.enableEventNotification = true;
+                settings.maxPlayerReactions = 20;
+                settings.chainExpireDays = 10.0f;
+                settings.tensionDecayPerDay = 0.03f;
                 _promptText = string.Empty;
                 SavePrompt();
             });
@@ -169,6 +192,7 @@ namespace RimMind.Storyteller.Settings
             h += 24f;
 
             h += 24f + 24f + 32f + 24f + 32f;
+            h += 24f + 24f + 32f + 24f + 32f + 24f + 32f;
 
             var memory = StorytellerMemory.Instance;
             if (memory != null)

@@ -1,9 +1,9 @@
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using RimMind.Core;
-using RimMind.Core.Client;
-using RimMind.Core.Prompt;
+using RimMind.Core.Context;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
 using RimWorld;
@@ -20,6 +20,7 @@ namespace RimMind.Storyteller.UI
         private bool _waitingForResponse;
         private Vector2 _scrollPos = Vector2.zero;
         private bool _autoScroll = true;
+        private readonly ConcurrentQueue<(string role, string content)> _responseQueue = new ConcurrentQueue<(string, string)>();
         private const int MaxHistoryRounds = 6;
         private const float Padding = 8f;
         private const float InputHeight = 36f;
@@ -58,6 +59,15 @@ namespace RimMind.Storyteller.UI
 
         public override void DoWindowContents(Rect inRect)
         {
+            while (_responseQueue.TryDequeue(out var resp))
+            {
+                _waitingForResponse = false;
+                if (resp.role == "system") continue;
+                _messages.Add(resp);
+                _autoScroll = true;
+                RecordDialogueToMemory(resp.role, resp.content);
+            }
+
             Text.Font = GameFont.Small;
 
             float statusH = _waitingForResponse ? StatusHeight + Padding : 0f;
@@ -171,42 +181,49 @@ namespace RimMind.Storyteller.UI
 
             _waitingForResponse = true;
 
-            string systemPrompt = BuildSystemPrompt();
-            string userPrompt = BuildUserPrompt(userMsg);
-
-            var request = new AIRequest
+            // 祭坛对话走 Chat 路径，由 ContextEngine 接管 Prompt 构建
+            float budget = GetStorytellerBudget();
+            var request = new ContextRequest
             {
-                SystemPrompt = systemPrompt,
-                UserPrompt = userPrompt,
+                NpcId = "NPC-storyteller",
+                Scenario = ContextScenario.Storyteller,
+                Budget = budget,
+                CurrentQuery = userMsg,
                 MaxTokens = 300,
                 Temperature = 0.9f,
-                RequestId = $"Storyteller_Altar_{Find.TickManager.TicksGame}",
-                ModId = "Storyteller",
-                ExpireAtTicks = Find.TickManager.TicksGame + 6000,
-                UseJsonMode = false,
-                Priority = AIRequestPriority.High,
             };
 
-            RimMindAPI.RequestImmediate(request, response =>
+            RimMindAPI.Chat(request).ContinueWith(task =>
             {
-                _waitingForResponse = false;
-                if (!response.Success) return;
-                string assistantMsg = response.Content?.Trim() ?? "";
-                _messages.Add(("assistant", assistantMsg));
-                _autoScroll = true;
-                RecordDialogueToMemory("assistant", assistantMsg);
+                if (task.IsFaulted || task.IsCanceled)
+                {
+                    _responseQueue.Enqueue(("system", ""));
+                    return;
+                }
+                var result = task.Result;
+                if (result == null || !string.IsNullOrEmpty(result.Error))
+                {
+                    _responseQueue.Enqueue(("system", ""));
+                    return;
+                }
+                string assistantMsg = result.Message?.Trim() ?? "";
+                if (assistantMsg.NullOrEmpty())
+                {
+                    _responseQueue.Enqueue(("system", ""));
+                    return;
+                }
+                _responseQueue.Enqueue(("assistant", assistantMsg));
             });
         }
 
-        private string BuildSystemPrompt()
+        // 从 ContextSettings 读取 Storyteller 场景预算
+        private static float GetStorytellerBudget()
         {
-            return StorytellerPromptBuilder.BuildDialogueSystemPrompt();
-        }
-
-        private string BuildUserPrompt(string userMsg)
-        {
-            var memory = StorytellerMemory.Instance ?? new StorytellerMemory(Find.World);
-            return StorytellerPromptBuilder.BuildDialogueUserPrompt(_map, memory, userMsg, _messages);
+            var settings = RimMind.Core.RimMindCoreMod.Settings?.Context;
+            if (settings == null) return 0.6f;
+            if (settings.ScenarioBudgetOverrides.TryGetValue(ContextScenario.Storyteller, out float overrideBudget))
+                return overrideBudget;
+            return settings.ContextBudget;
         }
 
         private float CalcMessagesHeight(float width)
@@ -312,7 +329,10 @@ namespace RimMind.Storyteller.UI
                 if (addActiveMethod != null && entry != null)
                     addActiveMethod.Invoke(narratorStore, new object[] { entry, narratorMaxActive, narratorMaxArchive });
             }
-            catch { }
+            catch (System.Exception ex)
+            {
+                Log.WarningOnce($"[RimMind-Storyteller] TryPushToMemoryMod failed: {ex.Message}", 76543210);
+            }
         }
     }
 }

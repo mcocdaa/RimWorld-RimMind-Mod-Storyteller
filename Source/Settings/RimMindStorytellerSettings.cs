@@ -21,6 +21,9 @@ namespace RimMind.Storyteller.Settings
         public int maxEventRecords = 50;
         public int maxDialogueRecords = 30;
         public bool enableEventNotification = true;
+        public int maxPlayerReactions = 20;
+        public float chainExpireDays = 10.0f;
+        public float tensionDecayPerDay = 0.03f;
 
         public override void ExposeData()
         {
@@ -34,6 +37,9 @@ namespace RimMind.Storyteller.Settings
             Scribe_Values.Look(ref maxEventRecords, "maxEventRecords", 50);
             Scribe_Values.Look(ref maxDialogueRecords, "maxDialogueRecords", 30);
             Scribe_Values.Look(ref enableEventNotification, "enableEventNotification", true);
+            Scribe_Values.Look(ref maxPlayerReactions, "maxPlayerReactions", 20);
+            Scribe_Values.Look(ref chainExpireDays, "chainExpireDays", 10.0f);
+            Scribe_Values.Look(ref tensionDecayPerDay, "tensionDecayPerDay", 0.03f);
         }
     }
 }

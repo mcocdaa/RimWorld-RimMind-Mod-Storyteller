@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimMind.Core;
 using RimMind.Core.Client;
+using RimMind.Core.Context;
 using RimMind.Core.UI;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
@@ -43,6 +45,7 @@ namespace RimMind.Storyteller
             if (map == null) yield break;
 
             EnsureMemory();
+            if (_memory == null) yield break;
             _memory.ApplyDecayAndCleanup();
 
             if (_hasPendingResult && _pendingIncident != null)
@@ -77,22 +80,18 @@ namespace RimMind.Storyteller
             _hasPendingRequest = true;
             _cachedTarget = target;
 
-            int maxCandidates = RimMindStorytellerMod.Settings?.maxCandidates ?? Props.maxCandidates;
-
-            var request = new AIRequest
+            // 事件选择走 Structured 路径，由 ContextEngine 接管 Prompt 构建
+            float budget = GetStorytellerBudget();
+            var ctxRequest = new ContextRequest
             {
-                SystemPrompt = RimMindIncidentSelector.BuildSystemPrompt(_memory),
-                UserPrompt = RimMindIncidentSelector.BuildUserPrompt(map, _memory, maxCandidates),
+                NpcId = "NPC-storyteller",
+                Scenario = ContextScenario.Storyteller,
+                Budget = budget,
                 MaxTokens = 200,
                 Temperature = 0.8f,
-                RequestId = "Storyteller_Director",
-                ModId = "Storyteller",
-                ExpireAtTicks = Find.TickManager.TicksGame + (RimMindStorytellerMod.Settings?.requestExpireTicks ?? 30000),
-                UseJsonMode = true,
-                Priority = AIRequestPriority.Normal,
             };
 
-            RimMindAPI.RequestAsync(request, response => OnAIResponseReceived(response, target));
+            TrySelectIncidentWithStructuredOutput(ctxRequest, target);
 
             yield break;
         }
@@ -137,7 +136,6 @@ namespace RimMind.Storyteller
                         incident.parms.points,
                         incident.parms.faction?.def?.defName ?? string.Empty);
                 }
-                _memory.UpdateTension(incident.def.category);
 
                 if (ShouldNotifyPlayer(incident.def))
                     RegisterEventNotification(incident, incidentResponse);
@@ -170,23 +168,20 @@ namespace RimMind.Storyteller
 
             Core.Internal.AIRequestQueue.Instance?.ClearCooldown("Storyteller");
 
-            int maxCandidates = RimMindStorytellerMod.Settings?.maxCandidates ?? Props.maxCandidates;
-
-            var request = new AIRequest
+            // 事件选择走 Structured 路径，由 ContextEngine 接管 Prompt 构建
+            float budget = GetStorytellerBudget();
+            var ctxRequest = new ContextRequest
             {
-                SystemPrompt = RimMindIncidentSelector.BuildSystemPrompt(_memory),
-                UserPrompt = RimMindIncidentSelector.BuildUserPrompt(map, _memory, maxCandidates),
+                NpcId = "NPC-storyteller",
+                Scenario = ContextScenario.Storyteller,
+                Budget = budget,
                 MaxTokens = 200,
                 Temperature = 0.8f,
-                RequestId = "Storyteller_Director",
-                ModId = "Storyteller",
-                ExpireAtTicks = Find.TickManager.TicksGame + RimMindStorytellerMod.Settings!.requestExpireTicks,
-                UseJsonMode = true,
-                Priority = AIRequestPriority.Normal,
             };
 
-            Log.Message("[RimMind-Storyteller] ForceRequest: sending immediate AI request");
-            RimMindAPI.RequestImmediate(request, response => OnAIResponseReceived(response, target));
+            var schema = BuildIncidentSchema();
+            Log.Message("[RimMind-Storyteller] ForceRequest: sending structured AI request");
+            RimMindAPI.RequestStructured(ctxRequest, schema, response => OnAIResponseReceived(response, target));
             return true;
         }
 
@@ -282,10 +277,40 @@ namespace RimMind.Storyteller
             RimMindAPI.RegisterPendingRequest(entry);
         }
 
+        private void TrySelectIncidentWithStructuredOutput(ContextRequest request, IIncidentTarget target)
+        {
+            var schema = BuildIncidentSchema();
+            RimMindAPI.RequestStructured(request, schema, response => OnAIResponseReceived(response, target));
+        }
+
+        // 事件选择 JSON Schema
+        private static string BuildIncidentSchema()
+        {
+            return "{\"type\":\"object\",\"properties\":{\"defName\":{\"type\":\"string\"},\"reason\":{\"type\":\"string\"},\"params\":{\"type\":\"object\"},\"chain\":{\"type\":\"object\"}},\"required\":[\"defName\",\"reason\"]}";
+        }
+
+        // 从 ContextSettings 读取 Storyteller 场景预算
+        private static float GetStorytellerBudget()
+        {
+            var settings = RimMind.Core.RimMindCoreMod.Settings?.Context;
+            if (settings == null) return 0.6f;
+            if (settings.ScenarioBudgetOverrides.TryGetValue(ContextScenario.Storyteller, out float overrideBudget))
+                return overrideBudget;
+            return settings.ContextBudget;
+        }
+
         private void EnsureMemory()
         {
             if (_memory == null)
-                _memory = StorytellerMemory.Instance ?? new StorytellerMemory(Find.World);
+            {
+                _memory = StorytellerMemory.Instance;
+                if (_memory == null && Find.World != null)
+                {
+                    _memory = Find.World.components.OfType<StorytellerMemory>().FirstOrDefault();
+                }
+                if (_memory == null)
+                    Log.WarningOnce("[RimMind-Storyteller] StorytellerMemory not found, skipping.", 91827364);
+            }
         }
     }
 }
