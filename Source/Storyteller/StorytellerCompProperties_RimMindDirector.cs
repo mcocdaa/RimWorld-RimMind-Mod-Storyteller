@@ -5,7 +5,6 @@ namespace RimMind.Storyteller
     public class StorytellerCompProperties_RimMindDirector : RimWorld.StorytellerCompProperties
     {
         public float mtbDays = 1.5f;
-        public int maxCandidates = 15;
 
         public StorytellerCompProperties_RimMindDirector()
         {

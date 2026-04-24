@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RimMind.Core;
 using RimMind.Core.Context;
+using RimMind.Storyteller;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
 using RimWorld;
@@ -182,7 +183,7 @@ namespace RimMind.Storyteller.UI
             _waitingForResponse = true;
 
             // 祭坛对话走 Chat 路径，由 ContextEngine 接管 Prompt 构建
-            float budget = GetStorytellerBudget();
+            float budget = StorytellerComp_RimMindDirector.GetStorytellerBudget();
             var request = new ContextRequest
             {
                 NpcId = "NPC-storyteller",
@@ -214,14 +215,6 @@ namespace RimMind.Storyteller.UI
                 }
                 _responseQueue.Enqueue(("assistant", assistantMsg));
             });
-        }
-
-        // 从 ContextSettings 读取 Storyteller 场景预算
-        private static float GetStorytellerBudget()
-        {
-            var settings = RimMind.Core.RimMindCoreMod.Settings?.Context;
-            if (settings == null) return 0.6f;
-            return settings.ContextBudget;
         }
 
         private float CalcMessagesHeight(float width)

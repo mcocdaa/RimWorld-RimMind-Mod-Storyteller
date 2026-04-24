@@ -113,7 +113,8 @@ namespace RimMind.Storyteller.Memory
 
         public IReadOnlyList<IncidentHistoryRecord> Records => _records;
         public IReadOnlyList<DialogueRecord> DialogueRecords => _dialogueRecords;
-        private IReadOnlyList<PlayerReactionRecord> PlayerReactions => _playerReactions;
+        // TODO: PlayerReactions data is collected but not yet consumed by AI decision-making
+        internal IReadOnlyList<PlayerReactionRecord> PlayerReactions => _playerReactions;
         public int ActiveChainsCount => _activeChains.Count;
 
         public int MaxRecords
@@ -148,26 +149,6 @@ namespace RimMind.Storyteller.Memory
                 sb.AppendLine("RimMind.Storyteller.Prompt.DaySummary".Translate(day, r.Label, r.MapName));
             }
             return sb.ToString().TrimEnd();
-        }
-
-        public bool IsOnCooldown(IncidentDef def)
-        {
-            if (def.minRefireDays <= 0f) return false;
-
-            int now = Find.TickManager.TicksGame;
-            float minRefireTicks = def.minRefireDays * 60000f;
-
-            for (int i = _records.Count - 1; i >= 0; i--)
-            {
-                if (_records[i].IncidentDefName == def.defName)
-                {
-                    float elapsed = now - _records[i].TriggeredTick;
-                    if (elapsed < minRefireTicks)
-                        return true;
-                    break;
-                }
-            }
-            return false;
         }
 
         public void ClearRecords() => _records.Clear();

@@ -34,12 +34,6 @@ namespace RimMind.Storyteller.Settings
             listing.CheckboxLabeled("RimMind.Storyteller.UI.EnableEventNotification".Translate(), ref settings.enableEventNotification,
                 "RimMind.Storyteller.UI.EnableEventNotification.Desc".Translate());
 
-            listing.Label("RimMind.Storyteller.UI.MaxCandidates".Translate(settings.maxCandidates));
-            GUI.color = Color.gray;
-            listing.Label("  " + "RimMind.Storyteller.UI.MaxCandidatesDesc".Translate());
-            GUI.color = Color.white;
-            settings.maxCandidates = (int)listing.Slider(settings.maxCandidates, 5f, 25f);
-
             SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Fallback".Translate());
             listing.Label("RimMind.Storyteller.UI.FallbackModeLabel".Translate(settings.fallbackMode.ToString()));
             GUI.color = Color.gray;
@@ -146,7 +140,6 @@ namespace RimMind.Storyteller.Settings
                 settings.enableIntervalTrigger = true;
                 settings.fallbackMode = FallbackMode.Cassandra;
                 settings.mtbDays = 1.5f;
-                settings.maxCandidates = 15;
                 settings.debugLogging = false;
                 settings.requestExpireTicks = 30000;
                 settings.maxEventRecords = 50;

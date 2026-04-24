@@ -235,7 +235,7 @@ namespace RimMind.Storyteller
                 description = description,
                 options = new[] { optShock, optExcited, optAccept },
                 optionTooltips = new[] { tooltip, tooltip, tooltip },
-                expireTicks = 60000,
+                expireTicks = RimMindStorytellerMod.Settings?.requestExpireTicks ?? 30000,
                 callback = choice =>
                 {
                     string reaction;
@@ -282,9 +282,7 @@ namespace RimMind.Storyteller
             RimMindAPI.RequestStructured(request, schema, response => OnAIResponseReceived(response, target));
         }
 
-        // 事件选择 JSON Schema
-        // 从 ContextSettings 读取 Storyteller 场景预算
-        private static float GetStorytellerBudget()
+        internal static float GetStorytellerBudget()
         {
             var settings = RimMind.Core.RimMindCoreMod.Settings?.Context;
             if (settings == null) return 0.6f;
