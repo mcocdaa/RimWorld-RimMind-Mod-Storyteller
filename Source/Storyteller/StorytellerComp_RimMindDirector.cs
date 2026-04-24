@@ -218,9 +218,9 @@ namespace RimMind.Storyteller
                 description = "RimMind.Storyteller.UI.DefaultDesc".Translate(incident.def.LabelCap);
             }
 
-            string optShock    = "RimMind.Storyteller.UI.Shock".Translate();
-            string optExcited  = "RimMind.Storyteller.UI.Excited".Translate();
-            string optAccept   = "RimMind.Storyteller.UI.Accept".Translate();
+            string optShock = "RimMind.Storyteller.UI.Shock".Translate();
+            string optExcited = "RimMind.Storyteller.UI.Excited".Translate();
+            string optAccept = "RimMind.Storyteller.UI.Accept".Translate();
 
             string tooltip = "RimMind.Storyteller.UI.NoInterfere".Translate();
 
