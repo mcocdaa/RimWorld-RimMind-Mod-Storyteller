@@ -5,6 +5,7 @@ using RimMind.Core;
 using RimMind.Core.Client;
 using RimMind.Core.Context;
 using RimMind.Core.UI;
+using RimMind.Core.Npc;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
 using RimWorld;
@@ -80,12 +81,11 @@ namespace RimMind.Storyteller
             _hasPendingRequest = true;
             _cachedTarget = target;
 
-            // 事件选择走 Structured 路径，由 ContextEngine 接管 Prompt 构建
             float budget = GetStorytellerBudget();
             var ctxRequest = new ContextRequest
             {
-                NpcId = "NPC-storyteller",
-                Scenario = ContextScenario.Storyteller,
+                NpcId = NpcManager.Instance?.GetNpcForMap(map) ?? "NPC-storyteller",
+                Scenario = ScenarioIds.Storyteller,
                 Budget = budget,
                 MaxTokens = 200,
                 Temperature = 0.8f,
@@ -168,18 +168,17 @@ namespace RimMind.Storyteller
 
             Core.Internal.AIRequestQueue.Instance?.ClearCooldown("Storyteller");
 
-            // 事件选择走 Structured 路径，由 ContextEngine 接管 Prompt 构建
             float budget = GetStorytellerBudget();
             var ctxRequest = new ContextRequest
             {
-                NpcId = "NPC-storyteller",
-                Scenario = ContextScenario.Storyteller,
+                NpcId = NpcManager.Instance?.GetNpcForMap(map) ?? "NPC-storyteller",
+                Scenario = ScenarioIds.Storyteller,
                 Budget = budget,
                 MaxTokens = 200,
                 Temperature = 0.8f,
             };
 
-            var schema = BuildIncidentSchema();
+            var schema = RimMind.Core.Context.SchemaRegistry.IncidentOutput;
             Log.Message("[RimMind-Storyteller] ForceRequest: sending structured AI request");
             RimMindAPI.RequestStructured(ctxRequest, schema, response => OnAIResponseReceived(response, target));
             return true;
@@ -279,23 +278,16 @@ namespace RimMind.Storyteller
 
         private void TrySelectIncidentWithStructuredOutput(ContextRequest request, IIncidentTarget target)
         {
-            var schema = BuildIncidentSchema();
+            var schema = RimMind.Core.Context.SchemaRegistry.IncidentOutput;
             RimMindAPI.RequestStructured(request, schema, response => OnAIResponseReceived(response, target));
         }
 
         // 事件选择 JSON Schema
-        private static string BuildIncidentSchema()
-        {
-            return "{\"type\":\"object\",\"properties\":{\"defName\":{\"type\":\"string\"},\"reason\":{\"type\":\"string\"},\"params\":{\"type\":\"object\"},\"chain\":{\"type\":\"object\"}},\"required\":[\"defName\",\"reason\"]}";
-        }
-
         // 从 ContextSettings 读取 Storyteller 场景预算
         private static float GetStorytellerBudget()
         {
             var settings = RimMind.Core.RimMindCoreMod.Settings?.Context;
             if (settings == null) return 0.6f;
-            if (settings.ScenarioBudgetOverrides.TryGetValue(ContextScenario.Storyteller, out float overrideBudget))
-                return overrideBudget;
             return settings.ContextBudget;
         }
 

@@ -186,7 +186,7 @@ namespace RimMind.Storyteller.UI
             var request = new ContextRequest
             {
                 NpcId = "NPC-storyteller",
-                Scenario = ContextScenario.Storyteller,
+                Scenario = ScenarioIds.Storyteller,
                 Budget = budget,
                 CurrentQuery = userMsg,
                 MaxTokens = 300,
@@ -221,8 +221,6 @@ namespace RimMind.Storyteller.UI
         {
             var settings = RimMind.Core.RimMindCoreMod.Settings?.Context;
             if (settings == null) return 0.6f;
-            if (settings.ScenarioBudgetOverrides.TryGetValue(ContextScenario.Storyteller, out float overrideBudget))
-                return overrideBudget;
             return settings.ContextBudget;
         }
 
