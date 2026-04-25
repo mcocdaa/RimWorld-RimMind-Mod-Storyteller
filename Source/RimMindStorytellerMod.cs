@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Text;
 using HarmonyLib;
 using RimMind.Core;
+using RimMind.Core.Context;
 using RimMind.Core.Prompt;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
@@ -52,6 +54,13 @@ namespace RimMind.Storyteller
                 string dialogue = mem.GetRecentDialogueSummary(5);
                 return string.IsNullOrEmpty(dialogue) ? null : $"{"RimMind.Storyteller.Dialogue.StorytellerDialogueHeader".Translate()}\n{dialogue}";
             }, PromptSection.PriorityAuxiliary, ModId);
+
+            ContextKeyRegistry.Register("storyteller_task", ContextLayer.L0_Static, 0.95f,
+                pawn =>
+                {
+                    if (ContextKeyRegistry.CurrentScenario != ScenarioIds.Storyteller) return new List<ContextEntry>();
+                    return new List<ContextEntry> { new ContextEntry("RimMind.Storyteller.Prompt.TaskInstruction".Translate()) };
+                }, "RimMind.Storyteller");
         }
 
         public override string SettingsCategory() => "RimMind - Storyteller";

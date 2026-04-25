@@ -293,7 +293,7 @@ namespace RimMind.Storyteller
         {
             if (_memory == null)
             {
-                _memory = StorytellerMemory.Instance;
+                _memory = StorytellerMemory.Instance!;
                 if (_memory == null && Find.World != null)
                 {
                     _memory = Find.World.components.OfType<StorytellerMemory>().FirstOrDefault();

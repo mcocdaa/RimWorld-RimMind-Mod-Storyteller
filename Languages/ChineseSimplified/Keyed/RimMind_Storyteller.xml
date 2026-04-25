@@ -70,4 +70,5 @@
   <RimMind.Storyteller.UI.Excited>来的好！</RimMind.Storyteller.UI.Excited>
   <RimMind.Storyteller.UI.Accept>了解</RimMind.Storyteller.UI.Accept>
   <RimMind.Storyteller.UI.NoInterfere>你无权干涉叙事者的行动</RimMind.Storyteller.UI.NoInterfere>
+  <RimMind.Storyteller.Prompt.TaskInstruction>你是一名叙事者，负责为殖民地选择和叙述事件。根据当前的张力等级、局势和角色状态，选择最合适的事件。\n\n输出格式：返回 JSON，格式为 {"defName":"事件DefName","reason":"选择理由","params":{}}\n\n行为约束：\n- 根据张力等级选择事件强度\n- 考虑殖民地的当前需求和威胁等级\n- 事件应推动故事发展</RimMind.Storyteller.Prompt.TaskInstruction>
 </LanguageData>

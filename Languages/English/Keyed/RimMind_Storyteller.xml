@@ -70,4 +70,5 @@
   <RimMind.Storyteller.UI.Excited>Bring it on!</RimMind.Storyteller.UI.Excited>
   <RimMind.Storyteller.UI.Accept>Understood</RimMind.Storyteller.UI.Accept>
   <RimMind.Storyteller.UI.NoInterfere>You have no authority to interfere with the storyteller's actions</RimMind.Storyteller.UI.NoInterfere>
+  <RimMind.Storyteller.Prompt.TaskInstruction>You are a storyteller, responsible for selecting and narrating events for the colony. Based on the current tension level, situation, and character states, choose the most appropriate event.\n\nOutput format: Return JSON: {"defName":"IncidentDefName","reason":"reasoning","params":{}}\n\nBehavior constraints:\n- Select event intensity based on tension level\n- Consider the colony's current needs and threat level\n- Events should drive the story forward</RimMind.Storyteller.Prompt.TaskInstruction>
 </LanguageData>
