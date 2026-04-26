@@ -87,8 +87,10 @@ namespace RimMind.Storyteller
                 NpcId = NpcManager.Instance?.GetNpcForMap(map) ?? "NPC-storyteller",
                 Scenario = ScenarioIds.Storyteller,
                 Budget = budget,
-                MaxTokens = 200,
+                CurrentQuery = "Select the most appropriate incident event for the current colony situation and return it as structured JSON.",
+                MaxTokens = 400,
                 Temperature = 0.8f,
+                Map = map,
             };
 
             TrySelectIncidentWithStructuredOutput(ctxRequest, target);
@@ -174,8 +176,10 @@ namespace RimMind.Storyteller
                 NpcId = NpcManager.Instance?.GetNpcForMap(map) ?? "NPC-storyteller",
                 Scenario = ScenarioIds.Storyteller,
                 Budget = budget,
-                MaxTokens = 200,
+                CurrentQuery = "Select the most appropriate incident event for the current colony situation and return it as structured JSON.",
+                MaxTokens = 400,
                 Temperature = 0.8f,
+                Map = map,
             };
 
             var schema = RimMind.Core.Context.SchemaRegistry.IncidentOutput;

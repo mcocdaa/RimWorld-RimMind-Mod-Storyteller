@@ -190,8 +190,9 @@ namespace RimMind.Storyteller.UI
                 Scenario = ScenarioIds.Storyteller,
                 Budget = budget,
                 CurrentQuery = userMsg,
-                MaxTokens = 300,
+                MaxTokens = 400,
                 Temperature = 0.9f,
+                Map = Find.CurrentMap,
             };
 
             RimMindAPI.Chat(request).ContinueWith(task =>

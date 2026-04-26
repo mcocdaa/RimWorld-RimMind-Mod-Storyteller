@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using RimMind.Core.Client;
 using RimMind.Storyteller.Memory;
 using RimWorld;
 using Verse;
@@ -18,9 +19,23 @@ namespace RimMind.Storyteller
             {
                 result = JsonConvert.DeserializeObject<IncidentResponse>(aiContent);
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
-                Log.WarningOnce($"[RimMind-Storyteller] Failed to parse AI response: {ex.Message}", 39127);
+                string? repaired = JsonRepairHelper.TryRepairTruncatedJson(aiContent);
+                if (repaired != null)
+                {
+                    try { result = JsonConvert.DeserializeObject<IncidentResponse>(repaired); }
+                    catch { result = null; }
+                }
+                else
+                {
+                    result = null;
+                }
+            }
+
+            if (result == null)
+            {
+                Log.WarningOnce($"[RimMind-Storyteller] Failed to parse AI response", 39127);
                 return (null, null);
             }
 
@@ -69,6 +84,7 @@ namespace RimMind.Storyteller
 
             return (new FiringIncident(incidentDef, source, parms), result);
         }
+
     }
 
     public class IncidentResponse
