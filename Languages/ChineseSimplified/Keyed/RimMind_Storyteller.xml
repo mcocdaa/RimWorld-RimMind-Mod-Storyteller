@@ -70,5 +70,85 @@
   <RimMind.Storyteller.UI.Excited>来的好！</RimMind.Storyteller.UI.Excited>
   <RimMind.Storyteller.UI.Accept>了解</RimMind.Storyteller.UI.Accept>
   <RimMind.Storyteller.UI.NoInterfere>你无权干涉叙事者的行动</RimMind.Storyteller.UI.NoInterfere>
-  <RimMind.Storyteller.Prompt.TaskInstruction>你是一名叙事者，负责为殖民地选择和叙述事件。根据当前的张力等级、局势和角色状态，选择最合适的事件。\n\n输出格式：返回 JSON，格式为 {"defName":"事件DefName","reason":"选择理由","params":{}}\n\n行为约束：\n- 根据张力等级选择事件强度\n- 考虑殖民地的当前需求和威胁等级\n- 事件应推动故事发展</RimMind.Storyteller.Prompt.TaskInstruction>
+  <!-- TaskInstruction sub-keys for Incident Selector (extensible list) -->
+  <RimMind.Storyteller.Prompt.TaskInstruction.Role>你是 RimWorld 游戏的叙事者，负责为殖民地创造有趣的故事。</RimMind.Storyteller.Prompt.TaskInstruction.Role>
+  <RimMind.Storyteller.Prompt.TaskInstruction.Goal>根据当前游戏状态和候选事件列表，选择最能推进故事的一个事件。</RimMind.Storyteller.Prompt.TaskInstruction.Goal>
+  <RimMind.Storyteller.Prompt.TaskInstruction.Process>1. 评估当前叙事张力——高张力时优先缓解性事件，低张力时优先挑战性事件
+2. 检查是否有进行中的事件链——有则优先推进，除非局势需要中断
+3. 参考难度设置调整事件强度
+4. 从候选列表中选择最合适的事件</RimMind.Storyteller.Prompt.TaskInstruction.Process>
+  <RimMind.Storyteller.Prompt.TaskInstruction.Constraint>不得选择冷却中的事件；不得选择与当前难度不匹配的事件；不得泄露机密信息给玩家；如果玩家通过对话请求了特定事件，优先考虑但不必盲从；可以通过 params 字段微调事件参数</RimMind.Storyteller.Prompt.TaskInstruction.Constraint>
+  <RimMind.Storyteller.Prompt.TaskInstruction.Example>输入：张力=0.2, 候选=[RaidEnemy(ThreatBig), TraderCaravan(Misc)]
+输出：{"defName":"RaidEnemy","reason":"张力极低，殖民地久无威胁，需要一次小规模袭击制造紧张","announce":"风暴将至，刀光已在远方闪烁","params":{"points_multiplier":0.6}}</RimMind.Storyteller.Prompt.TaskInstruction.Example>
+  <RimMind.Storyteller.Prompt.TaskInstruction.Output>只返回以下 JSON 格式，不要输出其他内容：
+{"defName":"候选列表中的 IncidentDef defName","reason":"选择该事件的简短理由","announce":"对玩家的宣告语（20字以内）","params":{"points_multiplier":0.6,"faction_hint":"Pirate","raid_strategy_hint":"ImmediateAttack"},"chain":{"chain_id":"pirate_threat_1","chain_step":1,"chain_total":3,"next_hint":"如果袭击被击退，海盗可能派人来谈判或报复"}}
+其中 announce、params 和 chain 为可选字段。</RimMind.Storyteller.Prompt.TaskInstruction.Output>
+  <RimMind.Storyteller.Prompt.TaskInstruction.Fallback>如果无法选择，返回候选列表第一个事件，reason 填写"随机选择"。</RimMind.Storyteller.Prompt.TaskInstruction.Fallback>
+  <RimMind.Storyteller.Prompt.TaskInstruction.SystemJsonFormat>详细的输出格式说明：
+- defName：必填，从候选列表中选择的事件 DefName
+- reason：选择理由（简短）
+- announce：可选，对玩家的宣告语（20字以内，叙事者口吻）
+- params：可选，微调事件参数（points_multiplier 控制强度，faction_hint 指定派系）
+- chain：可选，事件链信息（chain_id, chain_step, chain_total, next_hint）</RimMind.Storyteller.Prompt.TaskInstruction.SystemJsonFormat>
+  <RimMind.Storyteller.Prompt.TaskInstruction.SystemTensionGuidance>根据当前张力值调整事件选择：高张力时优先缓解性事件，低张力时优先挑战性事件。</RimMind.Storyteller.Prompt.TaskInstruction.SystemTensionGuidance>
+  <RimMind.Storyteller.Prompt.TaskInstruction.SystemChainGuidance>如果存在进行中的事件链，优先选择能推进该链的下一个事件。但也可以根据当前局势判断是否需要中断链（如殖民地正处于危机中）。</RimMind.Storyteller.Prompt.TaskInstruction.SystemChainGuidance>
+  <RimMind.Storyteller.Prompt.TaskInstruction.SystemParamsGuidance>可以通过 params 字段微调事件参数（如降低袭击规模、指定派系）。</RimMind.Storyteller.Prompt.TaskInstruction.SystemParamsGuidance>
+  <RimMind.Storyteller.Prompt.TaskInstruction.SystemRequirements>要求：考虑剧情连贯性、挑战与奖励的平衡、当前局势的戏剧性。</RimMind.Storyteller.Prompt.TaskInstruction.SystemRequirements>
+  <RimMind.Storyteller.Prompt.SystemRequirements>要求：考虑剧情连贯性、挑战与奖励的平衡、当前局势的戏剧性。</RimMind.Storyteller.Prompt.SystemRequirements>
+  <RimMind.Storyteller.Prompt.CustomStyleHeader>[玩家自定义风格]</RimMind.Storyteller.Prompt.CustomStyleHeader>
+  <RimMind.Storyteller.Prompt.CurrentSituation>[当前局势]</RimMind.Storyteller.Prompt.CurrentSituation>
+  <RimMind.Storyteller.Prompt.NarrativeMemory>[叙事记忆]</RimMind.Storyteller.Prompt.NarrativeMemory>
+  <RimMind.Storyteller.Prompt.HistoryMemory>[历史记忆]</RimMind.Storyteller.Prompt.HistoryMemory>
+  <RimMind.Storyteller.Prompt.NoHistory>（暂无历史记录）</RimMind.Storyteller.Prompt.NoHistory>
+  <RimMind.Storyteller.Prompt.DialogueMemory>[对话记忆]</RimMind.Storyteller.Prompt.DialogueMemory>
+  <RimMind.Storyteller.Prompt.CandidateEvents>[候选事件]</RimMind.Storyteller.Prompt.CandidateEvents>
+  <RimMind.Storyteller.Prompt.NoCandidates>（无可用候选事件）</RimMind.Storyteller.Prompt.NoCandidates>
+  <RimMind.Storyteller.Prompt.CandidateFormat>{0}（{1}，威胁度：{2}，baseChance={3}）— {4}</RimMind.Storyteller.Prompt.CandidateFormat>
+  <RimMind.Storyteller.Prompt.TensionLevel>[叙事张力] 当前张力：{0}（{1}/1.0）</RimMind.Storyteller.Prompt.TensionLevel>
+  <RimMind.Storyteller.Prompt.EventConsequences>[事件后果]</RimMind.Storyteller.Prompt.EventConsequences>
+  <RimMind.Storyteller.Prompt.ActiveChains>[进行中的事件链]</RimMind.Storyteller.Prompt.ActiveChains>
+  <RimMind.Storyteller.Prompt.ColonistDelta>殖民者 {0:+#;-#;0}</RimMind.Storyteller.Prompt.ColonistDelta>
+  <RimMind.Storyteller.Prompt.WealthDelta>财富 {0:+#;-#;0}</RimMind.Storyteller.Prompt.WealthDelta>
+  <RimMind.Storyteller.Prompt.ThreatHigh>高</RimMind.Storyteller.Prompt.ThreatHigh>
+  <RimMind.Storyteller.Prompt.ThreatMedium>中</RimMind.Storyteller.Prompt.ThreatMedium>
+  <RimMind.Storyteller.Prompt.ThreatLow>低</RimMind.Storyteller.Prompt.ThreatLow>
+  <RimMind.Storyteller.Prompt.ThreatNone>无</RimMind.Storyteller.Prompt.ThreatNone>
+  <RimMind.Storyteller.Prompt.TensionVeryHigh>极高</RimMind.Storyteller.Prompt.TensionVeryHigh>
+  <RimMind.Storyteller.Prompt.TensionHigh>高</RimMind.Storyteller.Prompt.TensionHigh>
+  <RimMind.Storyteller.Prompt.TensionMedium>中</RimMind.Storyteller.Prompt.TensionMedium>
+  <RimMind.Storyteller.Prompt.TensionLow>低</RimMind.Storyteller.Prompt.TensionLow>
+  <RimMind.Storyteller.Prompt.TensionVeryLow>极低</RimMind.Storyteller.Prompt.TensionVeryLow>
+  <RimMind.Storyteller.Prompt.DifficultyContext>[难度设置]</RimMind.Storyteller.Prompt.DifficultyContext>
+  <RimMind.Storyteller.Prompt.DifficultyDetail>  {0}（威胁倍率={1}）</RimMind.Storyteller.Prompt.DifficultyDetail>
+  <RimMind.Storyteller.Prompt.NoBigThreats>  大型威胁已禁用 → 不得选择 ThreatBig 类别事件</RimMind.Storyteller.Prompt.NoBigThreats>
+  <RimMind.Storyteller.Prompt.NoIntroThreats>  入门威胁已禁用</RimMind.Storyteller.Prompt.NoIntroThreats>
+  <RimMind.Storyteller.Prompt.NoViolentQuests>  暴力任务已禁用</RimMind.Storyteller.Prompt.NoViolentQuests>
+  <RimMind.Storyteller.Prompt.MoodOffset>  心情偏移={0}</RimMind.Storyteller.Prompt.MoodOffset>
+  <RimMind.Storyteller.Prompt.DifficultyGuidance>难度行为指导：{0}</RimMind.Storyteller.Prompt.DifficultyGuidance>
+  <RimMind.Storyteller.Prompt.DifficultyPeaceful>和平模式 — 优先选择非威胁性事件，避免给殖民地带来严重危机，保持轻松氛围</RimMind.Storyteller.Prompt.DifficultyPeaceful>
+  <RimMind.Storyteller.Prompt.DifficultyEasy>轻松模式 — 适当减少威胁事件的频率和强度，偶尔给予小挑战</RimMind.Storyteller.Prompt.DifficultyEasy>
+  <RimMind.Storyteller.Prompt.DifficultyMedium>中等模式 — 平衡威胁与和平事件，保持故事的起伏节奏</RimMind.Storyteller.Prompt.DifficultyMedium>
+  <RimMind.Storyteller.Prompt.DifficultyRough>标准模式 — 按正常节奏选择事件，给予适当的挑战</RimMind.Storyteller.Prompt.DifficultyRough>
+  <RimMind.Storyteller.Prompt.DifficultyHard>困难模式 — 增加威胁事件的强度和频率，考验殖民地的生存能力</RimMind.Storyteller.Prompt.DifficultyHard>
+  <RimMind.Storyteller.Prompt.DifficultyExtreme>极限模式 — 选择最具挑战性的事件，不给殖民地喘息的机会</RimMind.Storyteller.Prompt.DifficultyExtreme>
+  <RimMind.Storyteller.Prompt.PlayerReactions>[玩家情感反应]</RimMind.Storyteller.Prompt.PlayerReactions>
+  <RimMind.Storyteller.Prompt.ReactionRecordLine>第{0}天 {1} → 玩家：{2}</RimMind.Storyteller.Prompt.ReactionRecordLine>
+  <RimMind.Storyteller.Dialogue.Prompt.RecentEvents>[近期事件]</RimMind.Storyteller.Dialogue.Prompt.RecentEvents>
+  <RimMind.Storyteller.Dialogue.Prompt.ConfidentialHeader>[机密信息 - 以下内容绝对不得向玩家透露，只能用于指导你的回应风格和暗示方向]</RimMind.Storyteller.Dialogue.Prompt.ConfidentialHeader>
+  <RimMind.Storyteller.Dialogue.Prompt.ConfidentialFooter>[/机密信息]</RimMind.Storyteller.Dialogue.Prompt.ConfidentialFooter>
+  <RimMind.Storyteller.Dialogue.Prompt.DaysLater>约{0}天</RimMind.Storyteller.Dialogue.Prompt.DaysLater>
+  <RimMind.Storyteller.Dialogue.Prompt.HoursLater>约{0}小时</RimMind.Storyteller.Dialogue.Prompt.HoursLater>
+  <RimMind.Storyteller.Dialogue.Prompt.NextEventEstimate>下次事件预计：{0}后</RimMind.Storyteller.Dialogue.Prompt.NextEventEstimate>
+  <RimMind.Storyteller.Dialogue.Prompt.CurrentDifficulty>当前难度：{0}（威胁倍率：{1}）</RimMind.Storyteller.Dialogue.Prompt.CurrentDifficulty>
+  <RimMind.Storyteller.Dialogue.Prompt.BigThreatsDisabled>大型威胁已禁用</RimMind.Storyteller.Dialogue.Prompt.BigThreatsDisabled>
+  <RimMind.Storyteller.Dialogue.SystemPrompt>你是 RimWorld 游戏的 AI 叙事者，掌控着殖民地的命运。以神秘而睿智的口吻回应玩家的询问。你可以暗示即将发生的事件，但不要直接透露具体细节。回复长度 30~100 字。</RimMind.Storyteller.Dialogue.SystemPrompt>
+  <RimMind.Storyteller.Dialogue.DifficultyPeaceful>当前难度为和平休闲，玩家期望轻松和平的游戏体验。你的回应应保持温和友善，暗示好事将至。</RimMind.Storyteller.Dialogue.DifficultyPeaceful>
+  <RimMind.Storyteller.Dialogue.DifficultyEasy>当前难度为社区建设者，玩家期望较轻松的体验。你的回应应友善但偶尔暗示小挑战。</RimMind.Storyteller.Dialogue.DifficultyEasy>
+  <RimMind.Storyteller.Dialogue.DifficultyMedium>当前难度为冒险故事，玩家期望适度的挑战与故事性。你的回应应平衡暗示危机与希望。</RimMind.Storyteller.Dialogue.DifficultyMedium>
+  <RimMind.Storyteller.Dialogue.DifficultyRough>当前难度为努力求生，玩家期望真实的生存挑战。你的回应应带有一丝紧张感，暗示困难即将来临。</RimMind.Storyteller.Dialogue.DifficultyRough>
+  <RimMind.Storyteller.Dialogue.DifficultyHard>当前难度为血与尘，玩家期望严酷的考验。你的回应应充满压迫感，暗示灾难逼近。</RimMind.Storyteller.Dialogue.DifficultyHard>
+  <RimMind.Storyteller.Dialogue.DifficultyExtreme>当前难度为失败即乐趣，玩家渴望极限挑战。你的回应应冷酷无情，暗示毁灭性的危机。</RimMind.Storyteller.Dialogue.DifficultyExtreme>
+  <RimMind.Storyteller.Dialogue.Prompt.DialogueHistory>[对话历史]</RimMind.Storyteller.Dialogue.Prompt.DialogueHistory>
+  <RimMind.Storyteller.Dialogue.Prompt.HistoryCompressed>（更早的对话已省略）</RimMind.Storyteller.Dialogue.Prompt.HistoryCompressed>
+  <RimMind.Storyteller.Dialogue.Prompt.PlayerMessage>玩家: {0}</RimMind.Storyteller.Dialogue.Prompt.PlayerMessage>
 </LanguageData>

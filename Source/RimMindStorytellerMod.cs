@@ -59,7 +59,12 @@ namespace RimMind.Storyteller
                 pawn =>
                 {
                     if (ContextKeyRegistry.CurrentScenario != ScenarioIds.Storyteller) return new List<ContextEntry>();
-                    return new List<ContextEntry> { new ContextEntry("RimMind.Storyteller.Prompt.TaskInstruction".Translate()) };
+                    string taskInstruction = TaskInstructionBuilder.Build(
+                        "RimMind.Storyteller.Prompt.TaskInstruction",
+                        "Role", "Goal", "Process", "Constraint", "Example", "Output", "Fallback",
+                        "SystemJsonFormat", "SystemTensionGuidance", "SystemChainGuidance",
+                        "SystemParamsGuidance", "SystemRequirements");
+                    return new List<ContextEntry> { new ContextEntry(taskInstruction) };
                 }, "RimMind.Storyteller");
         }
 
