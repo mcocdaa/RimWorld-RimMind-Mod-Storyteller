@@ -278,7 +278,7 @@ namespace RimMind.Storyteller.UI
                 var settingsType = memoryAssembly.GetType("RimMind.Memory.RimMindMemoryMod");
                 if (settingsType == null) return;
 
-                var settingsProp = settingsType.GetProperty("Settings",
+                var settingsProp = settingsType.GetField("Settings",
                     System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
                 var memSettings = settingsProp?.GetValue(null);
 

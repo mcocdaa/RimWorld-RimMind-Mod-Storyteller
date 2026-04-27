@@ -66,6 +66,43 @@ namespace RimMind.Storyteller
                         "SystemParamsGuidance", "SystemRequirements");
                     return new List<ContextEntry> { new ContextEntry(taskInstruction) };
                 }, "RimMind.Storyteller");
+
+            ContextKeyRegistry.Register("storyteller_context", ContextLayer.L1_Baseline, 0.85f,
+                pawn =>
+                {
+                    if (ContextKeyRegistry.CurrentScenario != ScenarioIds.Storyteller) return new List<ContextEntry>();
+                    var mem = StorytellerMemory.Instance;
+                    if (mem == null) return new List<ContextEntry>();
+                    var sb = new StringBuilder();
+                    sb.AppendLine("RimMind.Storyteller.Prompt.StorytellerStateHeader".Translate());
+                    sb.AppendLine("RimMind.Storyteller.Prompt.TensionLevel".Translate(
+                        $"{(int)(mem.TensionLevel * 100)}%", $"{mem.TensionLevel:F2}"));
+                    string summary = mem.GetRecentSummary(5);
+                    if (!string.IsNullOrEmpty(summary))
+                        sb.AppendLine(summary);
+                    string chains = mem.GetActiveChainsSummary();
+                    if (!string.IsNullOrEmpty(chains))
+                        sb.AppendLine(chains);
+                    return new List<ContextEntry> { new ContextEntry(sb.ToString().TrimEnd()) };
+                }, "RimMind.Storyteller");
+
+            ContextKeyRegistry.Register("storyteller_reactions", ContextLayer.L1_Baseline, 0.8f,
+                pawn =>
+                {
+                    if (ContextKeyRegistry.CurrentScenario != ScenarioIds.Storyteller) return new List<ContextEntry>();
+                    var mem = StorytellerMemory.Instance;
+                    if (mem == null) return new List<ContextEntry>();
+                    var reactions = mem.PlayerReactions;
+                    if (reactions.Count == 0) return new List<ContextEntry>();
+                    var sb = new StringBuilder();
+                    foreach (var r in reactions)
+                    {
+                        int day = r.tick / 60000 + 1;
+                        sb.AppendLine("RimMind.Storyteller.Prompt.ReactionRecordLine".Translate(
+                            day.ToString(), r.incidentLabel, r.reactionLabel));
+                    }
+                    return new List<ContextEntry> { new ContextEntry(sb.ToString().TrimEnd()) };
+                }, "RimMind.Storyteller");
         }
 
         public override string SettingsCategory() => "RimMind - Storyteller";
