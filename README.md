@@ -123,7 +123,6 @@ AI 选择威胁事件时，通过审批页面通知玩家。ThreatBig 显示"叙
 | 定时触发 | 开启 | 按 MTB 随机间隔触发 AI 事件选择，关闭后仍可手动触发 |
 | Fallback 模式 | Cassandra | AI 冷却/失败/Director 不健康时的备用行为 |
 | 事件平均间隔 | 1.5 游戏天 | AI 评估频率（MTB 随机触发，0.5~10 天可调） |
-| 候选事件数上限 | 15 | 每次评估的候选事件数量（5~25 可调） |
 | 请求过期 | 0.5 游戏天 | AI 请求超时自动取消（0.06~2 天可调） |
 | 事件记录上限 | 50 | 保留的最近事件记录数量（10~100 可调） |
 | 对话记录上限 | 30 | 保留的最近对话记录数量（5~60 可调） |
@@ -248,7 +247,6 @@ cd RimWorld-RimMind-Mod-Storyteller
 | Interval Trigger | On | Trigger AI event selection at MTB-based random intervals; manual trigger still works when off |
 | Fallback Mode | Cassandra | Backup behavior when AI cooling down / failed / Director unhealthy |
 | Avg. Event Interval | 1.5 game days | AI evaluation frequency (MTB random trigger, 0.5~10 days) |
-| Max Candidates | 15 | Number of candidate events per AI evaluation (5~25) |
 | Request Expiry | 0.5 game days | Auto-cancel AI requests after timeout (0.06~2 days) |
 | Max Event Records | 50 | Number of recent event records kept (10~100) |
 | Max Dialogue Records | 30 | Number of recent dialogue records kept (5~60) |
