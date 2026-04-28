@@ -6,11 +6,9 @@ namespace RimMind.Storyteller.Memory
 {
     public class IncidentHistoryRecord : IExposable
     {
-        public string IncidentDefName = string.Empty;
         public string Label = string.Empty;
         public int TriggeredTick;
         public string MapName = string.Empty;
-        public string CategoryDefName = string.Empty;
 
         public IncidentHistoryRecord() { }
 
@@ -22,22 +20,22 @@ namespace RimMind.Storyteller.Memory
 
             return new IncidentHistoryRecord
             {
-                IncidentDefName = def.defName,
                 Label = def.LabelCap.RawText.NullOrEmpty() ? def.defName : def.LabelCap.RawText,
                 TriggeredTick = tick,
                 MapName = mapName,
-                CategoryDefName = def.category?.defName ?? string.Empty,
             };
         }
 
         public void ExposeData()
         {
 #pragma warning disable CS8601
-            Scribe_Values.Look(ref IncidentDefName, "incidentDefName", string.Empty);
+            string incidentDefName = string.Empty;
+            string categoryDefName = string.Empty;
+            Scribe_Values.Look(ref incidentDefName, "incidentDefName", string.Empty);
             Scribe_Values.Look(ref Label, "label", string.Empty);
             Scribe_Values.Look(ref TriggeredTick, "triggeredTick");
             Scribe_Values.Look(ref MapName, "mapName", string.Empty);
-            Scribe_Values.Look(ref CategoryDefName, "categoryDefName", string.Empty);
+            Scribe_Values.Look(ref categoryDefName, "categoryDefName", string.Empty);
 #pragma warning restore CS8601
         }
     }

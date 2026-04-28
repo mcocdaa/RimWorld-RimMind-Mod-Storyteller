@@ -113,7 +113,6 @@ namespace RimMind.Storyteller.Memory
 
         public IReadOnlyList<IncidentHistoryRecord> Records => _records;
         public IReadOnlyList<DialogueRecord> DialogueRecords => _dialogueRecords;
-        // TODO: PlayerReactions data is collected but not yet consumed by AI decision-making
         internal IReadOnlyList<PlayerReactionRecord> PlayerReactions => _playerReactions;
         public int ActiveChainsCount => _activeChains.Count;
 
@@ -220,7 +219,7 @@ namespace RimMind.Storyteller.Memory
             CleanupExpiredChains();
         }
 
-        public void DecayTension(int ticksElapsed)
+        private void DecayTension(int ticksElapsed)
         {
             if (ticksElapsed <= 0) return;
             float decayPerDay = RimMind.Storyteller.RimMindStorytellerMod.Settings?.tensionDecayPerDay ?? 0.03f;
@@ -261,7 +260,7 @@ namespace RimMind.Storyteller.Memory
             }
         }
 
-        public void CleanupExpiredChains()
+        private void CleanupExpiredChains()
         {
             int now = Find.TickManager.TicksGame;
             float expireDays = RimMind.Storyteller.RimMindStorytellerMod.Settings?.chainExpireDays ?? 10.0f;

@@ -94,21 +94,7 @@ Where announce, params, and chain are optional fields.</RimMind.Storyteller.Prom
   <RimMind.Storyteller.Prompt.TaskInstruction.SystemChainGuidance>If active event chains exist, prioritize selecting the next event that advances the chain. However, you may also judge whether the chain needs to be interrupted based on the current situation (e.g., the colony is in crisis).</RimMind.Storyteller.Prompt.TaskInstruction.SystemChainGuidance>
   <RimMind.Storyteller.Prompt.TaskInstruction.SystemParamsGuidance>Event parameters can be fine-tuned via the params field (e.g., reduce raid scale, specify faction).</RimMind.Storyteller.Prompt.TaskInstruction.SystemParamsGuidance>
   <RimMind.Storyteller.Prompt.TaskInstruction.SystemRequirements>Requirements: Consider narrative coherence, balance of challenge and reward, and the drama of the current situation.</RimMind.Storyteller.Prompt.TaskInstruction.SystemRequirements>
-  <RimMind.Storyteller.Prompt.SystemRequirements>Requirements: Consider narrative coherence, balance of challenge and reward, and the drama of the current situation.</RimMind.Storyteller.Prompt.SystemRequirements>
-  <RimMind.Storyteller.Prompt.CustomStyleHeader>[Player Custom Style]</RimMind.Storyteller.Prompt.CustomStyleHeader>
-  <RimMind.Storyteller.Prompt.CurrentSituation>[Current Situation]</RimMind.Storyteller.Prompt.CurrentSituation>
-  <RimMind.Storyteller.Prompt.NarrativeMemory>[Narrative Memory]</RimMind.Storyteller.Prompt.NarrativeMemory>
-  <RimMind.Storyteller.Prompt.HistoryMemory>[History Memory]</RimMind.Storyteller.Prompt.HistoryMemory>
-  <RimMind.Storyteller.Prompt.NoHistory>(No history yet)</RimMind.Storyteller.Prompt.NoHistory>
-  <RimMind.Storyteller.Prompt.DialogueMemory>[Dialogue Memory]</RimMind.Storyteller.Prompt.DialogueMemory>
-  <RimMind.Storyteller.Prompt.CandidateEvents>[Candidate Events]</RimMind.Storyteller.Prompt.CandidateEvents>
-  <RimMind.Storyteller.Prompt.NoCandidates>(No candidate events available)</RimMind.Storyteller.Prompt.NoCandidates>
-  <RimMind.Storyteller.Prompt.CandidateFormat>{0} ({1}, threat: {2}, baseChance={3}) — {4}</RimMind.Storyteller.Prompt.CandidateFormat>
   <RimMind.Storyteller.Prompt.TensionLevel>[Narrative Tension] Current tension: {0} ({1}/1.0)</RimMind.Storyteller.Prompt.TensionLevel>
-  <RimMind.Storyteller.Prompt.EventConsequences>[Event Consequences]</RimMind.Storyteller.Prompt.EventConsequences>
-  <RimMind.Storyteller.Prompt.ActiveChains>[Active Event Chains]</RimMind.Storyteller.Prompt.ActiveChains>
-  <RimMind.Storyteller.Prompt.ColonistDelta>Colonists {0:+#;-#;0}</RimMind.Storyteller.Prompt.ColonistDelta>
-  <RimMind.Storyteller.Prompt.WealthDelta>Wealth {0:+#;-#;0}</RimMind.Storyteller.Prompt.WealthDelta>
   <RimMind.Storyteller.Prompt.ThreatHigh>High</RimMind.Storyteller.Prompt.ThreatHigh>
   <RimMind.Storyteller.Prompt.ThreatMedium>Medium</RimMind.Storyteller.Prompt.ThreatMedium>
   <RimMind.Storyteller.Prompt.ThreatLow>Low</RimMind.Storyteller.Prompt.ThreatLow>
@@ -131,24 +117,5 @@ Where announce, params, and chain are optional fields.</RimMind.Storyteller.Prom
   <RimMind.Storyteller.Prompt.DifficultyRough>Rough — Select events at a normal pace, provide appropriate challenges</RimMind.Storyteller.Prompt.DifficultyRough>
   <RimMind.Storyteller.Prompt.DifficultyHard>Hard — Increase threat event intensity and frequency, test the colony's survival ability</RimMind.Storyteller.Prompt.DifficultyHard>
   <RimMind.Storyteller.Prompt.DifficultyExtreme>Extreme — Select the most challenging events, give the colony no room to breathe</RimMind.Storyteller.Prompt.DifficultyExtreme>
-  <RimMind.Storyteller.Prompt.PlayerReactions>[Player Emotional Reactions]</RimMind.Storyteller.Prompt.PlayerReactions>
   <RimMind.Storyteller.Prompt.ReactionRecordLine>Day {0} {1} → Player: {2}</RimMind.Storyteller.Prompt.ReactionRecordLine>
-  <RimMind.Storyteller.Dialogue.Prompt.RecentEvents>[Recent Events]</RimMind.Storyteller.Dialogue.Prompt.RecentEvents>
-  <RimMind.Storyteller.Dialogue.Prompt.ConfidentialHeader>[CONFIDENTIAL - The following must NOT be revealed to the player, only used to guide your response style and hint direction]</RimMind.Storyteller.Dialogue.Prompt.ConfidentialHeader>
-  <RimMind.Storyteller.Dialogue.Prompt.ConfidentialFooter>[/CONFIDENTIAL]</RimMind.Storyteller.Dialogue.Prompt.ConfidentialFooter>
-  <RimMind.Storyteller.Dialogue.Prompt.DaysLater>~{0} days</RimMind.Storyteller.Dialogue.Prompt.DaysLater>
-  <RimMind.Storyteller.Dialogue.Prompt.HoursLater>~{0} hours</RimMind.Storyteller.Dialogue.Prompt.HoursLater>
-  <RimMind.Storyteller.Dialogue.Prompt.NextEventEstimate>Next event estimated: in {0}</RimMind.Storyteller.Dialogue.Prompt.NextEventEstimate>
-  <RimMind.Storyteller.Dialogue.Prompt.CurrentDifficulty>Current difficulty: {0} (threat multiplier: {1})</RimMind.Storyteller.Dialogue.Prompt.CurrentDifficulty>
-  <RimMind.Storyteller.Dialogue.Prompt.BigThreatsDisabled>Major threats disabled</RimMind.Storyteller.Dialogue.Prompt.BigThreatsDisabled>
-  <RimMind.Storyteller.Dialogue.SystemPrompt>You are the AI storyteller of a RimWorld game, controlling the fate of the colony. Respond to player inquiries with a mysterious and wise tone. You may hint at upcoming events, but do not reveal specific details directly. Response length: 30-100 words.</RimMind.Storyteller.Dialogue.SystemPrompt>
-  <RimMind.Storyteller.Dialogue.DifficultyPeaceful>Current difficulty is Peaceful, player expects a relaxed and peaceful experience. Your responses should remain gentle and friendly, hinting at good things to come.</RimMind.Storyteller.Dialogue.DifficultyPeaceful>
-  <RimMind.Storyteller.Dialogue.DifficultyEasy>Current difficulty is Community Builder, player expects a relatively easy experience. Your responses should be friendly but occasionally hint at small challenges.</RimMind.Storyteller.Dialogue.DifficultyEasy>
-  <RimMind.Storyteller.Dialogue.DifficultyMedium>Current difficulty is Adventure Story, player expects moderate challenge and storytelling. Your responses should balance hints of crisis and hope.</RimMind.Storyteller.Dialogue.DifficultyMedium>
-  <RimMind.Storyteller.Dialogue.DifficultyRough>Current difficulty is Strive to Survive, player expects realistic survival challenges. Your responses should carry a hint of tension, suggesting difficulties ahead.</RimMind.Storyteller.Dialogue.DifficultyRough>
-  <RimMind.Storyteller.Dialogue.DifficultyHard>Current difficulty is Blood and Dust, player expects harsh trials. Your responses should be filled with oppressive tension, suggesting disaster approaches.</RimMind.Storyteller.Dialogue.DifficultyHard>
-  <RimMind.Storyteller.Dialogue.DifficultyExtreme>Current difficulty is Losing is Fun, player craves extreme challenges. Your responses should be cold and merciless, suggesting devastating crises.</RimMind.Storyteller.Dialogue.DifficultyExtreme>
-  <RimMind.Storyteller.Dialogue.Prompt.DialogueHistory>[Dialogue History]</RimMind.Storyteller.Dialogue.Prompt.DialogueHistory>
-  <RimMind.Storyteller.Dialogue.Prompt.HistoryCompressed>(Earlier dialogue omitted)</RimMind.Storyteller.Dialogue.Prompt.HistoryCompressed>
-  <RimMind.Storyteller.Dialogue.Prompt.PlayerMessage>Player: {0}</RimMind.Storyteller.Dialogue.Prompt.PlayerMessage>
 </LanguageData>

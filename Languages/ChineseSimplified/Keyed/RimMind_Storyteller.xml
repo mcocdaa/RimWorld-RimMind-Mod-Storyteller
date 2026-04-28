@@ -94,21 +94,7 @@
   <RimMind.Storyteller.Prompt.TaskInstruction.SystemChainGuidance>如果存在进行中的事件链，优先选择能推进该链的下一个事件。但也可以根据当前局势判断是否需要中断链（如殖民地正处于危机中）。</RimMind.Storyteller.Prompt.TaskInstruction.SystemChainGuidance>
   <RimMind.Storyteller.Prompt.TaskInstruction.SystemParamsGuidance>可以通过 params 字段微调事件参数（如降低袭击规模、指定派系）。</RimMind.Storyteller.Prompt.TaskInstruction.SystemParamsGuidance>
   <RimMind.Storyteller.Prompt.TaskInstruction.SystemRequirements>要求：考虑剧情连贯性、挑战与奖励的平衡、当前局势的戏剧性。</RimMind.Storyteller.Prompt.TaskInstruction.SystemRequirements>
-  <RimMind.Storyteller.Prompt.SystemRequirements>要求：考虑剧情连贯性、挑战与奖励的平衡、当前局势的戏剧性。</RimMind.Storyteller.Prompt.SystemRequirements>
-  <RimMind.Storyteller.Prompt.CustomStyleHeader>[玩家自定义风格]</RimMind.Storyteller.Prompt.CustomStyleHeader>
-  <RimMind.Storyteller.Prompt.CurrentSituation>[当前局势]</RimMind.Storyteller.Prompt.CurrentSituation>
-  <RimMind.Storyteller.Prompt.NarrativeMemory>[叙事记忆]</RimMind.Storyteller.Prompt.NarrativeMemory>
-  <RimMind.Storyteller.Prompt.HistoryMemory>[历史记忆]</RimMind.Storyteller.Prompt.HistoryMemory>
-  <RimMind.Storyteller.Prompt.NoHistory>（暂无历史记录）</RimMind.Storyteller.Prompt.NoHistory>
-  <RimMind.Storyteller.Prompt.DialogueMemory>[对话记忆]</RimMind.Storyteller.Prompt.DialogueMemory>
-  <RimMind.Storyteller.Prompt.CandidateEvents>[候选事件]</RimMind.Storyteller.Prompt.CandidateEvents>
-  <RimMind.Storyteller.Prompt.NoCandidates>（无可用候选事件）</RimMind.Storyteller.Prompt.NoCandidates>
-  <RimMind.Storyteller.Prompt.CandidateFormat>{0}（{1}，威胁度：{2}，baseChance={3}）— {4}</RimMind.Storyteller.Prompt.CandidateFormat>
   <RimMind.Storyteller.Prompt.TensionLevel>[叙事张力] 当前张力：{0}（{1}/1.0）</RimMind.Storyteller.Prompt.TensionLevel>
-  <RimMind.Storyteller.Prompt.EventConsequences>[事件后果]</RimMind.Storyteller.Prompt.EventConsequences>
-  <RimMind.Storyteller.Prompt.ActiveChains>[进行中的事件链]</RimMind.Storyteller.Prompt.ActiveChains>
-  <RimMind.Storyteller.Prompt.ColonistDelta>殖民者 {0:+#;-#;0}</RimMind.Storyteller.Prompt.ColonistDelta>
-  <RimMind.Storyteller.Prompt.WealthDelta>财富 {0:+#;-#;0}</RimMind.Storyteller.Prompt.WealthDelta>
   <RimMind.Storyteller.Prompt.ThreatHigh>高</RimMind.Storyteller.Prompt.ThreatHigh>
   <RimMind.Storyteller.Prompt.ThreatMedium>中</RimMind.Storyteller.Prompt.ThreatMedium>
   <RimMind.Storyteller.Prompt.ThreatLow>低</RimMind.Storyteller.Prompt.ThreatLow>
@@ -131,24 +117,5 @@
   <RimMind.Storyteller.Prompt.DifficultyRough>标准模式 — 按正常节奏选择事件，给予适当的挑战</RimMind.Storyteller.Prompt.DifficultyRough>
   <RimMind.Storyteller.Prompt.DifficultyHard>困难模式 — 增加威胁事件的强度和频率，考验殖民地的生存能力</RimMind.Storyteller.Prompt.DifficultyHard>
   <RimMind.Storyteller.Prompt.DifficultyExtreme>极限模式 — 选择最具挑战性的事件，不给殖民地喘息的机会</RimMind.Storyteller.Prompt.DifficultyExtreme>
-  <RimMind.Storyteller.Prompt.PlayerReactions>[玩家情感反应]</RimMind.Storyteller.Prompt.PlayerReactions>
   <RimMind.Storyteller.Prompt.ReactionRecordLine>第{0}天 {1} → 玩家：{2}</RimMind.Storyteller.Prompt.ReactionRecordLine>
-  <RimMind.Storyteller.Dialogue.Prompt.RecentEvents>[近期事件]</RimMind.Storyteller.Dialogue.Prompt.RecentEvents>
-  <RimMind.Storyteller.Dialogue.Prompt.ConfidentialHeader>[机密信息 - 以下内容绝对不得向玩家透露，只能用于指导你的回应风格和暗示方向]</RimMind.Storyteller.Dialogue.Prompt.ConfidentialHeader>
-  <RimMind.Storyteller.Dialogue.Prompt.ConfidentialFooter>[/机密信息]</RimMind.Storyteller.Dialogue.Prompt.ConfidentialFooter>
-  <RimMind.Storyteller.Dialogue.Prompt.DaysLater>约{0}天</RimMind.Storyteller.Dialogue.Prompt.DaysLater>
-  <RimMind.Storyteller.Dialogue.Prompt.HoursLater>约{0}小时</RimMind.Storyteller.Dialogue.Prompt.HoursLater>
-  <RimMind.Storyteller.Dialogue.Prompt.NextEventEstimate>下次事件预计：{0}后</RimMind.Storyteller.Dialogue.Prompt.NextEventEstimate>
-  <RimMind.Storyteller.Dialogue.Prompt.CurrentDifficulty>当前难度：{0}（威胁倍率：{1}）</RimMind.Storyteller.Dialogue.Prompt.CurrentDifficulty>
-  <RimMind.Storyteller.Dialogue.Prompt.BigThreatsDisabled>大型威胁已禁用</RimMind.Storyteller.Dialogue.Prompt.BigThreatsDisabled>
-  <RimMind.Storyteller.Dialogue.SystemPrompt>你是 RimWorld 游戏的 AI 叙事者，掌控着殖民地的命运。以神秘而睿智的口吻回应玩家的询问。你可以暗示即将发生的事件，但不要直接透露具体细节。回复长度 30~100 字。</RimMind.Storyteller.Dialogue.SystemPrompt>
-  <RimMind.Storyteller.Dialogue.DifficultyPeaceful>当前难度为和平休闲，玩家期望轻松和平的游戏体验。你的回应应保持温和友善，暗示好事将至。</RimMind.Storyteller.Dialogue.DifficultyPeaceful>
-  <RimMind.Storyteller.Dialogue.DifficultyEasy>当前难度为社区建设者，玩家期望较轻松的体验。你的回应应友善但偶尔暗示小挑战。</RimMind.Storyteller.Dialogue.DifficultyEasy>
-  <RimMind.Storyteller.Dialogue.DifficultyMedium>当前难度为冒险故事，玩家期望适度的挑战与故事性。你的回应应平衡暗示危机与希望。</RimMind.Storyteller.Dialogue.DifficultyMedium>
-  <RimMind.Storyteller.Dialogue.DifficultyRough>当前难度为努力求生，玩家期望真实的生存挑战。你的回应应带有一丝紧张感，暗示困难即将来临。</RimMind.Storyteller.Dialogue.DifficultyRough>
-  <RimMind.Storyteller.Dialogue.DifficultyHard>当前难度为血与尘，玩家期望严酷的考验。你的回应应充满压迫感，暗示灾难逼近。</RimMind.Storyteller.Dialogue.DifficultyHard>
-  <RimMind.Storyteller.Dialogue.DifficultyExtreme>当前难度为失败即乐趣，玩家渴望极限挑战。你的回应应冷酷无情，暗示毁灭性的危机。</RimMind.Storyteller.Dialogue.DifficultyExtreme>
-  <RimMind.Storyteller.Dialogue.Prompt.DialogueHistory>[对话历史]</RimMind.Storyteller.Dialogue.Prompt.DialogueHistory>
-  <RimMind.Storyteller.Dialogue.Prompt.HistoryCompressed>（更早的对话已省略）</RimMind.Storyteller.Dialogue.Prompt.HistoryCompressed>
-  <RimMind.Storyteller.Dialogue.Prompt.PlayerMessage>玩家: {0}</RimMind.Storyteller.Dialogue.Prompt.PlayerMessage>
 </LanguageData>

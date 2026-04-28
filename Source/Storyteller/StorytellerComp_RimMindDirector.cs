@@ -168,7 +168,7 @@ namespace RimMind.Storyteller
             _hasPendingRequest = true;
             _cachedTarget = target;
 
-            Core.Internal.AIRequestQueue.Instance?.ClearCooldown("Storyteller");
+            RimMindAPI.ClearModCooldown("Storyteller");
 
             float budget = GetStorytellerBudget();
             var ctxRequest = new ContextRequest
