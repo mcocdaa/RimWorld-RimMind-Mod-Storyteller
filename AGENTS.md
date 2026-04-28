@@ -21,7 +21,7 @@ AI叙事者模块，替换RimWorld Storyteller系统，LLM决定事件选择。
 
 ```
 Source/
-├── RimMindStorytellerMod.cs                                    Mod入口
+├── RimMindStorytellerMod.cs                                    Mod入口 + ContextKey注册
 ├── Storyteller/
 │   ├── StorytellerComp_RimMindDirector.cs                      AI事件选择器(StorytellerComp)
 │   ├── StorytellerComp_RimMindFallback.cs                      回退事件生成器
@@ -65,13 +65,28 @@ StorytellerComp_RimMindDirector.MakeIntervalIncidents
 | Randy | 1.35 | 30%Big/30%Small/40%Misc |
 | Phoebe | 8.0 | 40%FactionArrival/60%Small |
 
-## ContextKey 注册
+## ContextKey 注册（全部使用新 API + 场景守卫）
 
 | Key | Layer | Priority | 内容 |
 |-----|-------|----------|------|
 | storyteller_task | L0_Static | 0.95 | TaskInstruction(12段事件选择指令) |
-| storyteller_context | L1_Baseline | 0.85 | 张力+近期事件+活跃链 |
+| storyteller_context | L1_Baseline | 0.85 | 难度+威胁+张力+近期事件+活跃链 |
 | storyteller_reactions | L1_Baseline | 0.8 | 玩家情感反应 |
+| storyteller_dialogue | L3_State | 0.5 | 近期对话摘要 |
+
+所有注册均包含 `if (ContextKeyRegistry.CurrentScenario != ScenarioIds.Storyteller) return new List<ContextEntry>();` 守卫。
+
+## 上下文注入流程
+
+```
+ContextEngine.BuildContext(Scenario=Storyteller)
+  ├── L0_Static: storyteller_task (TaskInstruction 12段指令)
+  ├── L1_Baseline: storyteller_context (难度+威胁+张力+事件+链)
+  ├── L1_Baseline: storyteller_reactions (玩家反应)
+  ├── L2_Environment: Core自动注入 (地图状态、殖民者状态等)
+  ├── L3_State: storyteller_dialogue (对话摘要)
+  └── L4_History: Core自动注入 (NarrativeMemory)
+```
 
 ## 代码约定
 
@@ -79,19 +94,24 @@ StorytellerComp_RimMindDirector.MakeIntervalIncidents
 - 翻译键前缀: `RimMind.Storyteller.*`
 - Harmony ID: `mcocdaa.RimMindStoryteller`
 - `mtbDays` 运行时以Settings为准(覆盖Def)
+- 所有ContextKey注册必须包含场景守卫
+- 禁止使用 `[Obsolete]` 的 `RegisterPawnContextProvider` / `RegisterStaticProvider`
+- 禁止直接访问 `Core.Internal` 命名空间
 
 ## 已知问题
 
-1. `storyteller_state`(旧API)和 `storyteller_context`(新API)提供重复数据，导致双重注入
-2. `ForceRequest` 使用 `Core.Internal.AIRequestQueue.Instance`，应替换为 `RimMindAPI.ClearModCooldown`
-3. 旧API `RegisterPawnContextProvider`/`RegisterStaticProvider` 已Obsolete，应迁移
+1. `_cachedTarget` 字段赋值后未读取，应删除
+2. `StorytellerDebugActions.cs` 仍导入 `using RimMind.Core.Internal;`（未使用）
+3. `IncidentHistoryRecord` 序列化了 `incidentDefName`/`categoryDefName` 但反序列化后未读取
+4. `RimMind.Storyteller.Prompt.MoodOffset` 翻译键未被消费
+5. Memory反射桥接(14目标)脆弱，长期应迁移到 `IMemoryBridge` 接口
 
 ## 操作边界
 
 ### ✅ 必须做
 - 修改事件选择逻辑后更新 `ParseResponse` 验证步骤
 - 修改张力计算后验证0~1范围
-- 新ContextKey注册后删除对应旧API注册
+- 新ContextKey注册必须包含场景守卫
 
 ### ⚠️ 先询问
 - 修改 `mtbDays`(1.5) / `TensionLevel`初始值(0.5)
@@ -99,5 +119,6 @@ StorytellerComp_RimMindDirector.MakeIntervalIncidents
 
 ### 🚫 绝对禁止
 - 通过 `Core.Internal.AIRequestQueue.Instance` 直接清除冷却
-- `storyteller_state` 和 `storyteller_context` 同时注册
+- 使用 `[Obsolete]` 的 `RegisterPawnContextProvider` / `RegisterStaticProvider`
+- ContextKey注册缺少场景守卫
 - 后台线程调用 `Find.Storyteller` 或 `IncidentDef.Worker.CanFireNow`
