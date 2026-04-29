@@ -33,12 +33,6 @@ namespace RimMind.Storyteller
                 }
             }
 
-            if (result == null)
-            {
-                Log.WarningOnce($"[RimMind-Storyteller] Failed to parse AI response", 39127);
-                return (null, null);
-            }
-
             if (result == null || string.IsNullOrEmpty(result.defName)) return (null, null);
 
             var incidentDef = DefDatabase<IncidentDef>.GetNamedSilentFail(result.defName);

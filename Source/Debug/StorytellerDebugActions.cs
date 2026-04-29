@@ -2,7 +2,6 @@ using System.Linq;
 using System.Text;
 using LudeonTK;
 using RimMind.Core;
-using RimMind.Core.Internal;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
 using RimWorld;

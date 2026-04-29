@@ -29,13 +29,13 @@ namespace RimMind.Storyteller.Memory
         public void ExposeData()
         {
 #pragma warning disable CS8601
-            string incidentDefName = string.Empty;
-            string categoryDefName = string.Empty;
-            Scribe_Values.Look(ref incidentDefName, "incidentDefName", string.Empty);
+            string _compat1 = string.Empty;
+            string _compat2 = string.Empty;
+            Scribe_Values.Look(ref _compat1, "incidentDefName", string.Empty);
             Scribe_Values.Look(ref Label, "label", string.Empty);
             Scribe_Values.Look(ref TriggeredTick, "triggeredTick");
             Scribe_Values.Look(ref MapName, "mapName", string.Empty);
-            Scribe_Values.Look(ref categoryDefName, "categoryDefName", string.Empty);
+            Scribe_Values.Look(ref _compat2, "categoryDefName", string.Empty);
 #pragma warning restore CS8601
         }
     }

@@ -19,7 +19,6 @@ namespace RimMind.Storyteller
         private bool _hasPendingRequest;
         private bool _hasPendingResult;
         private FiringIncident _pendingIncident = null!;
-        private IIncidentTarget _cachedTarget = null!;
         private int _lastSuccessTick = -99999;
         private int _lastFailTick = -99999;
 
@@ -79,7 +78,6 @@ namespace RimMind.Storyteller
                 yield break;
 
             _hasPendingRequest = true;
-            _cachedTarget = target;
 
             float budget = GetStorytellerBudget();
             var ctxRequest = new ContextRequest
@@ -166,7 +164,6 @@ namespace RimMind.Storyteller
             EnsureMemory();
 
             _hasPendingRequest = true;
-            _cachedTarget = target;
 
             RimMindAPI.ClearModCooldown("Storyteller");
 
