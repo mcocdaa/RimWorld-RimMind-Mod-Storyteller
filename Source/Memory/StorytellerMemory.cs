@@ -106,6 +106,8 @@ namespace RimMind.Storyteller.Memory
 
         private List<EventChain> _activeChains = new List<EventChain>();
 
+        private string? _consumedReactionsText;
+
         public StorytellerMemory(World world) : base(world)
         {
             _instance = this;
@@ -115,6 +117,7 @@ namespace RimMind.Storyteller.Memory
         public IReadOnlyList<DialogueRecord> DialogueRecords => _dialogueRecords;
         internal IReadOnlyList<PlayerReactionRecord> PlayerReactions => _playerReactions;
         public int ActiveChainsCount => _activeChains.Count;
+        public string? ConsumedReactionsText => _consumedReactionsText;
 
         public int MaxRecords
         {
@@ -195,6 +198,30 @@ namespace RimMind.Storyteller.Memory
                 _playerReactions.RemoveAt(0);
         }
 
+        public string ConsumeReactions(int maxCount)
+        {
+            if (_playerReactions.Count == 0)
+            {
+                _consumedReactionsText = null;
+                return string.Empty;
+            }
+
+            int takeCount = System.Math.Min(maxCount, _playerReactions.Count);
+            var consumed = _playerReactions.Take(takeCount).ToList();
+            _playerReactions.RemoveRange(0, takeCount);
+
+            var sb = new StringBuilder();
+            sb.AppendLine("RimMind.Storyteller.Prompt.PlayerReactions".Translate());
+            foreach (var r in consumed)
+            {
+                int day = r.tick / 60000 + 1;
+                sb.AppendLine("RimMind.Storyteller.Prompt.ReactionRecordLine".Translate(
+                    day.ToString(), r.incidentLabel, r.reactionLabel));
+            }
+            _consumedReactionsText = sb.ToString().TrimEnd();
+            return _consumedReactionsText;
+        }
+
         public void UpdateTension(IncidentCategoryDef category)
         {
             var factionArrival = DefDatabase<IncidentCategoryDef>.GetNamedSilentFail("FactionArrival");
@@ -225,6 +252,19 @@ namespace RimMind.Storyteller.Memory
             float decayPerDay = RimMind.Storyteller.RimMindStorytellerMod.Settings?.tensionDecayPerDay ?? 0.03f;
             float daysElapsed = ticksElapsed / 60000f;
             _tensionLevel = Mathf.Clamp01(_tensionLevel - decayPerDay * daysElapsed);
+        }
+
+        public void DecayTensionDaily()
+        {
+            float rate = RimMind.Storyteller.RimMindStorytellerMod.Settings?.tensionDecayPerDay ?? 0.03f;
+            _tensionLevel = Mathf.Clamp01(_tensionLevel - rate);
+        }
+
+        public override void WorldComponentTick()
+        {
+            base.WorldComponentTick();
+            if (Find.TickManager.TicksGame % 60000 == 0)
+                DecayTensionDaily();
         }
 
         public void ApplyTensionDelta(float delta)

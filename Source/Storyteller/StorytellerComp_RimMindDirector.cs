@@ -79,6 +79,8 @@ namespace RimMind.Storyteller
 
             _hasPendingRequest = true;
 
+            _memory.ConsumeReactions(20);
+
             float budget = GetStorytellerBudget();
             var ctxRequest = new ContextRequest
             {
@@ -162,6 +164,8 @@ namespace RimMind.Storyteller
             }
 
             EnsureMemory();
+
+            _memory.ConsumeReactions(20);
 
             _hasPendingRequest = true;
 

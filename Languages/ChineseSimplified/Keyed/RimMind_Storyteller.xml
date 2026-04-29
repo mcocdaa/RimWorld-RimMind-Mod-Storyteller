@@ -109,7 +109,6 @@
   <RimMind.Storyteller.Prompt.NoBigThreats>  大型威胁已禁用 → 不得选择 ThreatBig 类别事件</RimMind.Storyteller.Prompt.NoBigThreats>
   <RimMind.Storyteller.Prompt.NoIntroThreats>  入门威胁已禁用</RimMind.Storyteller.Prompt.NoIntroThreats>
   <RimMind.Storyteller.Prompt.NoViolentQuests>  暴力任务已禁用</RimMind.Storyteller.Prompt.NoViolentQuests>
-  <RimMind.Storyteller.Prompt.MoodOffset>  心情偏移={0}</RimMind.Storyteller.Prompt.MoodOffset>
   <RimMind.Storyteller.Prompt.DifficultyGuidance>难度行为指导：{0}</RimMind.Storyteller.Prompt.DifficultyGuidance>
   <RimMind.Storyteller.Prompt.DifficultyPeaceful>和平模式 — 优先选择非威胁性事件，避免给殖民地带来严重危机，保持轻松氛围</RimMind.Storyteller.Prompt.DifficultyPeaceful>
   <RimMind.Storyteller.Prompt.DifficultyEasy>轻松模式 — 适当减少威胁事件的频率和强度，偶尔给予小挑战</RimMind.Storyteller.Prompt.DifficultyEasy>

@@ -109,7 +109,6 @@ Where announce, params, and chain are optional fields.</RimMind.Storyteller.Prom
   <RimMind.Storyteller.Prompt.NoBigThreats>  Major threats disabled → do not select ThreatBig category events</RimMind.Storyteller.Prompt.NoBigThreats>
   <RimMind.Storyteller.Prompt.NoIntroThreats>  Intro threats disabled</RimMind.Storyteller.Prompt.NoIntroThreats>
   <RimMind.Storyteller.Prompt.NoViolentQuests>  Violent quests disabled</RimMind.Storyteller.Prompt.NoViolentQuests>
-  <RimMind.Storyteller.Prompt.MoodOffset>  Mood offset={0}</RimMind.Storyteller.Prompt.MoodOffset>
   <RimMind.Storyteller.Prompt.DifficultyGuidance>Difficulty behavior guidance: {0}</RimMind.Storyteller.Prompt.DifficultyGuidance>
   <RimMind.Storyteller.Prompt.DifficultyPeaceful>Peaceful — Prioritize non-threatening events, avoid bringing serious crisis to the colony, maintain a relaxed atmosphere</RimMind.Storyteller.Prompt.DifficultyPeaceful>
   <RimMind.Storyteller.Prompt.DifficultyEasy>Easy — Moderately reduce threat event frequency and intensity, occasionally provide small challenges</RimMind.Storyteller.Prompt.DifficultyEasy>

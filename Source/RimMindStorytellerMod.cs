@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using HarmonyLib;
 using RimMind.Core;
@@ -84,17 +87,72 @@ namespace RimMind.Storyteller
                     if (ContextKeyRegistry.CurrentScenario != ScenarioIds.Storyteller) return new List<ContextEntry>();
                     var mem = StorytellerMemory.Instance;
                     if (mem == null) return new List<ContextEntry>();
-                    var reactions = mem.PlayerReactions;
-                    if (reactions.Count == 0) return new List<ContextEntry>();
-                    var sb = new StringBuilder();
-                    foreach (var r in reactions)
-                    {
-                        int day = r.tick / 60000 + 1;
-                        sb.AppendLine("RimMind.Storyteller.Prompt.ReactionRecordLine".Translate(
-                            day.ToString(), r.incidentLabel, r.reactionLabel));
-                    }
-                    return new List<ContextEntry> { new ContextEntry(sb.ToString().TrimEnd()) };
+                    string? text = mem.ConsumedReactionsText;
+                    if (!string.IsNullOrEmpty(text))
+                        return new List<ContextEntry> { new ContextEntry(text!) };
+                    return new List<ContextEntry>();
                 }, "RimMind.Storyteller");
+
+            ContextKeyRegistry.Register("storyteller_recent_incidents", ContextLayer.L4_History, 0.7f,
+                pawn =>
+                {
+                    if (ContextKeyRegistry.CurrentScenario != ScenarioIds.Storyteller) return new List<ContextEntry>();
+                    string narrations = GetRecentNarrationsFromMemory(5);
+                    if (string.IsNullOrEmpty(narrations)) return new List<ContextEntry>();
+                    return new List<ContextEntry> { new ContextEntry(narrations) };
+                }, "RimMind.Storyteller");
+        }
+
+        private static string GetRecentNarrationsFromMemory(int count)
+        {
+            try
+            {
+                var memoryMod = LoadedModManager.RunningMods
+                    .FirstOrDefault(m => m.Name == "RimMind Memory" || m.Name.Contains("RimMind.Memory"));
+                if (memoryMod == null) return string.Empty;
+
+                var asm = memoryMod.assemblies?.loadedAssemblies
+                    ?.FirstOrDefault(a => a.GetName().Name == "RimMindMemory");
+                if (asm == null) return string.Empty;
+
+                var storeType = asm.GetType("RimMind.Memory.Data.NarratorMemoryStore");
+                if (storeType == null) return string.Empty;
+
+                var instanceProp = storeType.GetProperty("Instance",
+                    BindingFlags.Public | BindingFlags.Static | BindingFlags.NonPublic);
+                if (instanceProp == null) return string.Empty;
+
+                var instance = instanceProp.GetValue(null);
+                if (instance == null) return string.Empty;
+
+                var getRecentMethod = storeType.GetMethod("GetRecentNarrations",
+                    BindingFlags.Public | BindingFlags.Instance);
+                if (getRecentMethod == null) return string.Empty;
+
+                var narrations = getRecentMethod.Invoke(instance, new object[] { count }) as System.Collections.IList;
+                if (narrations == null || narrations.Count == 0) return string.Empty;
+
+                var sb = new StringBuilder();
+                sb.AppendLine("RimMind.Storyteller.Prompt.RecentIncidents".Translate());
+                var narType = narrations[0].GetType();
+                var contentProp = narType.GetProperty("Content");
+                var tickProp = narType.GetProperty("Tick");
+                var tickField = narType.GetField("Tick");
+                for (int i = 0; i < narrations.Count; i++)
+                {
+                    var n = narrations[i];
+                    string content = (contentProp?.GetValue(n) as string) ?? string.Empty;
+                    int tick = (tickProp?.GetValue(n) as int?) ?? (tickField?.GetValue(n) as int?) ?? 0;
+                    int day = tick / 60000 + 1;
+                    sb.AppendLine($"[Day {day}] {content}");
+                }
+                return sb.ToString().TrimEnd();
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"[RimMind-Storyteller] Failed to read NarratorStore via reflection: {ex.Message}");
+                return string.Empty;
+            }
         }
 
         private static void AppendDifficultyContext(StringBuilder sb)
