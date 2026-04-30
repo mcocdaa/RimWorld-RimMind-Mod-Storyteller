@@ -6,7 +6,7 @@ AI叙事者模块，替换RimWorld Storyteller系统，LLM决定事件选择。
 
 `StorytellerComp_RimMindDirector` MTB随机触发 → ContextEngine(RequestStructured, SchemaRegistry.IncidentOutput) → AI选择事件 → ParseResponse验证 → 威胁事件通知玩家审批(影响张力) → 张力系统(0~1) + 事件链(chain) + 回退模式(Cassandra/Randy/Phoebe) + 祭坛对话(RimMindAPI.Chat) + StorytellerMemory持久化。
 
-依赖: Core(编译期)，通过反射推送记忆到Memory的NarratorStore。
+依赖: Core(编译期)，通过反射推送/读取 Memory 模组数据。
 
 ## 构建
 
@@ -21,12 +21,13 @@ AI叙事者模块，替换RimWorld Storyteller系统，LLM决定事件选择。
 
 ```
 Source/
-├── RimMindStorytellerMod.cs                                    Mod入口 + ContextKey注册
+├── RimMindStorytellerMod.cs                                    Mod入口 + ContextKey注册(5个)
 ├── Storyteller/
 │   ├── StorytellerComp_RimMindDirector.cs                      AI事件选择器(StorytellerComp)
 │   ├── StorytellerComp_RimMindFallback.cs                      回退事件生成器
 │   └── RimMindIncidentSelector.cs                              响应解析(ParseResponse + IncidentResponse DTO)
 ├── Memory/StorytellerMemory.cs                                 WorldComponent(事件/对话/反应/张力/链)
+├── Memory/IncidentHistoryRecord.cs                             事件历史记录(含存档兼容字段)
 ├── Settings/RimMindStorytellerSettings.cs + StorytellerSettingsTab.cs
 ├── UI/Window_StorytellerDialogue.cs                            祭坛对话窗口
 ├── Comps/CompStorytellerAltar.cs                               祭坛建筑组件
@@ -42,9 +43,10 @@ StorytellerComp_RimMindDirector.MakeIntervalIncidents
   ├── 有pending结果 → yield return FiringIncident
   ├── 检查: API配置/enableIntervalTrigger/ShouldSkipStorytellerIncident/MTB随机触发
   └── 发起AI请求
+      ├── ConsumeReactions(20) — 消费玩家反应
       ├── ContextRequest(NpcId, Scenario=Storyteller, Budget, MaxTokens=400, T=0.8)
       ├── RimMindAPI.RequestStructured(request, SchemaRegistry.IncidentOutput, callback)
-      └── OnAIResponse → ParseResponse → RecordChainStep → UpdateTension → RegisterEventNotification
+      └── OnAIResponse → ParseResponse → RecordChainStep → RegisterEventNotification
 ```
 
 ## IncidentResponse DTO
@@ -56,6 +58,8 @@ StorytellerComp_RimMindDirector.MakeIntervalIncidents
 ## 张力系统
 
 初始0.5，事件影响: ThreatBig+0.25 / ThreatSmall+0.12 / Misc-0.05 / FactionArrival-0.08。玩家反应: shock+0.05 / excited-0.05。衰减: `tensionDecayPerDay`(默认0.03/天)。
+
+⚠️ **已知Bug**: `WorldComponentTick` 的 `DecayTensionDaily()` 与 `ApplyDecayAndCleanup()` 的 `DecayTension(ticksElapsed)` 双重衰减，实际衰减速率约为设定值的1.5~2倍。详见问题文档。
 
 ## 回退模式
 
@@ -71,8 +75,9 @@ StorytellerComp_RimMindDirector.MakeIntervalIncidents
 |-----|-------|----------|------|
 | storyteller_task | L0_Static | 0.95 | TaskInstruction(12段事件选择指令) |
 | storyteller_context | L1_Baseline | 0.85 | 难度+威胁+张力+近期事件+活跃链 |
-| storyteller_reactions | L1_Baseline | 0.8 | 玩家情感反应 |
+| storyteller_reactions | L1_Baseline | 0.8 | 玩家情感反应(ConsumedReactionsText) |
 | storyteller_dialogue | L3_State | 0.5 | 近期对话摘要 |
+| storyteller_recent_incidents | L4_History | 0.7 | Memory模组近期叙述(反射读取) |
 
 所有注册均包含 `if (ContextKeyRegistry.CurrentScenario != ScenarioIds.Storyteller) return new List<ContextEntry>();` 守卫。
 
@@ -85,8 +90,17 @@ ContextEngine.BuildContext(Scenario=Storyteller)
   ├── L1_Baseline: storyteller_reactions (玩家反应)
   ├── L2_Environment: Core自动注入 (地图状态、殖民者状态等)
   ├── L3_State: storyteller_dialogue (对话摘要)
-  └── L4_History: Core自动注入 (NarrativeMemory)
+  └── L4_History: storyteller_recent_incidents (Memory叙述) + Core自动注入 (NarrativeMemory)
 ```
+
+## Memory 反射桥接（2条路径）
+
+| 路径 | 方向 | 目标数 | 位置 |
+|------|------|--------|------|
+| TryPushToMemoryMod | 写入 | ~14 | Window_StorytellerDialogue.cs:254 |
+| GetRecentNarrationsFromMemory | 读取 | ~7 | RimMindStorytellerMod.cs:106 |
+
+⚠️ 两条路径均使用原始反射，无 `IMemoryBridge` 接口抽象。`IMemoryBridge` 仅在文档中规划，未实际实现。任何一方 API 变更都会导致静默失败。
 
 ## 代码约定
 
@@ -100,11 +114,10 @@ ContextEngine.BuildContext(Scenario=Storyteller)
 
 ## 已知问题
 
-1. `_cachedTarget` 字段赋值后未读取，应删除
-2. `StorytellerDebugActions.cs` 仍导入 `using RimMind.Core.Internal;`（未使用）
-3. `IncidentHistoryRecord` 序列化了 `incidentDefName`/`categoryDefName` 但反序列化后未读取
-4. `RimMind.Storyteller.Prompt.MoodOffset` 翻译键未被消费
-5. Memory反射桥接(14目标)脆弱，长期应迁移到 `IMemoryBridge` 接口
+1. **张力双重衰减Bug** — `DecayTensionDaily()` + `ApplyDecayAndCleanup()` 同时衰减，实际速率约为设定值1.5~2倍
+2. **缺失翻译键** — `RimMind.Storyteller.Prompt.PlayerReactions` 和 `RimMind.Storyteller.Prompt.RecentIncidents` 未在XML中定义
+3. **Memory反射脆弱** — 2条反射路径共~21个目标，`IMemoryBridge`未实现
+4. `IncidentHistoryRecord` 兼容字段 `_compat1`/`_compat2` 反序列化后未读取（存档兼容，可保留）
 
 ## 操作边界
 
