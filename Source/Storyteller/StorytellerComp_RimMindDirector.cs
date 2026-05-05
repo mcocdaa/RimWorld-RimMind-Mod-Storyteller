@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimMind.Core;
 using RimMind.Core.Client;
+using RimMind.Core.Context;
 using RimMind.Core.UI;
+using RimMind.Core.Npc;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
 using RimWorld;
@@ -16,7 +19,6 @@ namespace RimMind.Storyteller
         private bool _hasPendingRequest;
         private bool _hasPendingResult;
         private FiringIncident _pendingIncident = null!;
-        private IIncidentTarget _cachedTarget = null!;
         private int _lastSuccessTick = -99999;
         private int _lastFailTick = -99999;
 
@@ -43,6 +45,7 @@ namespace RimMind.Storyteller
             if (map == null) yield break;
 
             EnsureMemory();
+            if (_memory == null) yield break;
             _memory.ApplyDecayAndCleanup();
 
             if (_hasPendingResult && _pendingIncident != null)
@@ -75,24 +78,22 @@ namespace RimMind.Storyteller
                 yield break;
 
             _hasPendingRequest = true;
-            _cachedTarget = target;
 
-            int maxCandidates = RimMindStorytellerMod.Settings?.maxCandidates ?? Props.maxCandidates;
+            _memory.ConsumeReactions(20);
 
-            var request = new AIRequest
+            float budget = GetStorytellerBudget();
+            var ctxRequest = new ContextRequest
             {
-                SystemPrompt = RimMindIncidentSelector.BuildSystemPrompt(_memory),
-                UserPrompt = RimMindIncidentSelector.BuildUserPrompt(map, _memory, maxCandidates),
-                MaxTokens = 200,
+                NpcId = NpcManager.Instance?.GetNpcForMap(map) ?? "NPC-storyteller",
+                Scenario = ScenarioIds.Storyteller,
+                Budget = budget,
+                CurrentQuery = "Select the most appropriate incident event for the current colony situation and return it as structured JSON.",
+                MaxTokens = 400,
                 Temperature = 0.8f,
-                RequestId = "Storyteller_Director",
-                ModId = "Storyteller",
-                ExpireAtTicks = Find.TickManager.TicksGame + (RimMindStorytellerMod.Settings?.requestExpireTicks ?? 30000),
-                UseJsonMode = true,
-                Priority = AIRequestPriority.Normal,
+                Map = map,
             };
 
-            RimMindAPI.RequestAsync(request, response => OnAIResponseReceived(response, target));
+            TrySelectIncidentWithStructuredOutput(ctxRequest, target);
 
             yield break;
         }
@@ -137,7 +138,6 @@ namespace RimMind.Storyteller
                         incident.parms.points,
                         incident.parms.faction?.def?.defName ?? string.Empty);
                 }
-                _memory.UpdateTension(incident.def.category);
 
                 if (ShouldNotifyPlayer(incident.def))
                     RegisterEventNotification(incident, incidentResponse);
@@ -165,28 +165,27 @@ namespace RimMind.Storyteller
 
             EnsureMemory();
 
+            _memory.ConsumeReactions(20);
+
             _hasPendingRequest = true;
-            _cachedTarget = target;
 
-            Core.Internal.AIRequestQueue.Instance?.ClearCooldown("Storyteller");
+            RimMindAPI.ClearModCooldown("Storyteller");
 
-            int maxCandidates = RimMindStorytellerMod.Settings?.maxCandidates ?? Props.maxCandidates;
-
-            var request = new AIRequest
+            float budget = GetStorytellerBudget();
+            var ctxRequest = new ContextRequest
             {
-                SystemPrompt = RimMindIncidentSelector.BuildSystemPrompt(_memory),
-                UserPrompt = RimMindIncidentSelector.BuildUserPrompt(map, _memory, maxCandidates),
-                MaxTokens = 200,
+                NpcId = NpcManager.Instance?.GetNpcForMap(map) ?? "NPC-storyteller",
+                Scenario = ScenarioIds.Storyteller,
+                Budget = budget,
+                CurrentQuery = "Select the most appropriate incident event for the current colony situation and return it as structured JSON.",
+                MaxTokens = 400,
                 Temperature = 0.8f,
-                RequestId = "Storyteller_Director",
-                ModId = "Storyteller",
-                ExpireAtTicks = Find.TickManager.TicksGame + RimMindStorytellerMod.Settings!.requestExpireTicks,
-                UseJsonMode = true,
-                Priority = AIRequestPriority.Normal,
+                Map = map,
             };
 
-            Log.Message("[RimMind-Storyteller] ForceRequest: sending immediate AI request");
-            RimMindAPI.RequestImmediate(request, response => OnAIResponseReceived(response, target));
+            var schema = RimMind.Core.Context.SchemaRegistry.IncidentOutput;
+            Log.Message("[RimMind-Storyteller] ForceRequest: sending structured AI request");
+            RimMindAPI.RequestStructured(ctxRequest, schema, response => OnAIResponseReceived(response, target));
             return true;
         }
 
@@ -224,9 +223,9 @@ namespace RimMind.Storyteller
                 description = "RimMind.Storyteller.UI.DefaultDesc".Translate(incident.def.LabelCap);
             }
 
-            string optShock    = "RimMind.Storyteller.UI.Shock".Translate();
-            string optExcited  = "RimMind.Storyteller.UI.Excited".Translate();
-            string optAccept   = "RimMind.Storyteller.UI.Accept".Translate();
+            string optShock = "RimMind.Storyteller.UI.Shock".Translate();
+            string optExcited = "RimMind.Storyteller.UI.Excited".Translate();
+            string optAccept = "RimMind.Storyteller.UI.Accept".Translate();
 
             string tooltip = "RimMind.Storyteller.UI.NoInterfere".Translate();
 
@@ -241,7 +240,7 @@ namespace RimMind.Storyteller
                 description = description,
                 options = new[] { optShock, optExcited, optAccept },
                 optionTooltips = new[] { tooltip, tooltip, tooltip },
-                expireTicks = 60000,
+                expireTicks = RimMindStorytellerMod.Settings?.requestExpireTicks ?? 30000,
                 callback = choice =>
                 {
                     string reaction;
@@ -282,10 +281,31 @@ namespace RimMind.Storyteller
             RimMindAPI.RegisterPendingRequest(entry);
         }
 
+        private void TrySelectIncidentWithStructuredOutput(ContextRequest request, IIncidentTarget target)
+        {
+            var schema = RimMind.Core.Context.SchemaRegistry.IncidentOutput;
+            RimMindAPI.RequestStructured(request, schema, response => OnAIResponseReceived(response, target));
+        }
+
+        internal static float GetStorytellerBudget()
+        {
+            var settings = RimMind.Core.RimMindCoreMod.Settings?.Context;
+            if (settings == null) return 0.6f;
+            return settings.ContextBudget;
+        }
+
         private void EnsureMemory()
         {
             if (_memory == null)
-                _memory = StorytellerMemory.Instance ?? new StorytellerMemory(Find.World);
+            {
+                _memory = StorytellerMemory.Instance!;
+                if (_memory == null && Find.World != null)
+                {
+                    _memory = Find.World.components.OfType<StorytellerMemory>().FirstOrDefault();
+                }
+                if (_memory == null)
+                    Log.WarningOnce("[RimMind-Storyteller] StorytellerMemory not found, skipping.", 91827364);
+            }
         }
     }
 }
