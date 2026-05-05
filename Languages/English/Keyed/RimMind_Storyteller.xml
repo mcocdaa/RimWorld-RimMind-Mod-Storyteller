@@ -117,4 +117,6 @@ Where announce, params, and chain are optional fields.</RimMind.Storyteller.Prom
   <RimMind.Storyteller.Prompt.DifficultyHard>Hard — Increase threat event intensity and frequency, test the colony's survival ability</RimMind.Storyteller.Prompt.DifficultyHard>
   <RimMind.Storyteller.Prompt.DifficultyExtreme>Extreme — Select the most challenging events, give the colony no room to breathe</RimMind.Storyteller.Prompt.DifficultyExtreme>
   <RimMind.Storyteller.Prompt.ReactionRecordLine>Day {0} {1} → Player: {2}</RimMind.Storyteller.Prompt.ReactionRecordLine>
+  <RimMind.Storyteller.Prompt.PlayerReactions>[Player Reaction Records]</RimMind.Storyteller.Prompt.PlayerReactions>
+  <RimMind.Storyteller.Prompt.RecentIncidents>[Recent Narrative Incidents]</RimMind.Storyteller.Prompt.RecentIncidents>
 </LanguageData>

@@ -117,4 +117,6 @@
   <RimMind.Storyteller.Prompt.DifficultyHard>困难模式 — 增加威胁事件的强度和频率，考验殖民地的生存能力</RimMind.Storyteller.Prompt.DifficultyHard>
   <RimMind.Storyteller.Prompt.DifficultyExtreme>极限模式 — 选择最具挑战性的事件，不给殖民地喘息的机会</RimMind.Storyteller.Prompt.DifficultyExtreme>
   <RimMind.Storyteller.Prompt.ReactionRecordLine>第{0}天 {1} → 玩家：{2}</RimMind.Storyteller.Prompt.ReactionRecordLine>
+  <RimMind.Storyteller.Prompt.PlayerReactions>[玩家反应记录]</RimMind.Storyteller.Prompt.PlayerReactions>
+  <RimMind.Storyteller.Prompt.RecentIncidents>[近期叙事事件]</RimMind.Storyteller.Prompt.RecentIncidents>
 </LanguageData>

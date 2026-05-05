@@ -233,7 +233,7 @@ namespace RimMind.Storyteller.Memory
                 var c when c == factionArrival => -0.08f,
                 _ => 0f
             };
-            _tensionLevel = Mathf.Clamp01(_tensionLevel + delta);
+            _tensionLevel = TensionMath.ApplyDelta(_tensionLevel, delta);
         }
 
         public void ApplyDecayAndCleanup()
@@ -248,16 +248,15 @@ namespace RimMind.Storyteller.Memory
 
         private void DecayTension(int ticksElapsed)
         {
-            if (ticksElapsed <= 0) return;
             float decayPerDay = RimMind.Storyteller.RimMindStorytellerMod.Settings?.tensionDecayPerDay ?? 0.03f;
-            float daysElapsed = ticksElapsed / 60000f;
-            _tensionLevel = Mathf.Clamp01(_tensionLevel - decayPerDay * daysElapsed);
+            _tensionLevel = TensionMath.ComputeDecay(_tensionLevel, decayPerDay, ticksElapsed);
         }
 
         public void DecayTensionDaily()
         {
             float rate = RimMind.Storyteller.RimMindStorytellerMod.Settings?.tensionDecayPerDay ?? 0.03f;
-            _tensionLevel = Mathf.Clamp01(_tensionLevel - rate);
+            _tensionLevel = TensionMath.ComputeDailyDecay(_tensionLevel, rate);
+            _lastTensionDecayTick = Find.TickManager.TicksGame;
         }
 
         public override void WorldComponentTick()
@@ -269,7 +268,7 @@ namespace RimMind.Storyteller.Memory
 
         public void ApplyTensionDelta(float delta)
         {
-            _tensionLevel = Mathf.Clamp01(_tensionLevel + delta);
+            _tensionLevel = TensionMath.ApplyDelta(_tensionLevel, delta);
         }
 
         public void RecordChainStep(string chainId, int chainStep, int chainTotal, string nextHint, string incidentDefName, int tick, float points, string factionDefName)
