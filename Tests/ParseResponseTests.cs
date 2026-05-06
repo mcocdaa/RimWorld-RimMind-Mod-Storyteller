@@ -51,7 +51,7 @@ namespace RimMind.Storyteller.Tests
             string? repaired = RimMind.Core.Client.JsonRepairHelper.TryRepairTruncatedJson(truncated);
 
             Assert.NotNull(repaired);
-            Assert.True(repaired!.EndsWith("}}"));
+            Assert.EndsWith("}}", repaired!);
         }
 
         [Fact]

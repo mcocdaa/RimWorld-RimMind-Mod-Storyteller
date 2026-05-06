@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using HarmonyLib;
+using RimMind.Contracts.Extension;
 using RimMind.Core;
 using RimMind.Core.Context;
 using RimMind.Core.Prompt;
@@ -25,8 +26,10 @@ namespace RimMind.Storyteller
             Settings = GetSettings<RimMindStorytellerSettings>();
             new Harmony("mcocdaa.RimMindStoryteller").PatchAll();
 
-            RimMindAPI.RegisterSettingsTab("storyteller", () => "RimMind.Storyteller.UI.TabLabel".Translate(), StorytellerSettingsTab.Draw);
-            RimMindAPI.RegisterModCooldown("Storyteller", () => (int)(Settings.mtbDays * 60000f));
+            RimMindAPI.Extensions<ISettingsTab>().Register(new StorytellerSettingsTabAdapter());
+            RimMindAPI.Extensions<IModCooldown>().Register(new StorytellerModCooldown(Settings));
+            RimMindAPI.Extensions<ISkipCheck>().Register(new StorytellerIncidentSkipCheck(Settings));
+            RimMindAPI.Extensions<IIncidentExecutedListener>().Register(new StorytellerIncidentExecutedListener());
 
             RegisterProviders();
 
