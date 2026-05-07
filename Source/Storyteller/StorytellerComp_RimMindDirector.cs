@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using RimMind.Core;
 using RimMind.Core.Client;
-using RimMind.Core.Context;
-using RimMind.Core.UI;
+using RimMind.Kernel.Context;
+using RimMind.Adapters.UI;
 using RimMind.Core.Npc;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
@@ -183,7 +183,7 @@ namespace RimMind.Storyteller
                 Map = map,
             };
 
-            var schema = RimMind.Core.Context.SchemaRegistry.IncidentOutput;
+            var schema = RimMind.Kernel.Context.SchemaRegistry.IncidentOutput;
             Log.Message("[RimMind-Storyteller] ForceRequest: sending structured AI request");
             RimMindAPI.RequestStructured(ctxRequest, schema, response => OnAIResponseReceived(response, target));
             return true;
@@ -283,7 +283,7 @@ namespace RimMind.Storyteller
 
         private void TrySelectIncidentWithStructuredOutput(ContextRequest request, IIncidentTarget target)
         {
-            var schema = RimMind.Core.Context.SchemaRegistry.IncidentOutput;
+            var schema = RimMind.Kernel.Context.SchemaRegistry.IncidentOutput;
             RimMindAPI.RequestStructured(request, schema, response => OnAIResponseReceived(response, target));
         }
 
