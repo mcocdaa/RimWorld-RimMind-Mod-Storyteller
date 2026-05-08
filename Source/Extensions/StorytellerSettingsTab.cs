@@ -1,6 +1,7 @@
 using UnityEngine;
 using RimMind.Contracts.Extension;
 using RimMind.Storyteller.Settings;
+using Verse;
 
 namespace RimMind.Storyteller
 {

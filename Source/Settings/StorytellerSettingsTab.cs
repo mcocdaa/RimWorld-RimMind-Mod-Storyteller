@@ -54,7 +54,7 @@ namespace RimMind.Storyteller.Settings
 
             SettingsUIHelper.DrawCustomPromptSection(listing,
                 "RimMind.Storyteller.UI.StylePromptLabel".Translate(),
-                ref _promptText);
+                ref _promptText, 3f);
             SavePrompt();
 
             SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Request".Translate());

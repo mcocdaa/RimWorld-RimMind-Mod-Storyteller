@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using HarmonyLib;
+using RimMind.Contracts.Context;
 using RimMind.Contracts.Extension;
 using RimMind.Core;
 using RimMind.Kernel.Context;
@@ -39,8 +40,9 @@ namespace RimMind.Storyteller
         private void RegisterProviders()
         {
             ContextKeyRegistry.Register("storyteller_dialogue", ContextLayer.L3_State, 0.5f,
-                pawn =>
+                pawnObj =>
                 {
+                    var pawn = pawnObj as Pawn; if (pawn == null) return new List<ContextEntry>();
                     if (ContextKeyRegistry.CurrentScenario != ScenarioIds.Storyteller) return new List<ContextEntry>();
                     var mem = StorytellerMemory.Instance;
                     if (mem == null) return new List<ContextEntry>();
@@ -51,8 +53,9 @@ namespace RimMind.Storyteller
                 }, "RimMind.Storyteller");
 
             ContextKeyRegistry.Register("storyteller_task", ContextLayer.L0_Static, 0.95f,
-                pawn =>
+                pawnObj =>
                 {
+                    var pawn = pawnObj as Pawn; if (pawn == null) return new List<ContextEntry>();
                     if (ContextKeyRegistry.CurrentScenario != ScenarioIds.Storyteller) return new List<ContextEntry>();
                     string taskInstruction = TaskInstructionBuilder.Build(
                         "RimMind.Storyteller.Prompt.TaskInstruction",
@@ -63,8 +66,9 @@ namespace RimMind.Storyteller
                 }, "RimMind.Storyteller");
 
             ContextKeyRegistry.Register("storyteller_context", ContextLayer.L1_Baseline, 0.85f,
-                pawn =>
+                pawnObj =>
                 {
+                    var pawn = pawnObj as Pawn; if (pawn == null) return new List<ContextEntry>();
                     if (ContextKeyRegistry.CurrentScenario != ScenarioIds.Storyteller) return new List<ContextEntry>();
                     var mem = StorytellerMemory.Instance;
                     if (mem == null) return new List<ContextEntry>();
@@ -85,8 +89,9 @@ namespace RimMind.Storyteller
                 }, "RimMind.Storyteller");
 
             ContextKeyRegistry.Register("storyteller_reactions", ContextLayer.L1_Baseline, 0.8f,
-                pawn =>
+                pawnObj =>
                 {
+                    var pawn = pawnObj as Pawn; if (pawn == null) return new List<ContextEntry>();
                     if (ContextKeyRegistry.CurrentScenario != ScenarioIds.Storyteller) return new List<ContextEntry>();
                     var mem = StorytellerMemory.Instance;
                     if (mem == null) return new List<ContextEntry>();
@@ -97,8 +102,9 @@ namespace RimMind.Storyteller
                 }, "RimMind.Storyteller");
 
             ContextKeyRegistry.Register("storyteller_recent_incidents", ContextLayer.L4_History, 0.7f,
-                pawn =>
+                pawnObj =>
                 {
+                    var pawn = pawnObj as Pawn; if (pawn == null) return new List<ContextEntry>();
                     if (ContextKeyRegistry.CurrentScenario != ScenarioIds.Storyteller) return new List<ContextEntry>();
                     string narrations = GetRecentNarrationsFromMemory(5);
                     if (string.IsNullOrEmpty(narrations)) return new List<ContextEntry>();

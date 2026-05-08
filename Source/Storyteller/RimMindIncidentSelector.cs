@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using RimMind.Contracts.Client;
+using RimMind.Core.Client;
 using RimMind.Storyteller.Memory;
 using RimWorld;
 using Verse;
