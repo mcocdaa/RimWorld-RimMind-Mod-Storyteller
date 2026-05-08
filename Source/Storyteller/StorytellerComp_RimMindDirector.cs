@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RimMind.Contracts.Client;
+using RimMind.Contracts.Npc;
 using RimMind.Core;
-using RimMind.Core.Client;
 using RimMind.Kernel.Context;
 using RimMind.Adapters.UI;
 using RimMind.Core.Npc;

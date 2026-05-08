@@ -1,4 +1,5 @@
 using RimMind.Contracts.Extension;
+using RimMind.Storyteller.Settings;
 
 namespace RimMind.Storyteller
 {
