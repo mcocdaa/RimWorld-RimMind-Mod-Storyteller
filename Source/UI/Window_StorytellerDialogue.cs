@@ -1,9 +1,10 @@
-ï»¿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using RimMind.Core;
 using RimMind.Kernel.Context;
+using RimMind.Contracts.Context;
 using RimMind.Storyteller;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
@@ -182,7 +183,7 @@ namespace RimMind.Storyteller.UI
 
             _waitingForResponse = true;
 
-            // ç¥­å›å¯¹è¯èµ° Chat è·¯å¾„ï¼Œç”± ContextEngine æ¥ç®¡ Prompt æ„å»º
+            // ¼ÀÌ³¶Ô»°×ß Chat Â·¾¶£¬ÓÉ ContextEngine ½Ó¹Ü Prompt ¹¹½¨
             float budget = StorytellerComp_RimMindDirector.GetStorytellerBudget();
             var request = new ContextRequest
             {

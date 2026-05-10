@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="../../RimMind-Core/Source/Client/JsonRepairHelper.cs" LinkBase="Client" />
+    <Compile Include="../../RimMind-Core/Source/Kernel/Json/JsonRepairHelper.cs" LinkBase="Kernel/Json" />
     <Compile Include="../Source/Memory/TensionMath.cs" LinkBase="Memory" />
     <Compile Include="../Source/Memory/IncidentResponse.cs" LinkBase="Memory" />
   </ItemGroup>

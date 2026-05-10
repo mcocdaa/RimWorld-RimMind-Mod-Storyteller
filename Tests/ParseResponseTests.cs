@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using RimMind.Kernel.Json;
 using RimMind.Storyteller;
 using Xunit;
 
@@ -21,7 +22,7 @@ namespace RimMind.Storyteller.Tests
         public void ParseResponse_TruncatedJson_RepairsAndDeserialize()
         {
             string truncated = "{\"defName\":\"RaidEnemy\",\"reason\":\"tension\"";
-            string? repaired = RimMind.Core.Client.JsonRepairHelper.TryRepairTruncatedJson(truncated);
+            string? repaired = JsonRepairHelper.TryRepairTruncatedJson(truncated);
 
             Assert.NotNull(repaired);
             var result = JsonConvert.DeserializeObject<IncidentResponse>(repaired!);
@@ -32,7 +33,7 @@ namespace RimMind.Storyteller.Tests
         [Fact]
         public void ParseResponse_EmptyString_ReturnsNull()
         {
-            string? repaired = RimMind.Core.Client.JsonRepairHelper.TryRepairTruncatedJson("");
+            string? repaired = JsonRepairHelper.TryRepairTruncatedJson("");
             Assert.Null(repaired);
         }
 
@@ -40,7 +41,7 @@ namespace RimMind.Storyteller.Tests
         public void ParseResponse_AlreadyValidJson_ReturnsNull()
         {
             string valid = @"{""defName"":""Eclipse""}";
-            string? repaired = RimMind.Core.Client.JsonRepairHelper.TryRepairTruncatedJson(valid);
+            string? repaired = JsonRepairHelper.TryRepairTruncatedJson(valid);
             Assert.Null(repaired);
         }
 
@@ -48,7 +49,7 @@ namespace RimMind.Storyteller.Tests
         public void ParseResponse_TruncatedWithNestedBraces()
         {
             string truncated = @"{""defName"":""RaidEnemy"",""params"":{""points"":1.5";
-            string? repaired = RimMind.Core.Client.JsonRepairHelper.TryRepairTruncatedJson(truncated);
+            string? repaired = JsonRepairHelper.TryRepairTruncatedJson(truncated);
 
             Assert.NotNull(repaired);
             Assert.EndsWith("}}", repaired!);
