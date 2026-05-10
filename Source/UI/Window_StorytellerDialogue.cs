@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using RimMind.Contracts.Result;
 using RimMind.Core;
 using RimMind.Kernel.Context;
 using RimMind.Contracts.Context;
@@ -183,7 +184,7 @@ namespace RimMind.Storyteller.UI
 
             _waitingForResponse = true;
 
-            // ¼ÀÌ³¶Ô»°×ß Chat Â·¾¶£¬ÓÉ ContextEngine ½Ó¹Ü Prompt ¹¹½¨
+            // ï¿½ï¿½Ì³ï¿½Ô»ï¿½ï¿½ï¿½ Chat Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ContextEngine ï¿½Ó¹ï¿½ Prompt ï¿½ï¿½ï¿½ï¿½
             float budget = StorytellerComp_RimMindDirector.GetStorytellerBudget();
             var request = new ContextRequest
             {
@@ -204,12 +205,12 @@ namespace RimMind.Storyteller.UI
                     return;
                 }
                 var result = task.Result;
-                if (result == null || !string.IsNullOrEmpty(result.Error))
+                if (result.IsErr)
                 {
                     _responseQueue.Enqueue(("system", ""));
                     return;
                 }
-                string assistantMsg = result.Message?.Trim() ?? "";
+                string assistantMsg = result.Value.Message?.Trim() ?? "";
                 if (assistantMsg.NullOrEmpty())
                 {
                     _responseQueue.Enqueue(("system", ""));

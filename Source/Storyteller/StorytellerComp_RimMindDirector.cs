@@ -4,6 +4,7 @@ using System.Linq;
 using RimMind.Contracts.Client;
 using RimMind.Contracts.Npc;
 using RimMind.Contracts.UI;
+using RimMind.Contracts.Result;
 using RimMind.Core;
 using RimMind.Kernel.Context;
 using RimMind.Contracts.Context;
@@ -101,16 +102,18 @@ namespace RimMind.Storyteller
             yield break;
         }
 
-        private void OnAIResponseReceived(AIResponse response, IIncidentTarget target)
+        private void OnAIResponseReceived(Result<AIResponse, RimMindError> result, IIncidentTarget target)
         {
             _hasPendingRequest = false;
 
-            if (!response.Success)
+            if (result.IsErr)
             {
                 _lastFailTick = Find.TickManager.TicksGame;
-                Log.Warning($"[RimMind-Storyteller] AI request failed: {response.Error}");
+                Log.Warning($"[RimMind-Storyteller] AI request failed: {result.Error}");
                 return;
             }
+
+            var response = result.Value;
 
             if (RimMindStorytellerMod.Settings?.debugLogging == true)
                 Log.Message($"[RimMind-Storyteller] AI raw response: {response.Content}");
@@ -188,7 +191,7 @@ namespace RimMind.Storyteller
 
             var schema = RimMind.Kernel.Context.SchemaRegistry.IncidentOutput;
             Log.Message("[RimMind-Storyteller] ForceRequest: sending structured AI request");
-            RimMindAPI.RequestStructured(ctxRequest, schema, response => OnAIResponseReceived(response, target));
+            RimMindAPI.RequestStructured(ctxRequest, schema, result => OnAIResponseReceived(result, target));
             return true;
         }
 
@@ -287,7 +290,7 @@ namespace RimMind.Storyteller
         private void TrySelectIncidentWithStructuredOutput(ContextRequest request, IIncidentTarget target)
         {
             var schema = RimMind.Kernel.Context.SchemaRegistry.IncidentOutput;
-            RimMindAPI.RequestStructured(request, schema, response => OnAIResponseReceived(response, target));
+            RimMindAPI.RequestStructured(request, schema, result => OnAIResponseReceived(result, target));
         }
 
         internal static float GetStorytellerBudget()
