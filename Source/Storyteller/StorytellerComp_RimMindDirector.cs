@@ -109,7 +109,7 @@ namespace RimMind.Storyteller
             if (result.IsErr)
             {
                 _lastFailTick = Find.TickManager.TicksGame;
-                Log.Warning($"[RimMind-Storyteller] AI request failed: {result.Error}");
+                RimMindErrors.Warn($"[RimMind-Storyteller] AI request failed: {result.Error}");
                 return;
             }
 
@@ -122,7 +122,7 @@ namespace RimMind.Storyteller
             if (incident == null)
             {
                 _lastFailTick = Find.TickManager.TicksGame;
-                Log.Warning($"[RimMind-Storyteller] AI response parse failed or event cannot fire: {response.Content}");
+                RimMindErrors.Warn($"[RimMind-Storyteller] AI response parse failed or event cannot fire: {response.Content}");
                 return;
             }
 
@@ -156,7 +156,7 @@ namespace RimMind.Storyteller
         {
             if (_hasPendingRequest)
             {
-                Log.Warning("[RimMind-Storyteller] ForceRequest: overriding existing pending request");
+                RimMindErrors.Warn("[RimMind-Storyteller] ForceRequest: overriding existing pending request");
                 _hasPendingRequest = false;
             }
 
@@ -165,7 +165,7 @@ namespace RimMind.Storyteller
 
             if (!RimMindAPI.IsConfigured())
             {
-                Log.Warning("[RimMind-Storyteller] ForceRequest: API not configured");
+                RimMindErrors.Warn("[RimMind-Storyteller] ForceRequest: API not configured");
                 return false;
             }
 
@@ -310,7 +310,7 @@ namespace RimMind.Storyteller
                     _memory = Find.World.components.OfType<StorytellerMemory>().FirstOrDefault();
                 }
                 if (_memory == null)
-                    Log.WarningOnce("[RimMind-Storyteller] StorytellerMemory not found, skipping.", 91827364);
+                    RimMindErrors.Warn("[RimMind-Storyteller] StorytellerMemory not found, skipping.");
             }
         }
     }

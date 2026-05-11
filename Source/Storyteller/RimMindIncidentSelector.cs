@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using RimMind.Contracts.Client;
 using RimMind.Adapters.Client;
 using RimMind.Kernel.Json;
+using RimMind.Contracts.Result;
 using RimMind.Storyteller.Memory;
 using RimWorld;
 using Verse;
@@ -40,7 +41,7 @@ namespace RimMind.Storyteller
             var incidentDef = DefDatabase<IncidentDef>.GetNamedSilentFail(result.defName);
             if (incidentDef == null)
             {
-                Log.Warning($"[RimMind-Storyteller] AI returned unknown defName: {result.defName}");
+                RimMindErrors.Warn($"[RimMind-Storyteller] AI returned unknown defName: {result.defName}");
                 return (null, result);
             }
 
@@ -71,7 +72,7 @@ namespace RimMind.Storyteller
 
             if (!incidentDef.Worker.CanFireNow(parms))
             {
-                Log.Warning($"[RimMind-Storyteller] AI selected event cannot fire now: {result.defName}");
+                RimMindErrors.Warn($"[RimMind-Storyteller] AI selected event cannot fire now: {result.defName}");
                 return (null, result);
             }
 

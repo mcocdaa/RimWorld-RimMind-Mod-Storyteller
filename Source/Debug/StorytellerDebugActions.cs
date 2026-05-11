@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Text;
 using LudeonTK;
+using RimMind.Contracts.Result;
 using RimMind.Core;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
@@ -18,13 +19,13 @@ namespace RimMind.Storyteller.Debug
             var map = Find.CurrentMap;
             if (map == null)
             {
-                Log.Warning("[RimMind-Storyteller] No current map.");
+                RimMindErrors.Warn("[RimMind-Storyteller] No current map.");
                 return;
             }
 
             if (!RimMindAPI.IsConfigured())
             {
-                Log.Warning("[RimMind-Storyteller] API not configured.");
+                RimMindErrors.Warn("[RimMind-Storyteller] API not configured.");
                 return;
             }
 
@@ -34,7 +35,7 @@ namespace RimMind.Storyteller.Debug
 
             if (director == null)
             {
-                Log.Warning("[RimMind-Storyteller] Current storyteller is not RimMind Director.");
+                RimMindErrors.Warn("[RimMind-Storyteller] Current storyteller is not RimMind Director.");
                 return;
             }
 
@@ -78,7 +79,7 @@ namespace RimMind.Storyteller.Debug
             var map = Find.CurrentMap;
             if (map == null)
             {
-                Log.Warning("[RimMind-Storyteller] No current map.");
+                RimMindErrors.Warn("[RimMind-Storyteller] No current map.");
                 return;
             }
 
@@ -194,7 +195,7 @@ namespace RimMind.Storyteller.Debug
             var memory = StorytellerMemory.Instance;
             if (memory == null)
             {
-                Log.Warning("[RimMind-Storyteller] Memory not initialized (load a game first).");
+                RimMindErrors.Warn("[RimMind-Storyteller] Memory not initialized (load a game first).");
                 return;
             }
 
@@ -211,7 +212,7 @@ namespace RimMind.Storyteller.Debug
             var memory = StorytellerMemory.Instance;
             if (memory == null)
             {
-                Log.Warning("[RimMind-Storyteller] Memory not initialized (load a game first).");
+                RimMindErrors.Warn("[RimMind-Storyteller] Memory not initialized (load a game first).");
                 return;
             }
 

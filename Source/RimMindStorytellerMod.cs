@@ -6,6 +6,7 @@ using System.Text;
 using HarmonyLib;
 using RimMind.Contracts.Context;
 using RimMind.Contracts.Extension;
+using RimMind.Contracts.Result;
 using RimMind.Core;
 using RimMind.Kernel.Context;
 using RimMind.Kernel.Prompt;
@@ -159,7 +160,7 @@ namespace RimMind.Storyteller
             }
             catch (Exception ex)
             {
-                Log.Warning($"[RimMind-Storyteller] Failed to read NarratorStore via reflection: {ex.Message}");
+                RimMindErrors.Warn($"[RimMind-Storyteller] Failed to read NarratorStore via reflection: {ex.Message}");
                 return string.Empty;
             }
         }
