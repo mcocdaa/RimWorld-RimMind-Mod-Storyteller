@@ -1,6 +1,6 @@
 using UnityEngine;
 using RimMind.Application.Common.Interfaces.Extension;
-using RimMind.Presentation.Settings;
+using RimMind.Application.Common.Interfaces.Extension;
 using RimMind.Storyteller.Settings;
 using Verse;
 

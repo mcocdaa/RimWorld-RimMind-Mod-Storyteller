@@ -8,7 +8,7 @@ using RimMind.Application.Common.Interfaces.UI;
 using RimMind.Application.Common.Models.UI;
 using RimMind.Domain.ValueObjects;
 using RimMind.Presentation;
-using RimMind.Presentation.Settings;
+using RimMind.Application.Common.Interfaces.Extension;
 using RimMind.Application.Features.Context;
 using RimMind.Application.Common.Models.Context;
 using RimMind.Application.Common.Interfaces.Context;

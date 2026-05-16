@@ -64,6 +64,7 @@ namespace RimMind.Storyteller
                     if (ContextKeyRegistry.CurrentScenario != ScenarioIds.Storyteller) return new List<ContextEntry>();
                     string taskInstruction = TaskInstructionBuilder.Build(
                         "RimMind.Storyteller.Prompt.TaskInstruction",
+                        null,
                         "Role", "Goal", "Process", "Constraint", "Example", "Output", "Fallback",
                         "SystemJsonFormat", "SystemTensionGuidance", "SystemChainGuidance",
                         "SystemParamsGuidance", "SystemRequirements");
