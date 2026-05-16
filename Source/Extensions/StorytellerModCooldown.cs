@@ -1,4 +1,4 @@
-using RimMind.Contracts.Extension;
+using RimMind.Application.Common.Interfaces.Extension;
 using RimMind.Storyteller.Settings;
 
 namespace RimMind.Storyteller

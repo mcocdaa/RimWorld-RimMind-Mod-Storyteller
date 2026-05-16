@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using RimMind.Adapters.UI;
+using RimMind.Infrastructure.UI;
 using RimMind.Storyteller.Memory;
 using UnityEngine;
 using Verse;

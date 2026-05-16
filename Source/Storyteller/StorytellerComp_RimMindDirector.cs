@@ -1,15 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RimMind.Contracts.Client;
-using RimMind.Contracts.Npc;
-using RimMind.Contracts.UI;
-using RimMind.Contracts.Result;
-using RimMind.Core;
-using RimMind.Kernel.Context;
-using RimMind.Contracts.Context;
-using RimMind.Adapters.UI;
-using RimMind.Adapters.Verse;
+using RimMind.Application.Common.Interfaces.Client;
+using RimMind.Application.Common.Models.Client;
+using RimMind.Application.Common.Interfaces.Npc;
+using RimMind.Application.Common.Interfaces.UI;
+using RimMind.Application.Common.Models.UI;
+using RimMind.Domain.ValueObjects;
+using RimMind.Presentation;
+using RimMind.Presentation.Settings;
+using RimMind.Application.Features.Context;
+using RimMind.Application.Common.Models.Context;
+using RimMind.Application.Common.Interfaces.Context;
+using RimMind.Infrastructure.UI;
+using RimMind.Presentation.Context;
+using RimMind.Infrastructure.Verse;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
 using RimWorld;
@@ -189,7 +194,7 @@ namespace RimMind.Storyteller
                 Map = map,
             };
 
-            var schema = RimMind.Kernel.Context.SchemaRegistry.IncidentOutput;
+            var schema = RimMind.Application.Features.Context.SchemaRegistry.IncidentOutput;
             Log.Message("[RimMind-Storyteller] ForceRequest: sending structured AI request");
             RimMindAPI.RequestStructured(ctxRequest, schema, result => OnAIResponseReceived(result, target));
             return true;
@@ -289,13 +294,13 @@ namespace RimMind.Storyteller
 
         private void TrySelectIncidentWithStructuredOutput(ContextRequest request, IIncidentTarget target)
         {
-            var schema = RimMind.Kernel.Context.SchemaRegistry.IncidentOutput;
+            var schema = RimMind.Application.Features.Context.SchemaRegistry.IncidentOutput;
             RimMindAPI.RequestStructured(request, schema, result => OnAIResponseReceived(result, target));
         }
 
         internal static float GetStorytellerBudget()
         {
-            var settings = RimMind.Core.RimMindCoreMod.Settings?.Context;
+            var settings = RimMind.Presentation.RimMindCoreMod.Settings?.Context;
             if (settings == null) return 0.6f;
             return settings.ContextBudget;
         }

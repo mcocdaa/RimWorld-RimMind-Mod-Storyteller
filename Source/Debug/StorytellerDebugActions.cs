@@ -1,8 +1,9 @@
 using System.Linq;
 using System.Text;
 using LudeonTK;
-using RimMind.Contracts.Result;
-using RimMind.Core;
+using RimMind.Domain.ValueObjects;
+using RimMind.Presentation;
+using RimMind.Presentation.Context;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
 using RimWorld;

@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using RimMind.Contracts.Client;
-using RimMind.Adapters.Client;
-using RimMind.Kernel.Json;
-using RimMind.Contracts.Result;
+using RimMind.Application.Common.Interfaces.Client;
+using RimMind.Application.Common.Models.Client;
+using RimMind.Infrastructure.Services.Clients;
+using RimMind.Application.Features.Json;
+using RimMind.Domain.ValueObjects;
 using RimMind.Storyteller.Memory;
 using RimWorld;
 using Verse;

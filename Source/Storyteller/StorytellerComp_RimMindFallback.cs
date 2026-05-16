@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using RimMind.Core;
+using RimMind.Presentation;
+using RimMind.Presentation.Context;
 using RimMind.Storyteller.Settings;
 using RimWorld;
 using Verse;

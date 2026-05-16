@@ -1,5 +1,6 @@
 using HarmonyLib;
-using RimMind.Core;
+using RimMind.Presentation;
+using RimMind.Presentation.Context;
 using RimMind.Storyteller.Memory;
 using RimWorld;
 using Verse;
