@@ -1,5 +1,5 @@
 using Newtonsoft.Json;
-using RimMind.Kernel.Json;
+using RimMind.Application.Features.Json;
 using RimMind.Storyteller;
 using Xunit;
 
