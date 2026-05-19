@@ -12,9 +12,8 @@ using RimMind.Application.Common.Interfaces.Extension;
 using RimMind.Application.Features.Context;
 using RimMind.Application.Common.Models.Context;
 using RimMind.Application.Common.Interfaces.Context;
-using RimMind.Infrastructure.UI;
 using RimMind.Presentation.Context;
-using RimMind.Infrastructure.Verse;
+using RimMind.Application.Common.Interfaces.Internal;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
 using RimWorld;
@@ -93,7 +92,7 @@ namespace RimMind.Storyteller
             float budget = GetStorytellerBudget();
             var ctxRequest = new ContextRequest
             {
-                NpcId = NpcManager.Instance?.GetNpcForMap(map) ?? "NPC-storyteller",
+                NpcId = RimMindServiceLocator.Get<INpcManager>()?.GetNpcForMap(map) ?? "NPC-storyteller",
                 Scenario = ScenarioIds.Storyteller,
                 Budget = budget,
                 CurrentQuery = "Select the most appropriate incident event for the current colony situation and return it as structured JSON.",
@@ -185,7 +184,7 @@ namespace RimMind.Storyteller
             float budget = GetStorytellerBudget();
             var ctxRequest = new ContextRequest
             {
-                NpcId = NpcManager.Instance?.GetNpcForMap(map) ?? "NPC-storyteller",
+                NpcId = RimMindServiceLocator.Get<INpcManager>()?.GetNpcForMap(map) ?? "NPC-storyteller",
                 Scenario = ScenarioIds.Storyteller,
                 Budget = budget,
                 CurrentQuery = "Select the most appropriate incident event for the current colony situation and return it as structured JSON.",
