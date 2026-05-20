@@ -3,7 +3,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using RimMind.Application.Common.Interfaces.Client;
 using RimMind.Application.Common.Models.Client;
-using RimMind.Application.Features.Json;
+using RimMind.Presentation;
 using RimMind.Domain.ValueObjects;
 using RimMind.Storyteller.Memory;
 using RimWorld;
@@ -24,7 +24,7 @@ namespace RimMind.Storyteller
             }
             catch (System.Exception)
             {
-                string? repaired = JsonRepairHelper.TryRepairTruncatedJson(aiContent);
+                string? repaired = RimMindAPI.Json.TryRepairTruncatedJson(aiContent);
                 if (repaired != null)
                 {
                     try { result = JsonConvert.DeserializeObject<IncidentResponse>(repaired); }

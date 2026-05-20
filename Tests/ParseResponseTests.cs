@@ -1,5 +1,5 @@
 using Newtonsoft.Json;
-using RimMind.Application.Features.Json;
+using RimMind.Presentation;
 using RimMind.Storyteller;
 using Xunit;
 
@@ -22,7 +22,7 @@ namespace RimMind.Storyteller.Tests
         public void ParseResponse_TruncatedJson_RepairsAndDeserialize()
         {
             string truncated = "{\"defName\":\"RaidEnemy\",\"reason\":\"tension\"";
-            string? repaired = JsonRepairHelper.TryRepairTruncatedJson(truncated);
+            string? repaired = RimMindAPI.Json.TryRepairTruncatedJson(truncated);
 
             Assert.NotNull(repaired);
             var result = JsonConvert.DeserializeObject<IncidentResponse>(repaired!);
@@ -33,7 +33,7 @@ namespace RimMind.Storyteller.Tests
         [Fact]
         public void ParseResponse_EmptyString_ReturnsNull()
         {
-            string? repaired = JsonRepairHelper.TryRepairTruncatedJson("");
+            string? repaired = RimMindAPI.Json.TryRepairTruncatedJson("");
             Assert.Null(repaired);
         }
 
@@ -49,7 +49,7 @@ namespace RimMind.Storyteller.Tests
         public void ParseResponse_TruncatedWithNestedBraces()
         {
             string truncated = @"{""defName"":""RaidEnemy"",""params"":{""points"":1.5";
-            string? repaired = JsonRepairHelper.TryRepairTruncatedJson(truncated);
+            string? repaired = RimMindAPI.Json.TryRepairTruncatedJson(truncated);
 
             Assert.NotNull(repaired);
             Assert.EndsWith("}}", repaired!);

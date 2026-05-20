@@ -19,7 +19,11 @@
   <ItemGroup>
     <Compile Include="../Source/Memory/TensionMath.cs" LinkBase="Memory" />
     <Compile Include="../Source/Memory/IncidentResponse.cs" LinkBase="Memory" />
-    <Compile Include="../../RimMind-Core/Source/backup/DeadCode/JsonRepairHelper.cs" LinkBase="Application/Json" />
+    <Compile Include="../../RimMind-Core/Source/Application/Features/Json/JsonRepairHelper.cs" LinkBase="Application/Json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../RimMind-Core/Source/Domain/RimMindCore.Domain.csproj" />
   </ItemGroup>
 
 </Project>

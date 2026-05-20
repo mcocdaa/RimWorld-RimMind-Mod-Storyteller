@@ -3,17 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using RimMind.Application.Common.Interfaces.Client;
 using RimMind.Application.Common.Models.Client;
-using RimMind.Application.Common.Interfaces.Npc;
 using RimMind.Application.Common.Interfaces.UI;
 using RimMind.Application.Common.Models.UI;
 using RimMind.Domain.ValueObjects;
 using RimMind.Presentation;
 using RimMind.Application.Common.Interfaces.Extension;
-using RimMind.Application.Features.Context;
-using RimMind.Application.Common.Models.Context;
-using RimMind.Application.Common.Interfaces.Context;
-using RimMind.Presentation.Context;
-using RimMind.Application.Common.Interfaces.Internal;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
 using RimWorld;
@@ -92,8 +86,8 @@ namespace RimMind.Storyteller
             float budget = GetStorytellerBudget();
             var ctxRequest = new ContextRequest
             {
-                NpcId = RimMindServiceLocator.Get<INpcManager>()?.GetNpcForMap(map) ?? "NPC-storyteller",
-                Scenario = ScenarioIds.Storyteller,
+                NpcId = RimMindAPI.GetNpcForMap(map) ?? "NPC-storyteller",
+                Scenario = RimMindAPI.Context.ScenarioStoryteller,
                 Budget = budget,
                 CurrentQuery = "Select the most appropriate incident event for the current colony situation and return it as structured JSON.",
                 MaxTokens = 400,
@@ -184,8 +178,8 @@ namespace RimMind.Storyteller
             float budget = GetStorytellerBudget();
             var ctxRequest = new ContextRequest
             {
-                NpcId = RimMindServiceLocator.Get<INpcManager>()?.GetNpcForMap(map) ?? "NPC-storyteller",
-                Scenario = ScenarioIds.Storyteller,
+                NpcId = RimMindAPI.GetNpcForMap(map) ?? "NPC-storyteller",
+                Scenario = RimMindAPI.Context.ScenarioStoryteller,
                 Budget = budget,
                 CurrentQuery = "Select the most appropriate incident event for the current colony situation and return it as structured JSON.",
                 MaxTokens = 400,
@@ -193,7 +187,7 @@ namespace RimMind.Storyteller
                 Map = map,
             };
 
-            var schema = RimMind.Application.Features.Context.SchemaRegistry.IncidentOutput;
+            var schema = RimMindAPI.Context.SchemaIncidentOutput;
             Log.Message("[RimMind-Storyteller] ForceRequest: sending structured AI request");
             RimMindAPI.RequestStructured(ctxRequest, schema, result => OnAIResponseReceived(result, target));
             return true;
@@ -293,13 +287,13 @@ namespace RimMind.Storyteller
 
         private void TrySelectIncidentWithStructuredOutput(ContextRequest request, IIncidentTarget target)
         {
-            var schema = RimMind.Application.Features.Context.SchemaRegistry.IncidentOutput;
+            var schema = RimMindAPI.Context.SchemaIncidentOutput;
             RimMindAPI.RequestStructured(request, schema, result => OnAIResponseReceived(result, target));
         }
 
         internal static float GetStorytellerBudget()
         {
-            var settings = RimMind.Presentation.RimMindCoreMod.Settings?.Context;
+            var settings = RimMindAPI.Settings.ContextSettings;
             if (settings == null) return 0.6f;
             return settings.ContextBudget;
         }

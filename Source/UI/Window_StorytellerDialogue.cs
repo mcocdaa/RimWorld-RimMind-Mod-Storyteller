@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using RimMind.Domain.ValueObjects;
 using RimMind.Presentation;
-using RimMind.Presentation.Context;
-using RimMind.Application.Features.Context;
 using RimMind.Application.Common.Models.Context;
 using RimMind.Application.Common.Interfaces.Context;
 using RimMind.Storyteller;
