@@ -8,6 +8,7 @@ namespace RimMind.Storyteller
         private readonly RimMindStorytellerSettings _settings;
         public StorytellerModCooldown(RimMindStorytellerSettings settings) { _settings = settings; }
         public string Id => "Storyteller";
+        public string OwnerModId => "RimMind.Storyteller";
         public int CooldownTicks => (int)(_settings.mtbDays * 60000f);
     }
 }

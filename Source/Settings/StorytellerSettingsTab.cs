@@ -16,8 +16,8 @@ namespace RimMind.Storyteller.Settings
         {
             LoadPromptOnce();
 
-            Rect contentArea = SettingsUIHelper.SplitContentArea(inRect);
-            Rect bottomBar = SettingsUIHelper.SplitBottomBar(inRect);
+            Rect contentArea = SettingsUIDrawer.SplitContentArea(inRect);
+            Rect bottomBar = SettingsUIDrawer.SplitBottomBar(inRect);
 
             float contentH = EstimateHeight();
             Rect viewRect = new Rect(0f, 0f, contentArea.width - 16f, contentH);
@@ -28,13 +28,13 @@ namespace RimMind.Storyteller.Settings
 
             var settings = RimMindStorytellerMod.Settings;
 
-            SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.TriggerSources".Translate());
+            SettingsUIDrawer.DrawSectionHeader(listing, "RimMind.Storyteller.UI.TriggerSources".Translate());
             listing.CheckboxLabeled("RimMind.Storyteller.UI.EnableIntervalTrigger".Translate(), ref settings.enableIntervalTrigger,
                 "RimMind.Storyteller.UI.EnableIntervalTrigger.Desc".Translate());
             listing.CheckboxLabeled("RimMind.Storyteller.UI.EnableEventNotification".Translate(), ref settings.enableEventNotification,
                 "RimMind.Storyteller.UI.EnableEventNotification.Desc".Translate());
 
-            SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Fallback".Translate());
+            SettingsUIDrawer.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Fallback".Translate());
             listing.Label("RimMind.Storyteller.UI.FallbackModeLabel".Translate(settings.fallbackMode.ToString()));
             GUI.color = Color.gray;
             listing.Label("  " + "RimMind.Storyteller.UI.FallbackModeDesc".Translate());
@@ -52,12 +52,12 @@ namespace RimMind.Storyteller.Settings
                 settings.fallbackMode = modes[(idx + 1) % modes.Count];
             }
 
-            SettingsUIHelper.DrawCustomPromptSection(listing,
+            SettingsUIDrawer.DrawCustomPromptSection(listing,
                 "RimMind.Storyteller.UI.StylePromptLabel".Translate(),
                 ref _promptText, 3f);
             SavePrompt();
 
-            SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Request".Translate());
+            SettingsUIDrawer.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Request".Translate());
             listing.Label("RimMind.Storyteller.UI.MTBDays".Translate($"{settings.mtbDays:F1}"));
             GUI.color = Color.gray;
             listing.Label("  " + "RimMind.Storyteller.UI.MTBDays.Desc".Translate());
@@ -72,11 +72,11 @@ namespace RimMind.Storyteller.Settings
             settings.requestExpireTicks = (int)listing.Slider(settings.requestExpireTicks, 3600f, 120000f);
             settings.requestExpireTicks = (settings.requestExpireTicks / 1500) * 1500;
 
-            SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Debug".Translate());
+            SettingsUIDrawer.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Debug".Translate());
             listing.CheckboxLabeled("RimMind.Storyteller.UI.DebugLogging".Translate(), ref settings.debugLogging,
                 "RimMind.Storyteller.UI.DebugLogging.Desc".Translate());
 
-            SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Memory".Translate());
+            SettingsUIDrawer.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Memory".Translate());
             listing.Label("RimMind.Storyteller.UI.MaxEventRecords".Translate(settings.maxEventRecords));
             GUI.color = Color.gray;
             listing.Label("  " + "RimMind.Storyteller.UI.MaxEventRecords.Desc".Translate());
@@ -108,7 +108,7 @@ namespace RimMind.Storyteller.Settings
             settings.tensionDecayPerDay = listing.Slider(settings.tensionDecayPerDay, 0.01f, 0.10f);
             settings.tensionDecayPerDay = (float)System.Math.Round(settings.tensionDecayPerDay * 200f) / 200f;
 
-            SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.MemoryTitle".Translate());
+            SettingsUIDrawer.DrawSectionHeader(listing, "RimMind.Storyteller.UI.MemoryTitle".Translate());
             var memory = StorytellerMemory.Instance;
             if (memory == null)
             {
@@ -135,7 +135,7 @@ namespace RimMind.Storyteller.Settings
             listing.End();
             Widgets.EndScrollView();
 
-            SettingsUIHelper.DrawBottomBar(bottomBar, () =>
+            SettingsUIDrawer.DrawBottomBar(bottomBar, () =>
             {
                 settings.enableIntervalTrigger = true;
                 settings.fallbackMode = FallbackMode.Cassandra;

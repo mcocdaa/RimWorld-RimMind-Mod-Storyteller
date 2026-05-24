@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimMind.Application.Common.Interfaces.Client;
-using RimMind.Application.Common.Models.Client;
 using RimMind.Application.Common.Interfaces.UI;
 using RimMind.Application.Common.Models.UI;
+using RimMind.Domain.Llm;
 using RimMind.Domain.ValueObjects;
 using RimMind.Presentation;
 using RimMind.Application.Common.Interfaces.Extension;
@@ -84,23 +84,15 @@ namespace RimMind.Storyteller
             _memory.ConsumeReactions(20);
 
             float budget = GetStorytellerBudget();
-            var ctxRequest = new ContextRequest
-            {
-                NpcId = RimMindAPI.GetNpcForMap(map) ?? "NPC-storyteller",
-                Scenario = RimMindAPI.Context.ScenarioStoryteller,
-                Budget = budget,
-                CurrentQuery = "Select the most appropriate incident event for the current colony situation and return it as structured JSON.",
-                MaxTokens = 400,
-                Temperature = 0.8f,
-                Map = map,
-            };
+            string npcId = RimMindAPI.GetNpcForMap(map) ?? "NPC-storyteller";
+            string scenario = RimMindAPI.Context.ScenarioStoryteller;
 
-            TrySelectIncidentWithStructuredOutput(ctxRequest, target);
+            TrySelectIncidentWithStructuredOutput(npcId, scenario, 400, 0.8f, target);
 
             yield break;
         }
 
-        private void OnAIResponseReceived(Result<AIResponse, RimMindError> result, IIncidentTarget target)
+        private void OnAIResponseReceived(Result<LlmResponse, RimMindError> result, IIncidentTarget target)
         {
             _hasPendingRequest = false;
 
@@ -176,20 +168,21 @@ namespace RimMind.Storyteller
             RimMindAPI.ClearModCooldown("Storyteller");
 
             float budget = GetStorytellerBudget();
-            var ctxRequest = new ContextRequest
-            {
-                NpcId = RimMindAPI.GetNpcForMap(map) ?? "NPC-storyteller",
-                Scenario = RimMindAPI.Context.ScenarioStoryteller,
-                Budget = budget,
-                CurrentQuery = "Select the most appropriate incident event for the current colony situation and return it as structured JSON.",
-                MaxTokens = 400,
-                Temperature = 0.8f,
-                Map = map,
-            };
+            string npcId = RimMindAPI.GetNpcForMap(map) ?? "NPC-storyteller";
+            string scenario = RimMindAPI.Context.ScenarioStoryteller;
 
             var schema = RimMindAPI.Context.SchemaIncidentOutput;
             Log.Message("[RimMind-Storyteller] ForceRequest: sending structured AI request");
-            RimMindAPI.RequestStructured(ctxRequest, schema, result => OnAIResponseReceived(result, target));
+
+            var envelope = LlmRequestEnvelopeBuilder
+                .ForScenario(scenario)
+                .WithModId("RimMind.Storyteller")
+                .WithSchema(schema)
+                .WithMaxTokens(400)
+                .WithTemperature(0.8f)
+                .WithNpcId(npcId)
+                .Build();
+            RimMindAPI.Request.Send(envelope, result => OnAIResponseReceived(result, target));
             return true;
         }
 
@@ -285,10 +278,19 @@ namespace RimMind.Storyteller
             RimMindAPI.RegisterPendingRequest(entry);
         }
 
-        private void TrySelectIncidentWithStructuredOutput(ContextRequest request, IIncidentTarget target)
+        private void TrySelectIncidentWithStructuredOutput(string npcId, string scenario, int maxTokens, float temperature, IIncidentTarget target)
         {
             var schema = RimMindAPI.Context.SchemaIncidentOutput;
-            RimMindAPI.RequestStructured(request, schema, result => OnAIResponseReceived(result, target));
+
+            var envelope = LlmRequestEnvelopeBuilder
+                .ForScenario(scenario)
+                .WithModId("RimMind.Storyteller")
+                .WithSchema(schema)
+                .WithMaxTokens(maxTokens)
+                .WithTemperature(temperature)
+                .WithNpcId(npcId)
+                .Build();
+            RimMindAPI.Request.Send(envelope, result => OnAIResponseReceived(result, target));
         }
 
         internal static float GetStorytellerBudget()

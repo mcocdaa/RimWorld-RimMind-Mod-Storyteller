@@ -2,10 +2,10 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using RimMind.Application.Common.Models.Context;
+using RimMind.Domain.Llm;
 using RimMind.Domain.ValueObjects;
 using RimMind.Presentation;
-using RimMind.Application.Common.Models.Context;
-using RimMind.Application.Common.Interfaces.Context;
 using RimMind.Storyteller;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
@@ -185,31 +185,22 @@ namespace RimMind.Storyteller.UI
             _waitingForResponse = true;
 
             float budget = StorytellerComp_RimMindDirector.GetStorytellerBudget();
-            var request = new ContextRequest
-            {
-                NpcId = "NPC-storyteller",
-                Scenario = ScenarioIds.Storyteller,
-                Budget = budget,
-                CurrentQuery = userMsg,
-                MaxTokens = 400,
-                Temperature = 0.9f,
-                Map = Find.CurrentMap,
-            };
+            var envelope = LlmRequestEnvelopeBuilder
+                .ForNpc("NPC-storyteller", gameStateInfo: userMsg)
+                .ForScenarioId(ScenarioIds.Storyteller)
+                .WithModId("RimMind.Storyteller")
+                .WithMaxTokens(400)
+                .WithTemperature(0.9f)
+                .Build();
 
-            RimMindAPI.Chat(request).ContinueWith(task =>
+            RimMindAPI.Request.Send(envelope, result =>
             {
-                if (task.IsFaulted || task.IsCanceled)
-                {
-                    _responseQueue.Enqueue(("system", ""));
-                    return;
-                }
-                var result = task.Result;
                 if (result.IsErr)
                 {
                     _responseQueue.Enqueue(("system", ""));
                     return;
                 }
-                string assistantMsg = result.Value.Message?.Trim() ?? "";
+                string assistantMsg = result.Value.Content?.Trim() ?? "";
                 if (assistantMsg.NullOrEmpty())
                 {
                     _responseQueue.Enqueue(("system", ""));
