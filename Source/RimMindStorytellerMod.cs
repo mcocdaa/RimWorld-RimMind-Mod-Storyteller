@@ -1,15 +1,15 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using HarmonyLib;
 using RimMind.Application.Common.Interfaces.Context;
 using RimMind.Application.Common.Interfaces.Extension;
 using RimMind.Domain.ValueObjects;
 using RimMind.Presentation;
 using RimMind.Presentation.Settings;
-using RimMind.Application.Common.Models.Context;
 using RimMind.Application.Common.Models.UI;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
@@ -41,40 +41,49 @@ namespace RimMind.Storyteller
 
         private void RegisterProviders()
         {
-            RimMindAPI.Context.RegisterContextKey("storyteller_dialogue", ContextLayer.L3_State, 0.5f,
-                pawnObj =>
+            RimMindAPI.Context.ContextKeys.Register(new ContextProviderDef(
+                "storyteller_dialogue", ContextLayer.L3_State, 0.5f,
+                async (ctx, ct) =>
                 {
-                    var pawn = pawnObj as Pawn; if (pawn == null) return new List<ContextEntry>();
-                    if (RimMindAPI.Context.CurrentScenario != RimMindAPI.Context.ScenarioStoryteller) return new List<ContextEntry>();
+                    if (ctx.PawnId <= 0) return null;
+                    if (ctx.Scenario != RimMindAPI.Context.ScenarioStoryteller) return null;
+                    var pawn = Find.WorldPawns.AllPawnsAlive.FirstOrDefault(p => p.thingIDNumber == ctx.PawnId)
+                        ?? Find.CurrentMap?.mapPawns?.FreeColonists.FirstOrDefault(p => p.thingIDNumber == ctx.PawnId);
+                    if (pawn == null) return null;
                     var mem = StorytellerMemory.Instance;
-                    if (mem == null) return new List<ContextEntry>();
+                    if (mem == null) return null;
                     string dialogue = mem.GetRecentDialogueSummary(5);
                     return string.IsNullOrEmpty(dialogue)
-                        ? new List<ContextEntry>()
-                        : new List<ContextEntry> { new ContextEntry($"{"RimMind.Storyteller.Dialogue.StorytellerDialogueHeader".Translate()}\n{dialogue}") };
-                }, "RimMind.Storyteller");
+                        ? null
+                        : $"{"RimMind.Storyteller.Dialogue.StorytellerDialogueHeader".Translate()}\n{dialogue}";
+                }, "RimMind.Storyteller", stalenessTicks: 750, invalidationTriggers: new[] { "StorytellerEvent" }));
 
-            RimMindAPI.Context.RegisterContextKey("storyteller_task", ContextLayer.L0_Static, 0.95f,
-                pawnObj =>
+            RimMindAPI.Context.ContextKeys.Register(new ContextProviderDef(
+                "storyteller_task", ContextLayer.L0_Static, 0.95f,
+                async (ctx, ct) =>
                 {
-                    var pawn = pawnObj as Pawn; if (pawn == null) return new List<ContextEntry>();
-                    if (RimMindAPI.Context.CurrentScenario != RimMindAPI.Context.ScenarioStoryteller) return new List<ContextEntry>();
+                    if (ctx.PawnId <= 0) return null;
+                    if (ctx.Scenario != RimMindAPI.Context.ScenarioStoryteller) return null;
                     string taskInstruction = RimMindAPI.Prompt.BuildTaskInstruction(
                         "RimMind.Storyteller.Prompt.TaskInstruction",
                         null,
                         "Role", "Goal", "Process", "Constraint", "Example", "Output", "Fallback",
                         "SystemJsonFormat", "SystemTensionGuidance", "SystemChainGuidance",
                         "SystemParamsGuidance", "SystemRequirements");
-                    return new List<ContextEntry> { new ContextEntry(taskInstruction) };
-                }, "RimMind.Storyteller");
+                    return taskInstruction;
+                }, "RimMind.Storyteller", stalenessTicks: 0, invalidationTriggers: new[] { "StorytellerEvent" }));
 
-            RimMindAPI.Context.RegisterContextKey("storyteller_context", ContextLayer.L1_Baseline, 0.85f,
-                pawnObj =>
+            RimMindAPI.Context.ContextKeys.Register(new ContextProviderDef(
+                "storyteller_context", ContextLayer.L1_Baseline, 0.85f,
+                async (ctx, ct) =>
                 {
-                    var pawn = pawnObj as Pawn; if (pawn == null) return new List<ContextEntry>();
-                    if (RimMindAPI.Context.CurrentScenario != RimMindAPI.Context.ScenarioStoryteller) return new List<ContextEntry>();
+                    if (ctx.PawnId <= 0) return null;
+                    if (ctx.Scenario != RimMindAPI.Context.ScenarioStoryteller) return null;
+                    var pawn = Find.WorldPawns.AllPawnsAlive.FirstOrDefault(p => p.thingIDNumber == ctx.PawnId)
+                        ?? Find.CurrentMap?.mapPawns?.FreeColonists.FirstOrDefault(p => p.thingIDNumber == ctx.PawnId);
+                    if (pawn == null) return null;
                     var mem = StorytellerMemory.Instance;
-                    if (mem == null) return new List<ContextEntry>();
+                    if (mem == null) return null;
                     var sb = new StringBuilder();
                     sb.AppendLine("RimMind.Storyteller.Prompt.StorytellerStateHeader".Translate());
                     AppendDifficultyContext(sb);
@@ -88,31 +97,36 @@ namespace RimMind.Storyteller
                     string chains = mem.GetActiveChainsSummary();
                     if (!string.IsNullOrEmpty(chains))
                         sb.AppendLine(chains);
-                    return new List<ContextEntry> { new ContextEntry(sb.ToString().TrimEnd()) };
-                }, "RimMind.Storyteller");
+                    return sb.ToString().TrimEnd();
+                }, "RimMind.Storyteller", stalenessTicks: 3000, invalidationTriggers: new[] { "StorytellerEvent" }));
 
-            RimMindAPI.Context.RegisterContextKey("storyteller_reactions", ContextLayer.L1_Baseline, 0.8f,
-                pawnObj =>
+            RimMindAPI.Context.ContextKeys.Register(new ContextProviderDef(
+                "storyteller_reactions", ContextLayer.L1_Baseline, 0.8f,
+                async (ctx, ct) =>
                 {
-                    var pawn = pawnObj as Pawn; if (pawn == null) return new List<ContextEntry>();
-                    if (RimMindAPI.Context.CurrentScenario != RimMindAPI.Context.ScenarioStoryteller) return new List<ContextEntry>();
+                    if (ctx.PawnId <= 0) return null;
+                    if (ctx.Scenario != RimMindAPI.Context.ScenarioStoryteller) return null;
+                    var pawn = Find.WorldPawns.AllPawnsAlive.FirstOrDefault(p => p.thingIDNumber == ctx.PawnId)
+                        ?? Find.CurrentMap?.mapPawns?.FreeColonists.FirstOrDefault(p => p.thingIDNumber == ctx.PawnId);
+                    if (pawn == null) return null;
                     var mem = StorytellerMemory.Instance;
-                    if (mem == null) return new List<ContextEntry>();
+                    if (mem == null) return null;
                     string? text = mem.ConsumedReactionsText;
-                    if (!string.IsNullOrEmpty(text))
-                        return new List<ContextEntry> { new ContextEntry(text!) };
-                    return new List<ContextEntry>();
-                }, "RimMind.Storyteller");
+                    return !string.IsNullOrEmpty(text) ? text : null;
+                }, "RimMind.Storyteller", stalenessTicks: 3000, invalidationTriggers: new[] { "StorytellerEvent" }));
 
-            RimMindAPI.Context.RegisterContextKey("storyteller_recent_incidents", ContextLayer.L4_History, 0.7f,
-                pawnObj =>
+            RimMindAPI.Context.ContextKeys.Register(new ContextProviderDef(
+                "storyteller_recent_incidents", ContextLayer.L4_History, 0.7f,
+                async (ctx, ct) =>
                 {
-                    var pawn = pawnObj as Pawn; if (pawn == null) return new List<ContextEntry>();
-                    if (RimMindAPI.Context.CurrentScenario != RimMindAPI.Context.ScenarioStoryteller) return new List<ContextEntry>();
+                    if (ctx.PawnId <= 0) return null;
+                    if (ctx.Scenario != RimMindAPI.Context.ScenarioStoryteller) return null;
+                    var pawn = Find.WorldPawns.AllPawnsAlive.FirstOrDefault(p => p.thingIDNumber == ctx.PawnId)
+                        ?? Find.CurrentMap?.mapPawns?.FreeColonists.FirstOrDefault(p => p.thingIDNumber == ctx.PawnId);
+                    if (pawn == null) return null;
                     string narrations = GetRecentNarrationsFromMemory(5);
-                    if (string.IsNullOrEmpty(narrations)) return new List<ContextEntry>();
-                    return new List<ContextEntry> { new ContextEntry(narrations) };
-                }, "RimMind.Storyteller");
+                    return string.IsNullOrEmpty(narrations) ? null : narrations;
+                }, "RimMind.Storyteller", stalenessTicks: 3000, invalidationTriggers: new[] { "StorytellerEvent" }));
         }
 
         private static string GetRecentNarrationsFromMemory(int count)
