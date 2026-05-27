@@ -1,5 +1,4 @@
 using Newtonsoft.Json;
-using RimMind.Presentation;
 using RimMind.Storyteller;
 using Xunit;
 
@@ -11,7 +10,7 @@ namespace RimMind.Storyteller.Tests
         public void ParseResponse_ValidJson_DeserializesCorrectly()
         {
             string json = @"{""defName"":""RaidEnemy"",""reason"":""tension rising""}";
-            var result = JsonConvert.DeserializeObject<IncidentResponse>(json);
+            var result = StorytellerResponseParserPure.ParseResponse(json);
 
             Assert.NotNull(result);
             Assert.Equal("RaidEnemy", result!.defName);
@@ -22,10 +21,8 @@ namespace RimMind.Storyteller.Tests
         public void ParseResponse_TruncatedJson_RepairsAndDeserialize()
         {
             string truncated = "{\"defName\":\"RaidEnemy\",\"reason\":\"tension\"";
-            string? repaired = RimMindAPI.Json.TryRepairTruncatedJson(truncated);
+            var result = StorytellerResponseParserPure.ParseResponse(truncated);
 
-            Assert.NotNull(repaired);
-            var result = JsonConvert.DeserializeObject<IncidentResponse>(repaired!);
             Assert.NotNull(result);
             Assert.Equal("RaidEnemy", result!.defName);
         }
@@ -33,7 +30,7 @@ namespace RimMind.Storyteller.Tests
         [Fact]
         public void ParseResponse_EmptyString_ReturnsNull()
         {
-            string? repaired = RimMindAPI.Json.TryRepairTruncatedJson("");
+            string? repaired = StorytellerResponseParserPure.TryRepairTruncatedJson("");
             Assert.Null(repaired);
         }
 
@@ -41,7 +38,7 @@ namespace RimMind.Storyteller.Tests
         public void ParseResponse_AlreadyValidJson_ReturnsNull()
         {
             string valid = @"{""defName"":""Eclipse""}";
-            string? repaired = JsonRepairHelper.TryRepairTruncatedJson(valid);
+            string? repaired = StorytellerResponseParserPure.TryRepairTruncatedJson(valid);
             Assert.Null(repaired);
         }
 
@@ -49,7 +46,7 @@ namespace RimMind.Storyteller.Tests
         public void ParseResponse_TruncatedWithNestedBraces()
         {
             string truncated = @"{""defName"":""RaidEnemy"",""params"":{""points"":1.5";
-            string? repaired = RimMindAPI.Json.TryRepairTruncatedJson(truncated);
+            string? repaired = StorytellerResponseParserPure.TryRepairTruncatedJson(truncated);
 
             Assert.NotNull(repaired);
             Assert.EndsWith("}}", repaired!);
@@ -59,7 +56,7 @@ namespace RimMind.Storyteller.Tests
         public void ParseResponse_FullFields_DeserializesAll()
         {
             string json = @"{""defName"":""RaidEnemy"",""reason"":""test"",""announce"":""Attack!"",""params"":{""points_multiplier"":1.5},""chain"":{""chain_id"":""c1"",""chain_step"":1,""chain_total"":3,""next_hint"":""Infestation""}}";
-            var result = JsonConvert.DeserializeObject<IncidentResponse>(json);
+            var result = StorytellerResponseParserPure.ParseResponse(json);
 
             Assert.NotNull(result);
             Assert.Equal("RaidEnemy", result!.defName);

@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="ParseResponseTests.cs" />
+    <Compile Include="../Source/Storyteller/StorytellerResponseParserPure.cs" LinkBase="Storyteller" />
   </ItemGroup>
 
   <ItemGroup>
