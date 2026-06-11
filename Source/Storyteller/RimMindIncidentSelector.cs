@@ -3,7 +3,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using RimMind.Application.Common.Interfaces.Client;
 using RimMind.Application.Common.Models.Client;
-using RimMind.Presentation;
+using RimMind.Application.Api;
 using RimMind.Domain.ValueObjects;
 using RimMind.Storyteller.Memory;
 using RimWorld;
