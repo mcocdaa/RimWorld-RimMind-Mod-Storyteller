@@ -56,7 +56,8 @@ namespace RimMind.Storyteller
                     return string.IsNullOrEmpty(dialogue)
                         ? null
                         : $"{"RimMind.Storyteller.Dialogue.StorytellerDialogueHeader".Translate()}\n{dialogue}";
-                }, "RimMind.Storyteller", stalenessTicks: 750, invalidationTriggers: new[] { "StorytellerEvent" }));
+                }, ownerMod: ModId, stalenessTicks: 750, invalidationTriggers: new[] { "StorytellerEvent" },
+                cacheScope: CacheScope.Scenario));
 
             RimMindAPI.Context.ContextKeys.Register(new ContextProviderDef(
                 "storyteller_task", ContextLayer.L0_Static, 0.95f,
@@ -71,7 +72,8 @@ namespace RimMind.Storyteller
                         "SystemJsonFormat", "SystemTensionGuidance", "SystemChainGuidance",
                         "SystemParamsGuidance", "SystemRequirements");
                     return taskInstruction;
-                }, "RimMind.Storyteller", stalenessTicks: 0, invalidationTriggers: new[] { "StorytellerEvent" }));
+                }, ownerMod: ModId, stalenessTicks: 0, invalidationTriggers: new[] { "StorytellerEvent" },
+                cacheScope: CacheScope.Static));
 
             RimMindAPI.Context.ContextKeys.Register(new ContextProviderDef(
                 "storyteller_context", ContextLayer.L1_Baseline, 0.85f,
@@ -98,7 +100,8 @@ namespace RimMind.Storyteller
                     if (!string.IsNullOrEmpty(chains))
                         sb.AppendLine(chains);
                     return sb.ToString().TrimEnd();
-                }, "RimMind.Storyteller", stalenessTicks: 3000, invalidationTriggers: new[] { "StorytellerEvent" }));
+                }, ownerMod: ModId, stalenessTicks: 3000, invalidationTriggers: new[] { "StorytellerEvent" },
+                cacheScope: CacheScope.Scenario));
 
             RimMindAPI.Context.ContextKeys.Register(new ContextProviderDef(
                 "storyteller_reactions", ContextLayer.L1_Baseline, 0.8f,
@@ -113,7 +116,8 @@ namespace RimMind.Storyteller
                     if (mem == null) return null;
                     string? text = mem.ConsumedReactionsText;
                     return !string.IsNullOrEmpty(text) ? text : null;
-                }, "RimMind.Storyteller", stalenessTicks: 3000, invalidationTriggers: new[] { "StorytellerEvent" }));
+                }, ownerMod: ModId, stalenessTicks: 3000, invalidationTriggers: new[] { "StorytellerEvent" },
+                cacheScope: CacheScope.Scenario));
 
             RimMindAPI.Context.ContextKeys.Register(new ContextProviderDef(
                 "storyteller_recent_incidents", ContextLayer.L4_History, 0.7f,
@@ -126,7 +130,8 @@ namespace RimMind.Storyteller
                     if (pawn == null) return null;
                     string narrations = GetRecentNarrationsFromMemory(5);
                     return string.IsNullOrEmpty(narrations) ? null : narrations;
-                }, "RimMind.Storyteller", stalenessTicks: 3000, invalidationTriggers: new[] { "StorytellerEvent" }));
+                }, ownerMod: ModId, stalenessTicks: 3000, invalidationTriggers: new[] { "StorytellerEvent" },
+                cacheScope: CacheScope.Scenario));
         }
 
         private static string GetRecentNarrationsFromMemory(int count)
