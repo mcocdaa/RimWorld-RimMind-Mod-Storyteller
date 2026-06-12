@@ -249,5 +249,11 @@ namespace RimMind.Storyteller.Debug
 
             Log.Message(sb.ToString());
         }
+
+        [DebugAction("RimMind Storyteller", "Open Storyteller Agent Control", actionType = DebugActionType.Action, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        private static void OpenStorytellerAgentControl()
+        {
+            Find.WindowStack.Add(new RimMind.Storyteller.UI.Window_StorytellerAgentControl());
+        }
     }
 }

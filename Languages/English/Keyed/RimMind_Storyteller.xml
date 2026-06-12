@@ -119,4 +119,12 @@ Where announce, params, and chain are optional fields.</RimMind.Storyteller.Prom
   <RimMind.Storyteller.Prompt.ReactionRecordLine>Day {0} {1} → Player: {2}</RimMind.Storyteller.Prompt.ReactionRecordLine>
   <RimMind.Storyteller.Prompt.PlayerReactions>[Player Reaction Records]</RimMind.Storyteller.Prompt.PlayerReactions>
   <RimMind.Storyteller.Prompt.RecentIncidents>[Recent Narrative Incidents]</RimMind.Storyteller.Prompt.RecentIncidents>
+  <!-- Window_StorytellerAgentControl.cs -->
+  <RimMind.Storyteller.UI.Agent.Title>Storyteller Agent</RimMind.Storyteller.UI.Agent.Title>
+  <RimMind.Storyteller.UI.Agent.State>State: {0}</RimMind.Storyteller.UI.Agent.State>
+  <RimMind.Storyteller.UI.Agent.Start>Start</RimMind.Storyteller.UI.Agent.Start>
+  <RimMind.Storyteller.UI.Agent.Pause>Pause</RimMind.Storyteller.UI.Agent.Pause>
+  <RimMind.Storyteller.UI.Agent.ForceThink>Force Think</RimMind.Storyteller.UI.Agent.ForceThink>
+  <RimMind.Storyteller.UI.Agent.OpenRequests>Requests</RimMind.Storyteller.UI.Agent.OpenRequests>
+  <RimMind.Storyteller.UI.Agent.NotCreated>No Storyteller agent has been created yet.</RimMind.Storyteller.UI.Agent.NotCreated>
 </LanguageData>
