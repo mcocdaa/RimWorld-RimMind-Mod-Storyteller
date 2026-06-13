@@ -1,8 +1,5 @@
-using RimMind.Application.Common.Interfaces;
 using RimMind.Application.Common.Interfaces.Agent;
-using RimMind.Application.Common.Interfaces.Internal;
-using RimMind.Domain.Enums;
-using Verse;
+using RimMind.Presentation.Api;
 
 namespace RimMind.Storyteller.Agent
 {
@@ -12,47 +9,18 @@ namespace RimMind.Storyteller.Agent
         public const string ScopeId = "NPC-storyteller";
 
         public static IScopedAgent? Find()
-        {
-            var manager = RimMindServiceLocator.TryGet<IScopedAgentManager>();
-            return manager?.Find(ScopeType, ScopeId);
-        }
+            => RimMindAPI.Agents.FindScoped(ScopeType, ScopeId);
 
         public static IScopedAgent? GetOrCreate()
-        {
-            var manager = RimMindServiceLocator.TryGet<IScopedAgentManager>();
-            var bus = RimMindServiceLocator.TryGet<IAgentBus>();
-            if (manager == null || bus == null)
-            {
-                Log.Warning("[RimMind-Storyteller] Storyteller agent services are not available.");
-                return null;
-            }
-
-            return manager.GetOrCreate(ScopeType, ScopeId, bus, Verse.Find.CurrentMap?.Index);
-        }
+            => RimMindAPI.Agents.GetOrCreateScoped(ScopeType, ScopeId, Verse.Find.CurrentMap?.Index);
 
         public static bool Start()
-        {
-            var agent = GetOrCreate();
-            if (agent == null) return false;
-
-            return agent.TransitionTo(AgentState.Active);
-        }
+            => RimMindAPI.Agents.StartScoped(ScopeType, ScopeId, Verse.Find.CurrentMap?.Index);
 
         public static bool Pause()
-        {
-            var agent = Find();
-            if (agent == null) return false;
-
-            return agent.TransitionTo(AgentState.Paused);
-        }
+            => RimMindAPI.Agents.PauseScoped(ScopeType, ScopeId);
 
         public static bool ForceThink()
-        {
-            var agent = Find();
-            if (agent == null) return false;
-
-            agent.ForceThink();
-            return true;
-        }
+            => RimMindAPI.Agents.ForceThinkScoped(ScopeType, ScopeId);
     }
 }

@@ -19,8 +19,9 @@ namespace RimMind.Storyteller.Tests.ArchTests
         {
             string content = ReadSource("Agent/StorytellerAgentController.cs");
 
-            Assert.Contains("IScopedAgentManager", content);
-            Assert.Contains("GetOrCreate(ScopeType, ScopeId", content);
+            Assert.DoesNotContain("RimMindServiceLocator", content);
+            Assert.Contains("RimMindAPI.Agents", content);
+            Assert.Contains("GetOrCreateScoped(ScopeType, ScopeId", content);
             Assert.Contains("NPC-storyteller", content);
             Assert.DoesNotContain("new ScopedAgent", content);
         }
@@ -32,7 +33,9 @@ namespace RimMind.Storyteller.Tests.ArchTests
 
             Assert.Contains("RimMind.Storyteller.UI.Agent.Start", content);
             Assert.Contains("RimMind.Storyteller.UI.Agent.Pause", content);
-            Assert.Contains("Window_RimMindHub.OpenAIRequests()", content);
+            Assert.DoesNotContain("using RimMind.Infrastructure.UI", content);
+            Assert.DoesNotContain("Window_RimMindHub", content);
+            Assert.Contains("RimMindAPI.Debug.OpenAIRequests()", content);
         }
 
         [Fact]

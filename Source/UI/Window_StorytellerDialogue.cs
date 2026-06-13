@@ -3,9 +3,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using RimMind.Application.Common.Models.Context;
+using RimMind.Application.Features.Llm;
 using RimMind.Domain.Llm;
 using RimMind.Domain.ValueObjects;
-using RimMind.Application.Api;
+using RimMind.Presentation.Api;
 using RimMind.Storyteller;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
@@ -270,7 +271,7 @@ namespace RimMind.Storyteller.UI
                     return;
                 }
 
-                object worldComp;
+                object? worldComp;
                 try { worldComp = instanceProp.GetValue(null); }
                 catch (System.Exception ex)
                 {
@@ -290,7 +291,7 @@ namespace RimMind.Storyteller.UI
                     return;
                 }
 
-                object narratorStore;
+                object? narratorStore;
                 try { narratorStore = narratorStoreProp.GetValue(worldComp); }
                 catch (System.Exception ex)
                 {
@@ -312,7 +313,7 @@ namespace RimMind.Storyteller.UI
 
                 var settingsProp = settingsType.GetField("Settings",
                     System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                object memSettings = null;
+                object? memSettings = null;
                 try { memSettings = settingsProp?.GetValue(null); }
                 catch (System.Exception ex)
                 {
@@ -399,7 +400,7 @@ namespace RimMind.Storyteller.UI
                     ? "RimMind.Storyteller.Prompt.RolePlayer".Translate()
                     : "RimMind.Storyteller.Prompt.RoleNarrator".Translate();
 
-                object entry;
+                object? entry;
                 try { entry = createMethod.Invoke(null, new object[] { $"{prefix}: {content}", eventType, tick, 0.3f, null! })!; }
                 catch (System.Exception ex)
                 {

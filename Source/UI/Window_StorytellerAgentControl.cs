@@ -1,4 +1,4 @@
-using RimMind.Infrastructure.UI;
+using RimMind.Presentation.Api;
 using RimMind.Storyteller.Agent;
 using UnityEngine;
 using Verse;
@@ -50,7 +50,7 @@ namespace RimMind.Storyteller.UI
             if (Widgets.ButtonText(new Rect(inRect.x + 390f, y, 140f, 32f),
                 "RimMind.Storyteller.UI.Agent.OpenRequests".Translate()))
             {
-                Find.WindowStack.Add(Window_RimMindHub.OpenAIRequests());
+                RimMindAPI.Debug.OpenAIRequests();
             }
 
             y += 48f;
