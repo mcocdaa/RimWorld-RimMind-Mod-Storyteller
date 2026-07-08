@@ -186,7 +186,6 @@ namespace RimMind.Storyteller.UI
 
             _waitingForResponse = true;
 
-            float budget = StorytellerComp_RimMindDirector.GetStorytellerBudget();
             var envelope = LlmRequestEnvelopeBuilder
                 .ForNpc("NPC-storyteller", gameStateInfo: new GameStateInfo().AddSection("dialogue_input", userMsg))
                 .ForScenarioId(ScenarioIds.Storyteller)

@@ -84,7 +84,6 @@ namespace RimMind.Storyteller
 
             _memory.ConsumeReactions(20);
 
-            float budget = GetStorytellerBudget();
             string npcId = RimMindAPI.GetNpcForMap(map) ?? "NPC-storyteller";
             string scenario = RimMindAPI.Context.ScenarioStoryteller;
 
@@ -168,7 +167,6 @@ namespace RimMind.Storyteller
 
             RimMindAPI.ClearModCooldown("Storyteller");
 
-            float budget = GetStorytellerBudget();
             string npcId = RimMindAPI.GetNpcForMap(map) ?? "NPC-storyteller";
             string scenario = RimMindAPI.Context.ScenarioStoryteller;
 
@@ -294,6 +292,7 @@ namespace RimMind.Storyteller
             RimMindAPI.Request.Send(envelope, result => OnAIResponseReceived(result, target));
         }
 
+        // Currently unused by envelope builder. Retained for future WithBudget support.
         internal static float GetStorytellerBudget()
         {
             var settings = RimMindAPI.Settings.ContextSettings;
