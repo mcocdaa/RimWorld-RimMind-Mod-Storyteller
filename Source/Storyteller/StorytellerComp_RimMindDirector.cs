@@ -170,18 +170,8 @@ namespace RimMind.Storyteller
             string npcId = RimMindAPI.GetNpcForMap(map) ?? "NPC-storyteller";
             string scenario = RimMindAPI.Context.ScenarioStoryteller;
 
-            var schema = RimMindAPI.Context.SchemaIncidentOutput;
             Log.Message("[RimMind-Storyteller] ForceRequest: sending structured AI request");
-
-            var envelope = LlmRequestEnvelopeBuilder
-                .ForScenario(scenario)
-                .WithModId("RimMind.Storyteller")
-                .WithSchema(schema)
-                .WithMaxTokens(400)
-                .WithTemperature(0.8f)
-                .WithNpcId(npcId)
-                .Build();
-            RimMindAPI.Request.Send(envelope, result => OnAIResponseReceived(result, target));
+            TrySelectIncidentWithStructuredOutput(npcId, scenario, 400, 0.8f, target);
             return true;
         }
 

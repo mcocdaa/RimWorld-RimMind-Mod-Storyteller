@@ -135,6 +135,9 @@ namespace RimMind.Storyteller.Memory
 
         public void RecordIncident(IncidentDef def, IIncidentTarget target, int tick)
         {
+            var settings = RimMind.Storyteller.RimMindStorytellerMod.Settings;
+            if (settings != null)
+                _maxRecords = settings.maxEventRecords;
             var record = IncidentHistoryRecord.Create(def, target, tick);
             _records.Add(record);
             if (_records.Count > _maxRecords)
@@ -159,6 +162,9 @@ namespace RimMind.Storyteller.Memory
 
         public void RecordDialogue(string role, string content, int tick)
         {
+            var settings = RimMind.Storyteller.RimMindStorytellerMod.Settings;
+            if (settings != null)
+                _maxDialogueRecords = settings.maxDialogueRecords;
             _dialogueRecords.Add(DialogueRecord.Create(role, content, tick));
             while (_dialogueRecords.Count > _maxDialogueRecords)
                 _dialogueRecords.RemoveAt(0);

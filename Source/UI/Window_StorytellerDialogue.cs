@@ -231,13 +231,6 @@ namespace RimMind.Storyteller.UI
             var memory = StorytellerMemory.Instance;
             if (memory == null) return;
 
-            var settings = RimMind.Storyteller.RimMindStorytellerMod.Settings;
-            if (settings != null)
-            {
-                memory.MaxDialogueRecords = settings.maxDialogueRecords;
-                memory.MaxRecords = settings.maxEventRecords;
-            }
-
             int tick = Find.TickManager.TicksGame;
             memory.RecordDialogue(role, content, tick);
 
