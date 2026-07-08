@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using RimMind.Application.Common.Interfaces.Client;
 using RimMind.Application.Common.Models.Client;
-using RimMind.Presentation.Api;
 using RimMind.Domain.ValueObjects;
 using RimMind.Storyteller.Memory;
 using RimWorld;
@@ -15,28 +13,11 @@ namespace RimMind.Storyteller
     {
         public static (FiringIncident? incident, IncidentResponse? response) ParseResponse(string aiContent, IIncidentTarget target, RimWorld.StorytellerComp source)
         {
-            if (string.IsNullOrEmpty(aiContent)) return (null, null);
-
-            IncidentResponse? result;
-            try
-            {
-                result = JsonConvert.DeserializeObject<IncidentResponse>(aiContent);
-            }
-            catch (System.Exception)
-            {
-                string? repaired = RimMindAPI.Json.TryRepairTruncatedJson(aiContent);
-                if (repaired != null)
-                {
-                    try { result = JsonConvert.DeserializeObject<IncidentResponse>(repaired); }
-                    catch { result = null; }
-                }
-                else
-                {
-                    result = null;
-                }
-            }
-
-            if (result == null || string.IsNullOrEmpty(result.defName)) return (null, null);
+            // Delegate JSON parse + repair to the pure-logic parser (single repair path).
+            // StorytellerResponseParserPure handles null/empty input, repair fallback, and
+            // defName validation, returning null in all those failure cases.
+            var result = StorytellerResponseParserPure.ParseResponse(aiContent);
+            if (result == null) return (null, null);
 
             var incidentDef = DefDatabase<IncidentDef>.GetNamedSilentFail(result.defName);
             if (incidentDef == null)
