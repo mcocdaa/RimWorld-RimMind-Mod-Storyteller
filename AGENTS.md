@@ -57,9 +57,7 @@ StorytellerComp_RimMindDirector.MakeIntervalIncidents
 
 ## 张力系统
 
-初始0.5，事件影响: ThreatBig+0.25 / ThreatSmall+0.12 / Misc-0.05 / FactionArrival-0.08。玩家反应: shock+0.05 / excited-0.05。衰减: `tensionDecayPerDay`(默认0.03/天)。
-
-⚠️ **已知Bug**: `WorldComponentTick` 的 `DecayTensionDaily()` 与 `ApplyDecayAndCleanup()` 的 `DecayTension(ticksElapsed)` 双重衰减，实际衰减速率约为设定值的1.5~2倍。详见问题文档。
+初始0.5，事件影响: ThreatBig+0.25 / ThreatSmall+0.12 / Misc-0.05 / FactionArrival-0.08。玩家反应: shock+0.05 / excited-0.05。衰减: `tensionDecayPerDay`(默认0.03/天)。衰减唯一入口为 `ApplyDecayAndCleanup()`：`WorldComponentTick` 每 60000 tick 调用，`MakeIntervalIncidents` 亦调用，内部通过 `(now - _lastTensionDecayTick)` 计算经过 tick 数后交 `TensionMath.ComputeDecay` 执行。
 
 ## 回退模式
 
@@ -114,10 +112,9 @@ ContextEngine.BuildContext(Scenario=Storyteller)
 
 ## 已知问题
 
-1. **张力双重衰减Bug** — `DecayTensionDaily()` + `ApplyDecayAndCleanup()` 同时衰减，实际速率约为设定值1.5~2倍
-2. **缺失翻译键** — `RimMind.Storyteller.Prompt.PlayerReactions` 和 `RimMind.Storyteller.Prompt.RecentIncidents` 未在XML中定义
-3. **Memory反射脆弱** — 2条反射路径共~21个目标，`IMemoryBridge`未实现
-4. `IncidentHistoryRecord` 兼容字段 `_compat1`/`_compat2` 反序列化后未读取（存档兼容，可保留）
+1. **缺失翻译键** — `RimMind.Storyteller.Prompt.PlayerReactions` 和 `RimMind.Storyteller.Prompt.RecentIncidents` 未在XML中定义
+2. **Memory反射脆弱** — 2条反射路径共~21个目标，`IMemoryBridge`未实现
+3. `IncidentHistoryRecord` 兼容字段 `_compat1`/`_compat2` 反序列化后未读取（存档兼容，可保留）
 
 ## 操作边界
 

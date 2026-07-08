@@ -252,18 +252,11 @@ namespace RimMind.Storyteller.Memory
             _tensionLevel = TensionMath.ComputeDecay(_tensionLevel, decayPerDay, ticksElapsed);
         }
 
-        public void DecayTensionDaily()
-        {
-            float rate = RimMind.Storyteller.RimMindStorytellerMod.Settings?.tensionDecayPerDay ?? 0.03f;
-            _tensionLevel = TensionMath.ComputeDailyDecay(_tensionLevel, rate);
-            _lastTensionDecayTick = Find.TickManager.TicksGame;
-        }
-
         public override void WorldComponentTick()
         {
             base.WorldComponentTick();
             if (Find.TickManager.TicksGame % 60000 == 0)
-                DecayTensionDaily();
+                ApplyDecayAndCleanup();
         }
 
         public void ApplyTensionDelta(float delta)
