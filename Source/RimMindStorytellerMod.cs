@@ -146,15 +146,10 @@ namespace RimMind.Storyteller
                     if (ctx.Scenario != RimMindAPI.Context.ScenarioStoryteller) return null;
                     var pawn = PawnLookup.FindPawnById(ctx.PawnId);
                     if (pawn == null) return null;
-                    string narrations = GetRecentNarrationsFromMemory(5);
+                    string narrations = StorytellerMemoryBridge.GetRecentNarrations(5);
                     return string.IsNullOrEmpty(narrations) ? null : narrations;
                 }, ownerMod: ModId, stalenessTicks: 3000, invalidationTriggers: new[] { "StorytellerEvent" },
                 cacheScope: CacheScope.Scenario));
-        }
-
-        private static string GetRecentNarrationsFromMemory(int count)
-        {
-            return StorytellerMemoryBridge.GetRecentNarrations(count);
         }
 
         public override string SettingsCategory() => "RimMind - Storyteller";
