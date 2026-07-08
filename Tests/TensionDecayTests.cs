@@ -46,36 +46,6 @@ namespace RimMind.Storyteller.Tests
         }
 
         [Fact]
-        public void DailyDecay_DecreasesByRate()
-        {
-            float result = TensionMath.ComputeDailyDecay(0.5f, 0.03f);
-            Assert.Equal(0.47f, result, 3);
-        }
-
-        [Fact]
-        public void DailyDecay_CannotGoBelowZero()
-        {
-            float result = TensionMath.ComputeDailyDecay(0.02f, 0.03f);
-            Assert.Equal(0f, result, 3);
-        }
-
-        [Fact]
-        public void DoubleDecayBug_DailyDecayPlusTickDecay()
-        {
-            float tension = 0.5f;
-            float rate = 0.03f;
-
-            float afterDailyDecay = TensionMath.ComputeDailyDecay(tension, rate);
-            float afterTickDecay = TensionMath.ComputeDecay(afterDailyDecay, rate, TensionMath.TicksPerDay);
-
-            Assert.Equal(0.47f, afterDailyDecay, 3);
-            Assert.Equal(0.44f, afterTickDecay, 3);
-
-            float expectedSingleDecay = TensionMath.ComputeDailyDecay(tension, rate);
-            Assert.NotEqual(expectedSingleDecay, afterTickDecay);
-        }
-
-        [Fact]
         public void ApplyDelta_IncreasesTension()
         {
             float result = TensionMath.ApplyDelta(0.5f, 0.25f);

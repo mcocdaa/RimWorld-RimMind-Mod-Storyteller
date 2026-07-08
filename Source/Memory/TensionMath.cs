@@ -18,11 +18,6 @@ namespace RimMind.Storyteller.Memory
             return Clamp01(currentTension - decayPerDay * daysElapsed);
         }
 
-        public static float ComputeDailyDecay(float currentTension, float decayPerDay)
-        {
-            return Clamp01(currentTension - decayPerDay);
-        }
-
         public static float ApplyDelta(float currentTension, float delta)
         {
             return Clamp01(currentTension + delta);

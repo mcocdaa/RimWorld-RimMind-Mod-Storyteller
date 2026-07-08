@@ -53,27 +53,6 @@ namespace RimMind.Storyteller.Tests
         }
 
         [Fact]
-        public void ComputeDailyDecay_ZeroRate_NoChange()
-        {
-            float result = TensionMath.ComputeDailyDecay(0.8f, 0f);
-            Assert.Equal(0.8f, result, 3);
-        }
-
-        [Fact]
-        public void ComputeDailyDecay_RateEqualsTension_ReturnsZero()
-        {
-            float result = TensionMath.ComputeDailyDecay(0.5f, 0.5f);
-            Assert.Equal(0f, result, 3);
-        }
-
-        [Fact]
-        public void ComputeDailyDecay_RateExceedsTension_ReturnsZero()
-        {
-            float result = TensionMath.ComputeDailyDecay(0.3f, 0.5f);
-            Assert.Equal(0f, result, 3);
-        }
-
-        [Fact]
         public void ApplyDelta_ZeroDelta_NoChange()
         {
             float result = TensionMath.ApplyDelta(0.5f, 0f);
