@@ -88,6 +88,13 @@ namespace RimMind.Storyteller
                         "Role", "Goal", "Process", "Constraint", "Example", "Output", "Fallback",
                         "SystemJsonFormat", "SystemTensionGuidance", "SystemChainGuidance",
                         "SystemParamsGuidance", "SystemRequirements");
+
+                    // 将 UI 中存储的 CustomSystemPrompt 前置注入到任务指令中，
+                    // 使玩家自定义的系统层提示词作为最高优先级上下文生效。
+                    var mem = StorytellerMemory.Instance;
+                    if (mem != null && !string.IsNullOrWhiteSpace(mem.CustomSystemPrompt))
+                        return $"{mem.CustomSystemPrompt.Trim()}\n\n{taskInstruction}";
+
                     return taskInstruction;
                 }, ownerMod: ModId, stalenessTicks: 0, invalidationTriggers: new[] { "StorytellerEvent" },
                 cacheScope: CacheScope.Static));
