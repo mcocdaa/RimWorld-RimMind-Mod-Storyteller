@@ -111,18 +111,5 @@ namespace RimMind.Storyteller.Tests.ArchTests
                     content);
             }
         }
-
-        /// <summary>
-        /// GetStorytellerBudget 方法必须保留（供未来 WithBudget 支持使用），
-        /// 不得在移除未使用变量时被误删。方法当前标记为 internal static，
-        /// 在 envelope builder 支持 budget 参数后将被重新启用。
-        /// </summary>
-        [Fact]
-        public void GetStorytellerBudget_MethodRetained_ForFutureUse()
-        {
-            string content = ReadSource("Storyteller/StorytellerComp_RimMindDirector.cs");
-
-            Assert.Contains("GetStorytellerBudget", content);
-        }
     }
 }

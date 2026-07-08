@@ -292,14 +292,6 @@ namespace RimMind.Storyteller
             RimMindAPI.Request.Send(envelope, result => OnAIResponseReceived(result, target));
         }
 
-        // Currently unused by envelope builder. Retained for future WithBudget support.
-        internal static float GetStorytellerBudget()
-        {
-            var settings = RimMindAPI.Settings.ContextSettings;
-            if (settings == null) return 0.6f;
-            return settings.ContextBudget;
-        }
-
         private void EnsureMemory()
         {
             if (_memory == null)
