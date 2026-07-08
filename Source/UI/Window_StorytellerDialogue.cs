@@ -8,6 +8,7 @@ using RimMind.Domain.Llm;
 using RimMind.Domain.ValueObjects;
 using RimMind.Presentation.Api;
 using RimMind.Storyteller;
+using RimMind.Storyteller.Extensions;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
 using RimWorld;
@@ -246,186 +247,11 @@ namespace RimMind.Storyteller.UI
 
         private static void TryPushToMemoryMod(string role, string content, int tick)
         {
-            try
-            {
-                var memoryAssembly = System.AppDomain.CurrentDomain.GetAssemblies()
-                    .FirstOrDefault(a => a.GetName().Name == "RimMindMemory");
-                if (memoryAssembly == null)
-                {
-                    RimMindErrors.Warn("[RimMind-Storyteller] TryPushToMemoryMod: RimMindMemory assembly not found");
-                    return;
-                }
+            string prefix = role == "user"
+                ? "RimMind.Storyteller.Prompt.RolePlayer".Translate()
+                : "RimMind.Storyteller.Prompt.RoleNarrator".Translate();
 
-                var worldCompType = memoryAssembly.GetType("RimMind.Memory.Data.RimMindMemoryWorldComponent");
-                if (worldCompType == null)
-                {
-                    RimMindErrors.Warn("[RimMind-Storyteller] TryPushToMemoryMod: RimMindMemoryWorldComponent type not found");
-                    return;
-                }
-
-                var instanceProp = worldCompType.GetProperty("Instance",
-                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                if (instanceProp == null)
-                {
-                    RimMindErrors.Warn("[RimMind-Storyteller] TryPushToMemoryMod: Instance property not found");
-                    return;
-                }
-
-                object? worldComp;
-                try { worldComp = instanceProp.GetValue(null); }
-                catch (System.Exception ex)
-                {
-                    RimMindErrors.Warn($"[RimMind-Storyteller] TryPushToMemoryMod: Instance.GetValue failed: {ex.Message}");
-                    return;
-                }
-                if (worldComp == null)
-                {
-                    RimMindErrors.Warn("[RimMind-Storyteller] TryPushToMemoryMod: worldComp is null");
-                    return;
-                }
-
-                var narratorStoreProp = worldCompType.GetProperty("NarratorStore");
-                if (narratorStoreProp == null)
-                {
-                    RimMindErrors.Warn("[RimMind-Storyteller] TryPushToMemoryMod: NarratorStore property not found");
-                    return;
-                }
-
-                object? narratorStore;
-                try { narratorStore = narratorStoreProp.GetValue(worldComp); }
-                catch (System.Exception ex)
-                {
-                    RimMindErrors.Warn($"[RimMind-Storyteller] TryPushToMemoryMod: NarratorStore.GetValue failed: {ex.Message}");
-                    return;
-                }
-                if (narratorStore == null)
-                {
-                    RimMindErrors.Warn("[RimMind-Storyteller] TryPushToMemoryMod: narratorStore is null");
-                    return;
-                }
-
-                var settingsType = memoryAssembly.GetType("RimMind.Memory.RimMindMemoryMod");
-                if (settingsType == null)
-                {
-                    RimMindErrors.Warn("[RimMind-Storyteller] TryPushToMemoryMod: RimMindMemoryMod type not found");
-                    return;
-                }
-
-                var settingsProp = settingsType.GetField("Settings",
-                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                object? memSettings = null;
-                try { memSettings = settingsProp?.GetValue(null); }
-                catch (System.Exception ex)
-                {
-                    RimMindErrors.Warn($"[RimMind-Storyteller] TryPushToMemoryMod: Settings.GetValue failed: {ex.Message}");
-                    return;
-                }
-
-                bool enableMemory = true;
-                int narratorMaxActive = 30;
-                int narratorMaxArchive = 10;
-
-                if (memSettings != null)
-                {
-                    var enableField = memSettings.GetType().GetField("enableMemory");
-                    if (enableField != null)
-                    {
-                        try { enableMemory = (bool)enableField.GetValue(memSettings); }
-                        catch (System.Exception ex)
-                        {
-                            RimMindErrors.Warn($"[RimMind-Storyteller] TryPushToMemoryMod: enableMemory.GetValue failed: {ex.Message}");
-                        }
-                    }
-                    else
-                    {
-                        RimMindErrors.Warn("[RimMind-Storyteller] TryPushToMemoryMod: enableMemory field not found, using default=true");
-                    }
-
-                    var maxActiveField = memSettings.GetType().GetField("narratorMaxActive");
-                    if (maxActiveField != null)
-                    {
-                        try { narratorMaxActive = (int)maxActiveField.GetValue(memSettings); }
-                        catch (System.Exception ex)
-                        {
-                            RimMindErrors.Warn($"[RimMind-Storyteller] TryPushToMemoryMod: narratorMaxActive.GetValue failed: {ex.Message}");
-                        }
-                    }
-                    else
-                    {
-                        RimMindErrors.Warn("[RimMind-Storyteller] TryPushToMemoryMod: narratorMaxActive field not found, using default=30");
-                    }
-
-                    var maxArchiveField = memSettings.GetType().GetField("narratorMaxArchive");
-                    if (maxArchiveField != null)
-                    {
-                        try { narratorMaxArchive = (int)maxArchiveField.GetValue(memSettings); }
-                        catch (System.Exception ex)
-                        {
-                            RimMindErrors.Warn($"[RimMind-Storyteller] TryPushToMemoryMod: narratorMaxArchive.GetValue failed: {ex.Message}");
-                        }
-                    }
-                    else
-                    {
-                        RimMindErrors.Warn("[RimMind-Storyteller] TryPushToMemoryMod: narratorMaxArchive field not found, using default=10");
-                    }
-                }
-
-                if (!enableMemory) return;
-
-                var entryType = memoryAssembly.GetType("RimMind.Memory.Data.MemoryEntry");
-                if (entryType == null)
-                {
-                    RimMindErrors.Warn("[RimMind-Storyteller] TryPushToMemoryMod: MemoryEntry type not found");
-                    return;
-                }
-
-                var createMethod = entryType.GetMethod("Create",
-                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                if (createMethod == null)
-                {
-                    RimMindErrors.Warn("[RimMind-Storyteller] TryPushToMemoryMod: MemoryEntry.Create method not found");
-                    return;
-                }
-
-                var memoryTypeEnum = memoryAssembly.GetType("RimMind.Memory.Data.MemoryType");
-                if (memoryTypeEnum == null)
-                {
-                    RimMindErrors.Warn("[RimMind-Storyteller] TryPushToMemoryMod: MemoryType enum not found");
-                    return;
-                }
-
-                var eventType = System.Enum.Parse(memoryTypeEnum, "Event");
-
-                string prefix = role == "user"
-                    ? "RimMind.Storyteller.Prompt.RolePlayer".Translate()
-                    : "RimMind.Storyteller.Prompt.RoleNarrator".Translate();
-
-                object? entry;
-                try { entry = createMethod.Invoke(null, new object[] { $"{prefix}: {content}", eventType, tick, 0.3f, null! })!; }
-                catch (System.Exception ex)
-                {
-                    RimMindErrors.Warn($"[RimMind-Storyteller] TryPushToMemoryMod: MemoryEntry.Create.Invoke failed: {ex.Message}");
-                    return;
-                }
-
-                var addActiveMethod = narratorStore.GetType().GetMethod("AddActive");
-                if (addActiveMethod != null && entry != null)
-                {
-                    try { addActiveMethod.Invoke(narratorStore, new object[] { entry, narratorMaxActive, narratorMaxArchive }); }
-                    catch (System.Exception ex)
-                    {
-                        RimMindErrors.Warn($"[RimMind-Storyteller] TryPushToMemoryMod: AddActive.Invoke failed: {ex.Message}");
-                    }
-                }
-                else if (addActiveMethod == null)
-                {
-                    RimMindErrors.Warn("[RimMind-Storyteller] TryPushToMemoryMod: AddActive method not found");
-                }
-            }
-            catch (System.Exception ex)
-            {
-                RimMindErrors.Warn($"[RimMind-Storyteller] TryPushToMemoryMod failed: {ex.Message}");
-            }
+            StorytellerMemoryBridge.TryPushNarratorEntry($"{prefix}: {content}", tick, 0.3f);
         }
     }
 }

@@ -26,6 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="../Source/Extensions/StorytellerMemoryBridge.cs" LinkBase="Extensions" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../../RimMind-Core/Source/Domain/RimMindCore.Domain.csproj" />
   </ItemGroup>
 
