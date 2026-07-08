@@ -32,7 +32,6 @@ namespace RimMind.Storyteller
             RimMindAPI.Extensions<ISettingsTab>().Register(new StorytellerSettingsTabAdapter());
             RimMindAPI.Extensions<IModCooldown>().Register(new StorytellerModCooldown(Settings));
             RimMindAPI.Extensions<ISkipCheck>().Register(new StorytellerIncidentSkipCheck(Settings));
-            RimMindAPI.Extensions<IIncidentExecutedListener>().Register(new StorytellerIncidentExecutedListener());
 
             RegisterProviders();
 
