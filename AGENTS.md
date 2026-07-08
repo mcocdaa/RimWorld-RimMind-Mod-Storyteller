@@ -21,15 +21,31 @@ AI叙事者模块，替换RimWorld Storyteller系统，LLM决定事件选择。
 
 ```
 Source/
-├── RimMindStorytellerMod.cs                                    Mod入口 + ContextKey注册(5个)
+├── RimMindStorytellerMod.cs                                    Mod入口 + ContextKey注册(5个) + Memory桥接委托注入
+├── Agent/StorytellerAgentController.cs                         Storyteller-owned Agent 控制器
 ├── Storyteller/
 │   ├── StorytellerComp_RimMindDirector.cs                      AI事件选择器(StorytellerComp)
 │   ├── StorytellerComp_RimMindFallback.cs                      回退事件生成器
-│   └── RimMindIncidentSelector.cs                              响应解析(ParseResponse + IncidentResponse DTO)
-├── Memory/StorytellerMemory.cs                                 WorldComponent(事件/对话/反应/张力/链)
-├── Memory/IncidentHistoryRecord.cs                             事件历史记录(含存档兼容字段)
+│   ├── StorytellerCompProperties_RimMindDirector.cs            Director Def属性
+│   ├── StorytellerCompProperties_RimMindFallback.cs            Fallback Def属性
+│   ├── RimMindIncidentSelector.cs                              响应解析入口(委托给 StorytellerResponseParserPure)
+│   └── StorytellerResponseParserPure.cs                        JSON解析+修复统一入口(纯逻辑，可单测)
+├── Memory/
+│   ├── StorytellerMemory.cs                                    WorldComponent(事件/对话/反应/张力/链)
+│   ├── IncidentHistoryRecord.cs                                事件历史记录(含存档兼容字段)
+│   ├── TensionMath.cs                                          张力衰减/Clamp01 纯逻辑(可单测)
+│   └── IncidentResponse.cs                                     IncidentResponse DTO
+├── Extensions/
+│   ├── StorytellerMemoryBridge.cs                              Memory反射统一桥接(写入+读取 单一入口)
+│   ├── PawnLookup.cs                                           共享Pawn查找(WorldPawns→FreeColonists)
+│   ├── StorytellerContextBuilder.cs                            难度/威胁/张力文本构建(6个helper，3个纯逻辑可单测)
+│   ├── StorytellerIncidentSkipCheck.cs                         ISkipCheck 实现
+│   ├── StorytellerModCooldown.cs                               IModCooldown 实现
+│   └── StorytellerSettingsTab.cs                               ISettingsTab Adapter
 ├── Settings/RimMindStorytellerSettings.cs + StorytellerSettingsTab.cs
-├── UI/Window_StorytellerDialogue.cs                            祭坛对话窗口
+├── UI/
+│   ├── Window_StorytellerDialogue.cs                           祭坛对话窗口
+│   └── Window_StorytellerAgentControl.cs                       Agent控制台窗口
 ├── Comps/CompStorytellerAltar.cs                               祭坛建筑组件
 ├── Patch/Patch_IncidentWorker_TryExecute.cs                    事件执行后置补丁
 └── Debug/StorytellerDebugActions.cs
@@ -91,14 +107,18 @@ ContextEngine.BuildContext(Scenario=Storyteller)
   └── L4_History: storyteller_recent_incidents (Memory叙述) + Core自动注入 (NarrativeMemory)
 ```
 
-## Memory 反射桥接（2条路径）
+## Memory 反射桥接（统一入口）
 
-| 路径 | 方向 | 目标数 | 位置 |
-|------|------|--------|------|
-| TryPushToMemoryMod | 写入 | ~14 | Window_StorytellerDialogue.cs:254 |
-| GetRecentNarrationsFromMemory | 读取 | ~7 | RimMindStorytellerMod.cs:106 |
+| 方法 | 方向 | 位置 |
+|------|------|------|
+| `StorytellerMemoryBridge.TryPushNarratorEntry` | 写入 | `Source/Extensions/StorytellerMemoryBridge.cs` |
+| `StorytellerMemoryBridge.GetRecentNarrations` | 读取 | `Source/Extensions/StorytellerMemoryBridge.cs` |
 
-⚠️ 两条路径均使用原始反射，无 `IMemoryBridge` 接口抽象。`IMemoryBridge` 仅在文档中规划，未实际实现。任何一方 API 变更都会导致静默失败。
+调用方：
+- `Window_StorytellerDialogue.TryPushToMemoryMod` → `StorytellerMemoryBridge.TryPushNarratorEntry`
+- `RimMindStorytellerMod.GetRecentNarrationsFromMemory` → `StorytellerMemoryBridge.GetRecentNarrations`
+
+⚠️ `IMemoryBridge` Core 接口仍待实施（见 `.trae/specs/clean-arch-compliance-audit/tasks.md` Task 10）。当前 `StorytellerMemoryBridge` 是 Storyteller 侧的统一封装，反射目标：`RimMind.Memory.Data.NarratorMemoryStore`（类名不可变，见 Memory mod 约束）。
 
 ## 代码约定
 
@@ -112,9 +132,22 @@ ContextEngine.BuildContext(Scenario=Storyteller)
 
 ## 已知问题
 
-1. **缺失翻译键** — `RimMind.Storyteller.Prompt.PlayerReactions` 和 `RimMind.Storyteller.Prompt.RecentIncidents` 未在XML中定义
-2. **Memory反射脆弱** — 2条反射路径共~21个目标，`IMemoryBridge`未实现
-3. `IncidentHistoryRecord` 兼容字段 `_compat1`/`_compat2` 反序列化后未读取（存档兼容，可保留）
+1. `IncidentHistoryRecord` 兼容字段 `_compat1`/`_compat2` 反序列化后未读取（存档兼容，可保留）
+2. `IMemoryBridge` Core 接口未实施 — 当前由 `StorytellerMemoryBridge` 在 Storyteller 侧统一封装反射，待 Core 提供 `IMemoryBridge` 后切换（见 `.trae/specs/clean-arch-compliance-audit/tasks.md` Task 10）
+
+## 已修复（2026-07-08）
+
+| # | 问题 | 修复 | 提交 |
+|---|------|------|------|
+| 1 | 张力双重衰减 Bug | 张力衰减唯一入口收敛到 `ApplyDecayAndCleanup()`，内部委托 `TensionMath.ComputeDecay` | 09435b3 |
+| 2 | 缺失翻译键（误报） | `RimMind.Storyteller.Prompt.PlayerReactions` 和 `RimMind.Storyteller.Prompt.RecentIncidents` 已在 English/ChineseSimplified XML 中定义（原 AGENTS.md 标注错误） | — |
+| 3 | Memory 反射脆弱，2 条路径 | 抽取 `StorytellerMemoryBridge` 统一写入/读取入口 | 9343bad |
+| 4 | JSON 修复双路径 | 统一到 `StorytellerResponseParserPure`，`RimMindIncidentSelector.ParseResponse` 仅委托 | e1494d1 |
+| 5 | 死代码 `StorytellerIncidentExecutedListener` 空实现 | 删除空实现与注册 | c218cb3 |
+| 6 | `budget` 未使用赋值 | 移除 3 处未使用赋值 | 5ed0fbb |
+| 7 | `PawnLookup` 重复 | 提取 `PawnLookup.FindPawnById` 去重 4 处 | 61dffb7 |
+| 8 | `StorytellerContextBuilder` 缺失 | 提取 6 个 helper 方法（3 个纯逻辑可单测） | fd9d054 |
+| 9 | `CustomSystemPrompt` 未注入 | 接入 `storyteller_task` ContextKey | 6612b1a |
 
 ## 操作边界
 
