@@ -27,6 +27,7 @@ namespace RimMind.Storyteller.Memory
         public string chainId = string.Empty;
         public List<ChainStep> steps = new List<ChainStep>();
         public int currentStep;
+        public int totalSteps;
         public string nextHint = string.Empty;
         public int lastAdvancedTick;
         public string lastFactionDefName = string.Empty;
@@ -37,6 +38,7 @@ namespace RimMind.Storyteller.Memory
             Scribe_Values.Look(ref chainId, "chainId", string.Empty);
             Scribe_Collections.Look(ref steps, "steps", LookMode.Deep);
             Scribe_Values.Look(ref currentStep, "currentStep");
+            Scribe_Values.Look(ref totalSteps, "totalSteps");
             Scribe_Values.Look(ref nextHint, "nextHint", string.Empty);
             Scribe_Values.Look(ref lastAdvancedTick, "lastAdvancedTick");
             Scribe_Values.Look(ref lastFactionDefName, "lastFactionDefName", string.Empty);
@@ -271,6 +273,7 @@ namespace RimMind.Storyteller.Memory
             {
                 chain.steps.Add(new ChainStep { incidentDefName = incidentDefName, triggeredTick = tick, completed = true });
                 chain.currentStep = chainStep;
+                chain.totalSteps = chainTotal;
                 chain.nextHint = nextHint;
                 chain.lastAdvancedTick = tick;
                 chain.lastFactionDefName = factionDefName;
@@ -282,6 +285,7 @@ namespace RimMind.Storyteller.Memory
                 {
                     chainId = chainId,
                     currentStep = chainStep,
+                    totalSteps = chainTotal,
                     nextHint = nextHint,
                     lastAdvancedTick = tick,
                     lastFactionDefName = factionDefName,
@@ -308,7 +312,7 @@ namespace RimMind.Storyteller.Memory
             {
                 var triggeredNames = string.Join(", ", chain.steps.Select(s => s.incidentDefName));
                 sb.AppendLine("RimMind.Storyteller.Prompt.ChainProgress".Translate(
-                    chain.chainId, $"{chain.currentStep}", $"{chain.steps.Count}", triggeredNames));
+                    chain.chainId, $"{chain.currentStep}", $"{chain.totalSteps}", triggeredNames));
                 sb.AppendLine("RimMind.Storyteller.Prompt.ChainHint".Translate(chain.nextHint ?? ""));
             }
             return sb.ToString().TrimEnd();
