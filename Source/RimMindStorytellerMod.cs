@@ -64,10 +64,8 @@ namespace RimMind.Storyteller
                 "storyteller_dialogue", ContextLayer.L3_State, 0.5f,
                 async (ctx, ct) =>
                 {
-                    if (ctx.PawnId <= 0) return null;
                     if (ctx.Scenario != RimMindAPI.Context.ScenarioStoryteller) return null;
-                    var pawn = Find.WorldPawns.AllPawnsAlive.FirstOrDefault(p => p.thingIDNumber == ctx.PawnId)
-                        ?? Find.CurrentMap?.mapPawns?.FreeColonists.FirstOrDefault(p => p.thingIDNumber == ctx.PawnId);
+                    var pawn = PawnLookup.FindPawnById(ctx.PawnId);
                     if (pawn == null) return null;
                     var mem = StorytellerMemory.Instance;
                     if (mem == null) return null;
@@ -98,10 +96,8 @@ namespace RimMind.Storyteller
                 "storyteller_context", ContextLayer.L1_Baseline, 0.85f,
                 async (ctx, ct) =>
                 {
-                    if (ctx.PawnId <= 0) return null;
                     if (ctx.Scenario != RimMindAPI.Context.ScenarioStoryteller) return null;
-                    var pawn = Find.WorldPawns.AllPawnsAlive.FirstOrDefault(p => p.thingIDNumber == ctx.PawnId)
-                        ?? Find.CurrentMap?.mapPawns?.FreeColonists.FirstOrDefault(p => p.thingIDNumber == ctx.PawnId);
+                    var pawn = PawnLookup.FindPawnById(ctx.PawnId);
                     if (pawn == null) return null;
                     var mem = StorytellerMemory.Instance;
                     if (mem == null) return null;
@@ -126,10 +122,8 @@ namespace RimMind.Storyteller
                 "storyteller_reactions", ContextLayer.L1_Baseline, 0.8f,
                 async (ctx, ct) =>
                 {
-                    if (ctx.PawnId <= 0) return null;
                     if (ctx.Scenario != RimMindAPI.Context.ScenarioStoryteller) return null;
-                    var pawn = Find.WorldPawns.AllPawnsAlive.FirstOrDefault(p => p.thingIDNumber == ctx.PawnId)
-                        ?? Find.CurrentMap?.mapPawns?.FreeColonists.FirstOrDefault(p => p.thingIDNumber == ctx.PawnId);
+                    var pawn = PawnLookup.FindPawnById(ctx.PawnId);
                     if (pawn == null) return null;
                     var mem = StorytellerMemory.Instance;
                     if (mem == null) return null;
@@ -142,10 +136,8 @@ namespace RimMind.Storyteller
                 "storyteller_recent_incidents", ContextLayer.L4_History, 0.7f,
                 async (ctx, ct) =>
                 {
-                    if (ctx.PawnId <= 0) return null;
                     if (ctx.Scenario != RimMindAPI.Context.ScenarioStoryteller) return null;
-                    var pawn = Find.WorldPawns.AllPawnsAlive.FirstOrDefault(p => p.thingIDNumber == ctx.PawnId)
-                        ?? Find.CurrentMap?.mapPawns?.FreeColonists.FirstOrDefault(p => p.thingIDNumber == ctx.PawnId);
+                    var pawn = PawnLookup.FindPawnById(ctx.PawnId);
                     if (pawn == null) return null;
                     string narrations = GetRecentNarrationsFromMemory(5);
                     return string.IsNullOrEmpty(narrations) ? null : narrations;
