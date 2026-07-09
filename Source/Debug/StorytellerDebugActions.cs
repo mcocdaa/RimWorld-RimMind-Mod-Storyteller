@@ -181,7 +181,7 @@ namespace RimMind.Storyteller.Debug
                 var recent = reactions.Skip(System.Math.Max(0, reactions.Count - showCount)).ToList();
                 foreach (var r in recent)
                 {
-                    int day = r.tick / 60000 + 1;
+                    int day = TensionMath.TicksToDay(r.tick);
                     sb.AppendLine($"    Day {day}: [{r.incidentDefName}] {r.incidentLabel} -> {r.reaction} ({r.reactionLabel})");
                 }
             }

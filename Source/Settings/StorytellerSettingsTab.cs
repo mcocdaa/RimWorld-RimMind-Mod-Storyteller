@@ -122,7 +122,7 @@ namespace RimMind.Storyteller.Settings
                 for (int i = memory.Records.Count - 1; i >= 0 && i >= memory.Records.Count - 10; i--)
                 {
                     var r = memory.Records[i];
-                    int day = r.TriggeredTick / 60000 + 1;
+                    int day = TensionMath.TicksToDay(r.TriggeredTick);
                     listing.Label("RimMind.Storyteller.UI.MemoryDayEntry".Translate(day, r.Label, r.MapName));
                 }
                 if (Widgets.ButtonText(listing.GetRect(30f), "RimMind.Storyteller.UI.ClearMemory".Translate()))

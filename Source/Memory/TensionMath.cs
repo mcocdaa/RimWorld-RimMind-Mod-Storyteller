@@ -11,6 +11,14 @@ namespace RimMind.Storyteller.Memory
             return value;
         }
 
+        /// <summary>
+        /// 将 tick 数转换为游戏天数（从 1 开始）。
+        /// </summary>
+        public static int TicksToDay(int tick)
+        {
+            return tick / TicksPerDay + 1;
+        }
+
         public static float ComputeDecay(float currentTension, float decayPerDay, int ticksElapsed)
         {
             if (ticksElapsed <= 0) return currentTension;

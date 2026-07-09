@@ -81,5 +81,43 @@ namespace RimMind.Storyteller.Tests
             Assert.True(result > 0.999f);
             Assert.True(result <= 1.0f);
         }
+
+        [Fact]
+        public void TicksToDay_ZeroTick_ReturnsDayOne()
+        {
+            // tick 0 应为第 1 天（从 1 开始）
+            Assert.Equal(1, TensionMath.TicksToDay(0));
+        }
+
+        [Fact]
+        public void TicksToDay_ExactlyOneDay_ReturnsDayTwo()
+        {
+            // 满 60000 tick 进入第 2 天
+            Assert.Equal(2, TensionMath.TicksToDay(TensionMath.TicksPerDay));
+        }
+
+        [Fact]
+        public void TicksToDay_BeforeFirstDayEnds_ReturnsDayOne()
+        {
+            // 59999 tick 仍属第 1 天
+            Assert.Equal(1, TensionMath.TicksToDay(TensionMath.TicksPerDay - 1));
+        }
+
+        [Fact]
+        public void TicksToDay_MultipleDays_ComputesCorrectly()
+        {
+            // 3 天 = 180000 tick → 第 4 天
+            Assert.Equal(4, TensionMath.TicksToDay(TensionMath.TicksPerDay * 3));
+        }
+
+        [Fact]
+        public void TicksToDay_PreservesOldFormula()
+        {
+            // 与原内联公式 tick / 60000 + 1 结果一致
+            for (int tick = 0; tick <= TensionMath.TicksPerDay * 5; tick += 12345)
+            {
+                Assert.Equal(tick / 60000 + 1, TensionMath.TicksToDay(tick));
+            }
+        }
     }
 }

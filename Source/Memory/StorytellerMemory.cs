@@ -152,7 +152,7 @@ namespace RimMind.Storyteller.Memory
             var recent = _records.Skip(System.Math.Max(0, _records.Count - count)).ToList();
             foreach (var r in recent)
             {
-                int day = r.TriggeredTick / 60000 + 1;
+                int day = TensionMath.TicksToDay(r.TriggeredTick);
                 sb.AppendLine("RimMind.Storyteller.Prompt.DaySummary".Translate(day, r.Label, r.MapName));
             }
             return sb.ToString().TrimEnd();
@@ -178,7 +178,7 @@ namespace RimMind.Storyteller.Memory
             var recent = _dialogueRecords.Skip(System.Math.Max(0, _dialogueRecords.Count - count)).ToList();
             foreach (var r in recent)
             {
-                int day = r.tick / 60000 + 1;
+                int day = TensionMath.TicksToDay(r.tick);
                 string prefix = r.role == "user"
                     ? "RimMind.Storyteller.Prompt.RolePlayer".Translate()
                     : "RimMind.Storyteller.Prompt.RoleNarrator".Translate();
@@ -222,7 +222,7 @@ namespace RimMind.Storyteller.Memory
             sb.AppendLine("RimMind.Storyteller.Prompt.PlayerReactions".Translate());
             foreach (var r in consumed)
             {
-                int day = r.tick / 60000 + 1;
+                int day = TensionMath.TicksToDay(r.tick);
                 sb.AppendLine("RimMind.Storyteller.Prompt.ReactionRecordLine".Translate(
                     day.ToString(), r.incidentLabel, r.reactionLabel));
             }
