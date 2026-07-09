@@ -29,9 +29,7 @@ namespace RimMind.Storyteller.Debug
                 return;
             }
 
-            var director = Find.Storyteller?.storytellerComps?
-                .OfType<StorytellerComp_RimMindDirector>()
-                .FirstOrDefault();
+            var director = FindDirector();
 
             if (director == null)
             {
@@ -48,12 +46,8 @@ namespace RimMind.Storyteller.Debug
         [DebugAction("RimMind Storyteller", "Show Memory", actionType = DebugActionType.Action)]
         private static void ShowMemory()
         {
-            var memory = StorytellerMemory.Instance;
-            if (memory == null)
-            {
-                Log.Message("[RimMind-Storyteller] Memory not initialized (load a game first).");
-                return;
-            }
+            var memory = TryGetMemory();
+            if (memory == null) return;
 
             var sb = new StringBuilder();
             sb.AppendLine($"[RimMind-Storyteller] History Memory ({memory.Records.Count}/50):");
@@ -118,9 +112,7 @@ namespace RimMind.Storyteller.Debug
         [DebugAction("RimMind Storyteller", "Show Director State", actionType = DebugActionType.Action)]
         private static void ShowDirectorState()
         {
-            var director = Find.Storyteller?.storytellerComps?
-                .OfType<StorytellerComp_RimMindDirector>()
-                .FirstOrDefault();
+            var director = FindDirector();
 
             if (director == null)
             {
@@ -158,12 +150,8 @@ namespace RimMind.Storyteller.Debug
         [DebugAction("RimMind Storyteller", "Show Tension History", actionType = DebugActionType.Action)]
         private static void ShowTensionHistory()
         {
-            var memory = StorytellerMemory.Instance;
-            if (memory == null)
-            {
-                Log.Message("[RimMind-Storyteller] Memory not initialized (load a game first).");
-                return;
-            }
+            var memory = TryGetMemory();
+            if (memory == null) return;
 
             var sb = new StringBuilder();
             sb.AppendLine($"[RimMind-Storyteller] Tension History:");
@@ -192,12 +180,8 @@ namespace RimMind.Storyteller.Debug
         [DebugAction("RimMind Storyteller", "Clear Storyteller Memory", actionType = DebugActionType.Action)]
         private static void ClearStorytellerMemory()
         {
-            var memory = StorytellerMemory.Instance;
-            if (memory == null)
-            {
-                RimMindErrors.Warn("[RimMind-Storyteller] Memory not initialized (load a game first).");
-                return;
-            }
+            var memory = TryGetMemory();
+            if (memory == null) return;
 
             int recordsBefore = memory.Records.Count;
             int dialoguesBefore = memory.DialogueRecords.Count;
@@ -209,12 +193,8 @@ namespace RimMind.Storyteller.Debug
         [DebugAction("RimMind Storyteller", "Reset Tension Level", actionType = DebugActionType.Action)]
         private static void ResetTensionLevel()
         {
-            var memory = StorytellerMemory.Instance;
-            if (memory == null)
-            {
-                RimMindErrors.Warn("[RimMind-Storyteller] Memory not initialized (load a game first).");
-                return;
-            }
+            var memory = TryGetMemory();
+            if (memory == null) return;
 
             float before = memory.TensionLevel;
             float delta = 0.5f - before;
@@ -225,12 +205,8 @@ namespace RimMind.Storyteller.Debug
         [DebugAction("RimMind Storyteller", "Show Event Chains Detail", actionType = DebugActionType.Action)]
         private static void ShowEventChainsDetail()
         {
-            var memory = StorytellerMemory.Instance;
-            if (memory == null)
-            {
-                Log.Message("[RimMind-Storyteller] Memory not initialized (load a game first).");
-                return;
-            }
+            var memory = TryGetMemory();
+            if (memory == null) return;
 
             var sb = new StringBuilder();
             sb.AppendLine($"[RimMind-Storyteller] Event Chains Detail:");
@@ -254,6 +230,23 @@ namespace RimMind.Storyteller.Debug
         private static void OpenStorytellerAgentControl()
         {
             Find.WindowStack.Add(new RimMind.Storyteller.UI.Window_StorytellerAgentControl());
+        }
+
+        private static StorytellerMemory? TryGetMemory()
+        {
+            var memory = StorytellerMemory.Instance;
+            if (memory == null)
+            {
+                Log.Message("[RimMind-Storyteller] Memory not initialized (load a game first).");
+            }
+            return memory;
+        }
+
+        private static StorytellerComp_RimMindDirector? FindDirector()
+        {
+            return Find.Storyteller?.storytellerComps?
+                .OfType<StorytellerComp_RimMindDirector>()
+                .FirstOrDefault();
         }
     }
 }
