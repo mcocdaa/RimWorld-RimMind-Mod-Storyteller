@@ -52,11 +52,11 @@ namespace RimMind.Storyteller.Tests.ArchTests
         /// 桥的运行时行为已由 StorytellerMemoryBridgeTests.cs 覆盖，此处仅断言源码级委托关系。
         /// </summary>
         [Fact]
-        public void Window_StorytellerDialogue_DelegatesToBridge_NoAppDomainReflection()
+        public void Window_StorytellerDialogue_DelegatesToTypedMemoryBridge_NoAppDomainReflection()
         {
             string content = ReadSource("UI/Window_StorytellerDialogue.cs");
 
-            Assert.Contains("StorytellerMemoryBridge.TryPushNarratorEntry", content);
+            Assert.Contains("RimMindAPI.Memory.AddNarratorMemory", content);
             Assert.DoesNotContain("AppDomain.CurrentDomain.GetAssemblies", content);
         }
 

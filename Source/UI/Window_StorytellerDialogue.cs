@@ -8,7 +8,6 @@ using RimMind.Domain.Llm;
 using RimMind.Domain.ValueObjects;
 using RimMind.Presentation.Api;
 using RimMind.Storyteller;
-using RimMind.Storyteller.Extensions;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
 using RimWorld;
@@ -243,7 +242,7 @@ namespace RimMind.Storyteller.UI
                 ? "RimMind.Storyteller.Prompt.RolePlayer".Translate()
                 : "RimMind.Storyteller.Prompt.RoleNarrator".Translate();
 
-            StorytellerMemoryBridge.TryPushNarratorEntry($"{prefix}: {content}", tick, 0.3f);
+            RimMindAPI.Memory.AddNarratorMemory($"{prefix}: {content}", tick, 0.3f);
         }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,27 +34,7 @@ namespace RimMind.Storyteller
 
             RegisterProviders();
 
-            WireMemoryBridge();
-
             Log.Message("[RimMind-Storyteller] Initialized.");
-        }
-
-        /// <summary>
-        /// 注入 StorytellerMemoryBridge 所需的 RimWorld 运行时依赖：
-        /// 程序集解析 (LoadedModManager.RunningMods)、警告日志 (RimMindErrors.Warn)、
-        /// 翻译查找 (key.Translate())。桥接本身为纯反射逻辑，不直接依赖这些运行时。
-        /// </summary>
-        private static void WireMemoryBridge()
-        {
-            StorytellerMemoryBridge.AssemblyResolver = () =>
-            {
-                var memoryMod = LoadedModManager.RunningMods
-                    .FirstOrDefault(m => m.Name == "RimMind Memory" || m.Name.Contains("RimMind.Memory"));
-                return memoryMod?.assemblies?.loadedAssemblies
-                    ?.FirstOrDefault(a => a.GetName().Name == "RimMindMemory");
-            };
-            StorytellerMemoryBridge.Warn = msg => RimMindErrors.Warn(msg);
-            StorytellerMemoryBridge.Translate = key => key.Translate();
         }
 
         private void RegisterProviders()
@@ -146,8 +125,17 @@ namespace RimMind.Storyteller
                     if (ctx.Scenario != RimMindAPI.Context.ScenarioStoryteller) return null;
                     var pawn = PawnLookup.FindPawnById(ctx.PawnId);
                     if (pawn == null) return null;
-                    string narrations = StorytellerMemoryBridge.GetRecentNarrations(5);
-                    return string.IsNullOrEmpty(narrations) ? null : narrations;
+                    var narrations = RimMindAPI.Memory.GetRecentNarrations(5);
+                    if (narrations.Count == 0) return null;
+
+                    var narrationText = new StringBuilder();
+                    narrationText.AppendLine("RimMind.Storyteller.Prompt.RecentIncidents".Translate());
+                    foreach (var narration in narrations)
+                    {
+                        int day = narration.Tick / 60000 + 1;
+                        narrationText.AppendLine($"[Day {day}] {narration.Content}");
+                    }
+                    return narrationText.ToString().TrimEnd();
                 }, ownerMod: ModId, stalenessTicks: 3000, invalidationTriggers: new[] { "StorytellerEvent" },
                 cacheScope: CacheScope.Scenario));
         }
