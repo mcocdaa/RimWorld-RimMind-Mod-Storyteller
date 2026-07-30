@@ -7,6 +7,7 @@
     <AssemblyName>RimMindStoryteller.Tests</AssemblyName>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,12 +18,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="VerseStubs.cs" />
+    <Compile Include="Contracts\**\*.cs" />
+    <Compile Include="..\..\RimMind-Core\TestSupport\ContractCaseRunner.cs"
+             Link="Support\ContractCaseRunner.cs" />
     <Compile Include="../Source/Memory/TensionMath.cs" LinkBase="Memory" />
     <Compile Include="../Source/Memory/IncidentResponse.cs" LinkBase="Memory" />
+    <Compile Include="../Source/Memory/StorytellerPersistenceCodec.cs" LinkBase="Memory" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="../Source/Storyteller/StorytellerResponseParserPure.cs" LinkBase="Storyteller" />
+    <Compile Include="../Source/Storyteller/IncidentSelectionPolicy.cs" LinkBase="Storyteller" />
+    <Compile Include="../Source/Storyteller/StorytellerRequestState.cs" LinkBase="Storyteller" />
+    <Compile Include="../Source/Extensions/PawnLookupCore.cs" LinkBase="Extensions" />
+    <Compile Include="../Source/Extensions/StorytellerContextPolicy.cs" LinkBase="Extensions" />
   </ItemGroup>
 
   <ItemGroup>

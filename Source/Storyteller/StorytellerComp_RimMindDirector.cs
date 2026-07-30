@@ -19,19 +19,16 @@ namespace RimMind.Storyteller
     public class StorytellerComp_RimMindDirector : RimWorld.StorytellerComp
     {
         private StorytellerMemory _memory = null!;
-        private bool _hasPendingRequest;
-        private bool _hasPendingResult;
-        private FiringIncident _pendingIncident = null!;
-        private int _lastSuccessTick = -99999;
-        private int _lastFailTick = -99999;
+        private readonly StorytellerRequestState<FiringIncident> _requestState =
+            new StorytellerRequestState<FiringIncident>();
 
         private StorytellerCompProperties_RimMindDirector Props =>
             (StorytellerCompProperties_RimMindDirector)props;
 
-        public bool IsActive => _hasPendingRequest || _hasPendingResult;
+        public bool IsActive => _requestState.HasPendingRequest || _requestState.HasPendingResult;
 
-        public int LastSuccessTick => _lastSuccessTick;
-        public int LastFailTick => _lastFailTick;
+        public int LastSuccessTick => _requestState.LastSuccessTick;
+        public int LastFailTick => _requestState.LastFailTick;
 
         public int GetEstimatedTicksUntilNextEvent()
         {
@@ -51,20 +48,16 @@ namespace RimMind.Storyteller
             if (_memory == null) yield break;
             _memory.ApplyDecayAndCleanup();
 
-            if (_hasPendingResult && _pendingIncident != null)
+            if (_requestState.TryTake(out FiringIncident? incident))
             {
-                var incident = _pendingIncident;
-                _hasPendingResult = false;
-                _pendingIncident = null!;
-
                 if (RimMindStorytellerMod.Settings?.debugLogging == true)
-                    Log.Message($"[RimMind-Storyteller] AI incident firing: {incident.def.defName}");
+                    Log.Message($"[RimMind-Storyteller] AI incident firing: {incident!.def.defName}");
 
-                yield return incident;
+                yield return incident!;
                 yield break;
             }
 
-            if (_hasPendingRequest)
+            if (_requestState.HasPendingRequest)
                 yield break;
 
             if (!RimMindAPI.IsConfigured())
@@ -80,25 +73,43 @@ namespace RimMind.Storyteller
             if (!Rand.MTBEventOccurs(mtb, 60000f, 1000f))
                 yield break;
 
-            _hasPendingRequest = true;
-
-            _memory.ConsumeReactions(20);
-
-            string npcId = RimMindAPI.GetNpcForMap(map) ?? "NPC-storyteller";
-            string scenario = RimMindAPI.Context.ScenarioStoryteller;
-
-            TrySelectIncidentWithStructuredOutput(npcId, scenario, 400, 0.8f, target);
+            int dispatchTick = Find.TickManager.TicksGame;
+            bool dispatched = _requestState.TryDispatch(
+                token =>
+                {
+                    _memory.ConsumeReactions(20);
+                    string npcId = RimMindAPI.GetNpcForMap(map) ?? "NPC-storyteller";
+                    string scenario = RimMindAPI.Context.ScenarioStoryteller;
+                    TrySelectIncidentWithStructuredOutput(
+                        npcId,
+                        scenario,
+                        400,
+                        0.8f,
+                        target,
+                        token);
+                },
+                dispatchTick,
+                out Exception? dispatchError);
+            if (!dispatched && dispatchError != null)
+            {
+                RimMindErrors.Warn(
+                    $"[RimMind-Storyteller] AI request dispatch failed: {dispatchError.Message}");
+            }
 
             yield break;
         }
 
-        private void OnAIResponseReceived(Result<LlmResponse, RimMindError> result, IIncidentTarget target)
+        private void OnAIResponseReceived(
+            Result<LlmResponse, RimMindError> result,
+            IIncidentTarget target,
+            long requestToken)
         {
-            _hasPendingRequest = false;
+            if (!_requestState.IsCurrent(requestToken))
+                return;
 
             if (result.IsErr)
             {
-                _lastFailTick = Find.TickManager.TicksGame;
+                _requestState.Fail(requestToken, Find.TickManager.TicksGame);
                 RimMindErrors.Warn($"[RimMind-Storyteller] AI request failed: {result.Error}");
                 return;
             }
@@ -111,14 +122,18 @@ namespace RimMind.Storyteller
             var (incident, incidentResponse) = RimMindIncidentSelector.ParseResponse(response.Content, target, this);
             if (incident == null)
             {
-                _lastFailTick = Find.TickManager.TicksGame;
+                _requestState.Fail(requestToken, Find.TickManager.TicksGame);
                 RimMindErrors.Warn($"[RimMind-Storyteller] AI response parse failed or event cannot fire: {response.Content}");
                 return;
             }
 
-            _lastSuccessTick = Find.TickManager.TicksGame;
-            _hasPendingResult = true;
-            _pendingIncident = incident;
+            if (!_requestState.Publish(
+                    requestToken,
+                    incident,
+                    Find.TickManager.TicksGame))
+            {
+                return;
+            }
 
             if (incidentResponse != null)
             {
@@ -144,10 +159,10 @@ namespace RimMind.Storyteller
 
         public bool ForceRequest(IIncidentTarget target)
         {
-            if (_hasPendingRequest)
+            if (_requestState.HasPendingRequest)
             {
                 RimMindErrors.Warn("[RimMind-Storyteller] ForceRequest: overriding existing pending request");
-                _hasPendingRequest = false;
+                _requestState.CancelRequest();
             }
 
             var map = target as Map;
@@ -161,27 +176,45 @@ namespace RimMind.Storyteller
 
             EnsureMemory();
 
-            _memory.ConsumeReactions(20);
+            int dispatchTick = Find.TickManager.TicksGame;
+            bool dispatched = _requestState.TryDispatch(
+                token =>
+                {
+                    _memory.ConsumeReactions(20);
+                    RimMindAPI.ClearModCooldown("Storyteller");
+                    string npcId = RimMindAPI.GetNpcForMap(map) ?? "NPC-storyteller";
+                    string scenario = RimMindAPI.Context.ScenarioStoryteller;
 
-            _hasPendingRequest = true;
+                    Log.Message("[RimMind-Storyteller] ForceRequest: sending structured AI request");
+                    TrySelectIncidentWithStructuredOutput(
+                        npcId,
+                        scenario,
+                        400,
+                        0.8f,
+                        target,
+                        token);
+                },
+                dispatchTick,
+                out Exception? dispatchError);
+            if (!dispatched && dispatchError != null)
+            {
+                RimMindErrors.Warn(
+                    $"[RimMind-Storyteller] ForceRequest dispatch failed: {dispatchError.Message}");
+            }
 
-            RimMindAPI.ClearModCooldown("Storyteller");
-
-            string npcId = RimMindAPI.GetNpcForMap(map) ?? "NPC-storyteller";
-            string scenario = RimMindAPI.Context.ScenarioStoryteller;
-
-            Log.Message("[RimMind-Storyteller] ForceRequest: sending structured AI request");
-            TrySelectIncidentWithStructuredOutput(npcId, scenario, 400, 0.8f, target);
-            return true;
+            return dispatched;
         }
 
         private bool ShouldNotifyPlayer(IncidentDef incidentDef)
         {
-            if (!(RimMindStorytellerMod.Settings?.enableEventNotification ?? true))
-                return false;
-
-            return incidentDef.category == IncidentCategoryDefOf.ThreatBig
-                || incidentDef.category == IncidentCategoryDefOf.ThreatSmall;
+            StorytellerIncidentKind kind = incidentDef.category == IncidentCategoryDefOf.ThreatBig
+                ? StorytellerIncidentKind.ThreatBig
+                : incidentDef.category == IncidentCategoryDefOf.ThreatSmall
+                    ? StorytellerIncidentKind.ThreatSmall
+                    : StorytellerIncidentKind.Other;
+            return IncidentSelectionPolicy.ShouldNotify(
+                RimMindStorytellerMod.Settings?.enableEventNotification ?? true,
+                kind);
         }
 
         private void RegisterEventNotification(FiringIncident incident, IncidentResponse incidentResponse)
@@ -267,7 +300,13 @@ namespace RimMind.Storyteller
             RimMindAPI.RegisterPendingRequest(entry);
         }
 
-        private void TrySelectIncidentWithStructuredOutput(string npcId, string scenario, int maxTokens, float temperature, IIncidentTarget target)
+        private void TrySelectIncidentWithStructuredOutput(
+            string npcId,
+            string scenario,
+            int maxTokens,
+            float temperature,
+            IIncidentTarget target,
+            long requestToken)
         {
             var schema = RimMindAPI.Context.SchemaIncidentOutput;
 
@@ -279,7 +318,9 @@ namespace RimMind.Storyteller
                 .WithTemperature(temperature)
                 .WithNpcId(npcId)
                 .Build();
-            RimMindAPI.Request.Send(envelope, result => OnAIResponseReceived(result, target));
+            RimMindAPI.Request.Send(
+                envelope,
+                result => OnAIResponseReceived(result, target, requestToken));
         }
 
         private void EnsureMemory()

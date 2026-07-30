@@ -35,15 +35,15 @@ namespace RimMind.Storyteller.Memory
 
         public void ExposeData()
         {
-            Scribe_Values.Look(ref chainId, "chainId", string.Empty);
-            Scribe_Collections.Look(ref steps, "steps", LookMode.Deep);
-            Scribe_Values.Look(ref currentStep, "currentStep");
-            Scribe_Values.Look(ref totalSteps, "totalSteps");
-            Scribe_Values.Look(ref nextHint, "nextHint", string.Empty);
-            Scribe_Values.Look(ref lastAdvancedTick, "lastAdvancedTick");
-            Scribe_Values.Look(ref lastFactionDefName, "lastFactionDefName", string.Empty);
-            Scribe_Values.Look(ref lastPoints, "lastPoints");
-            steps ??= new List<ChainStep>();
+            StorytellerPersistenceCodec.LookEventChain(
+                ref chainId,
+                ref steps,
+                ref currentStep,
+                ref totalSteps,
+                ref nextHint,
+                ref lastAdvancedTick,
+                ref lastFactionDefName,
+                ref lastPoints);
         }
     }
 
@@ -327,20 +327,14 @@ namespace RimMind.Storyteller.Memory
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Collections.Look(ref _records, "records", LookMode.Deep);
-            _records ??= new List<IncidentHistoryRecord>();
-            Scribe_Collections.Look(ref _dialogueRecords, "dialogueRecords", LookMode.Deep);
-            _dialogueRecords ??= new List<DialogueRecord>();
-            Scribe_Collections.Look(ref _playerReactions, "playerReactions", LookMode.Deep);
-            _playerReactions ??= new List<PlayerReactionRecord>();
-#pragma warning disable CS8601
-            Scribe_Values.Look(ref CustomSystemPrompt, "customSystemPrompt", string.Empty);
-#pragma warning restore CS8601
-            Scribe_Values.Look(ref _tensionLevel, "tensionLevel", 0.5f);
-            Scribe_Values.Look(ref _lastTensionDecayTick, "lastTensionDecayTick", -1);
-            Scribe_Collections.Look(ref _activeChains, "activeChains", LookMode.Deep);
-            _activeChains ??= new List<EventChain>();
-
+            StorytellerPersistenceCodec.LookMemory(
+                ref _records,
+                ref _dialogueRecords,
+                ref _playerReactions,
+                ref CustomSystemPrompt,
+                ref _tensionLevel,
+                ref _lastTensionDecayTick,
+                ref _activeChains);
         }
     }
 }

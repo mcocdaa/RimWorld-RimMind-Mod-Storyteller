@@ -1,4 +1,3 @@
-using System.Linq;
 using Verse;
 
 namespace RimMind.Storyteller.Extensions
@@ -14,10 +13,11 @@ namespace RimMind.Storyteller.Extensions
         /// </summary>
         public static Pawn? FindPawnById(int pawnId)
         {
-            if (pawnId <= 0) return null;
-
-            return Find.WorldPawns.AllPawnsAlive.FirstOrDefault(p => p.thingIDNumber == pawnId)
-                ?? Find.CurrentMap?.mapPawns?.FreeColonists.FirstOrDefault(p => p.thingIDNumber == pawnId);
+            return PawnLookupCore.FindById(
+                pawnId,
+                () => Find.WorldPawns.AllPawnsAlive,
+                () => Find.CurrentMap?.mapPawns?.FreeColonists,
+                pawn => pawn.thingIDNumber);
         }
     }
 }

@@ -17,22 +17,32 @@ namespace RimMind.Storyteller
             // StorytellerResponseParserPure handles null/empty input, repair fallback, and
             // defName validation, returning null in all those failure cases.
             var result = StorytellerResponseParserPure.ParseResponse(aiContent);
-            if (result == null) return (null, null);
+            if (IncidentSelectionPolicy.Evaluate(
+                    result != null,
+                    definitionExists: false,
+                    canFireNow: false) == IncidentSelectionDisposition.InvalidResponse)
+            {
+                return (null, null);
+            }
 
-            var incidentDef = DefDatabase<IncidentDef>.GetNamedSilentFail(result.defName);
-            if (incidentDef == null)
+            var incidentDef = DefDatabase<IncidentDef>.GetNamedSilentFail(result!.defName);
+            if (IncidentSelectionPolicy.Evaluate(
+                    hasParsedResponse: true,
+                    incidentDef != null,
+                    canFireNow: false) == IncidentSelectionDisposition.UnknownDefinition)
             {
                 RimMindErrors.Warn($"[RimMind-Storyteller] AI returned unknown defName: {result.defName}");
                 return (null, result);
             }
 
-            var parms = StorytellerUtility.DefaultParmsNow(incidentDef.category, target);
+            var parms = StorytellerUtility.DefaultParmsNow(incidentDef!.category, target);
 
             if (result.@params != null)
             {
                 if (result.@params.points_multiplier.HasValue)
                 {
-                    float mult = UnityEngine.Mathf.Clamp(result.@params.points_multiplier.Value, 0.3f, 2.0f);
+                    float mult = IncidentSelectionPolicy.ClampPointsMultiplier(
+                        result.@params.points_multiplier.Value);
                     parms.points *= mult;
                 }
 
@@ -51,7 +61,10 @@ namespace RimMind.Storyteller
                 }
             }
 
-            if (!incidentDef.Worker.CanFireNow(parms))
+            if (IncidentSelectionPolicy.Evaluate(
+                    hasParsedResponse: true,
+                    definitionExists: true,
+                    incidentDef!.Worker.CanFireNow(parms)) == IncidentSelectionDisposition.CannotFire)
             {
                 RimMindErrors.Warn($"[RimMind-Storyteller] AI selected event cannot fire now: {result.defName}");
                 return (null, result);
