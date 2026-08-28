@@ -8,7 +8,7 @@ production seams. Legacy files remain on disk but are excluded.
 | Contract | Stable boundaries | Discovered facts |
 |---|---|---:|
 | `Contracts/StorytellerIncidentPolicyContracts.cs` | response parsing, incident policy, pawn lookup, notification policy | 1 |
-| `Contracts/StorytellerRequestContextContracts.cs` | context scoping/composition, memory bridge, tension, request state | 1 |
+| `Contracts/StorytellerRequestContextContracts.cs` | context scoping/composition, tension math, request state | 1 |
 | `Contracts/StorytellerSaveErrorContracts.cs` | persistence codec, malformed-load normalization, request failure isolation | 1 |
 
 Current discovery count: **3 Facts**, **0 Theories** (budget: <= 40).
@@ -42,14 +42,13 @@ The compact pure-logic cutover needs:
   <Compile Include="..\Source\Storyteller\StorytellerRequestState.cs" LinkBase="Storyteller" />
   <Compile Include="..\Source\Extensions\PawnLookupCore.cs" LinkBase="Extensions" />
   <Compile Include="..\Source\Extensions\StorytellerContextPolicy.cs" LinkBase="Extensions" />
-  <Compile Include="..\Source\Extensions\StorytellerMemoryBridge.cs" LinkBase="Extensions" />
 </ItemGroup>
 ```
 
 Legacy compile categories superseded by these contracts are:
 
 - incident response/parser, incident selector, pawn lookup, and notification tests;
-- request envelope, context provider, prompt, memory bridge, tension, and decay tests;
+- request envelope, context provider, prompt, tension, and decay tests;
 - architecture-direction tests covered by the request/context contract.
 
 ## Retired legacy tests

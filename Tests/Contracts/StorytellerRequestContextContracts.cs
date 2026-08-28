@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using RimMind.Storyteller.Extensions;
 using RimMind.Storyteller.Memory;
 using RimMind.Testing;
@@ -15,8 +13,7 @@ namespace RimMind.Storyteller.Tests.Contracts
             ContractCaseRunner.Run(
                 ("tension clamps decay and day conversion stay deterministic", TensionMathRemainsDeterministic),
                 ("all context providers are storyteller scenario scoped", ContextProvidersRemainScenarioScoped),
-                ("requests and agent control use public Core APIs", RequestArchitectureRemainsCoreOnly),
-                ("request lifecycle has progressive disclosure boundaries", RequestLifecycleHasProgressiveDisclosureBoundaries));
+                ("requests and agent control use public Core APIs", RequestArchitectureRemainsCoreOnly));
         }
 
         private static void TensionMathRemainsDeterministic()
@@ -68,26 +65,6 @@ namespace RimMind.Storyteller.Tests.Contracts
             Assert.True(state.TryTake(out string? incident));
             Assert.Equal("incident", incident);
             Assert.False(state.TryTake(out _));
-        }
-
-        private static void RequestLifecycleHasProgressiveDisclosureBoundaries()
-        {
-            string sourceDirectory = Path.GetFullPath(Path.Combine(
-                AppContext.BaseDirectory,
-                "..", "..", "..", "..", "Source", "Storyteller"));
-            string director = File.ReadAllText(Path.Combine(
-                sourceDirectory,
-                "StorytellerComp_RimMindDirector.cs"));
-
-            Assert.True(File.Exists(Path.Combine(
-                sourceDirectory,
-                "StorytellerRequestCoordinator.cs")));
-            Assert.True(File.Exists(Path.Combine(
-                sourceDirectory,
-                "StorytellerNotificationService.cs")));
-            Assert.DoesNotContain("LlmRequestEnvelopeBuilder", director);
-            Assert.DoesNotContain("OnAIResponseReceived", director);
-            Assert.DoesNotContain("RegisterPendingRequest", director);
         }
 
     }

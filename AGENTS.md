@@ -2,11 +2,23 @@
 
 AI叙事者模块，替换RimWorld Storyteller系统，LLM决定事件选择。
 
+## Start here
+
+- 事件请求：`Source/Storyteller/README.md`
+- 事件历史、对话、反应、张力和事件链：`Source/Memory/StorytellerMemory.cs`
+- Context Provider 与模组注册：`Source/RimMindStorytellerMod.cs`
+- 祭坛对话：`Source/UI/Window_StorytellerDialogue.cs`
+- 调试操作：`Source/Debug/StorytellerDebugActions.cs`
+
+## Main incident flow
+
+`StorytellerComp_RimMindDirector` 保留 RimWorld 间隔触发门控，并把一次请求生命周期委托给 `StorytellerRequestCoordinator`。协调器复用 `StorytellerRequestState<FiringIncident>`、`RimMindIncidentSelector` 和 `IncidentSelectionPolicy`，玩家反应通知由 `StorytellerNotificationService` 构造。跨模组叙述记忆只走 `RimMindAPI.Memory`，不支持反射桥接。
+
 ## 项目定位
 
-`StorytellerComp_RimMindDirector` MTB随机触发 → ContextEngine(RequestStructured, SchemaRegistry.IncidentOutput) → AI选择事件 → ParseResponse验证 → 威胁事件通知玩家审批(影响张力) → 张力系统(0~1) + 事件链(chain) + 回退模式(Cassandra/Randy/Phoebe) + 祭坛对话(RimMindAPI.Chat) + StorytellerMemory持久化。
+`StorytellerComp_RimMindDirector` MTB随机触发 → `StorytellerRequestCoordinator` → `RimMindAPI.Request.Send` → AI选择事件 → `RimMindIncidentSelector`验证 → 威胁事件通知玩家审批(影响张力) → 张力系统(0~1) + 事件链(chain) + 回退模式(Cassandra/Randy/Phoebe) + 祭坛对话(RimMindAPI.Chat) + StorytellerMemory持久化。
 
-依赖: Core(编译期)，通过反射推送/读取 Memory 模组数据。
+依赖: Core(编译期)。跨模组 Memory 访问通过 Core 公共 `RimMindAPI.Memory`。
 
 ## 构建
 
@@ -21,10 +33,15 @@ AI叙事者模块，替换RimWorld Storyteller系统，LLM决定事件选择。
 
 ```
 Source/
-├── RimMindStorytellerMod.cs                                    Mod入口 + ContextKey注册(5个) + Memory桥接委托注入
+├── RimMindStorytellerMod.cs                                    Mod入口 + ContextKey注册(5个)
 ├── Agent/StorytellerAgentController.cs                         Storyteller-owned Agent 控制器
 ├── Storyteller/
-│   ├── StorytellerComp_RimMindDirector.cs                      AI事件选择器(StorytellerComp)
+│   ├── README.md                                                事件请求切片阅读地图
+│   ├── StorytellerComp_RimMindDirector.cs                      RimWorld入口 + 间隔触发门控
+│   ├── StorytellerRequestCoordinator.cs                        请求派发、回调终态与事件链记录
+│   ├── StorytellerRequestState.cs                              Token、pending请求和pending结果状态
+│   ├── StorytellerNotificationService.cs                       玩家反应通知与张力回调
+│   ├── IncidentSelectionPolicy.cs                              事件选择与通知纯策略
 │   ├── StorytellerComp_RimMindFallback.cs                      回退事件生成器
 │   ├── StorytellerCompProperties_RimMindDirector.cs            Director Def属性
 │   ├── StorytellerCompProperties_RimMindFallback.cs            Fallback Def属性
@@ -36,7 +53,6 @@ Source/
 │   ├── TensionMath.cs                                          张力衰减/Clamp01 纯逻辑(可单测)
 │   └── IncidentResponse.cs                                     IncidentResponse DTO
 ├── Extensions/
-│   ├── StorytellerMemoryBridge.cs                              Memory反射统一桥接(写入+读取 单一入口)
 │   ├── PawnLookup.cs                                           共享Pawn查找(WorldPawns→FreeColonists)
 │   ├── StorytellerContextBuilder.cs                            难度/威胁/张力文本构建(6个helper，3个纯逻辑可单测)
 │   ├── StorytellerIncidentSkipCheck.cs                         ISkipCheck 实现
@@ -58,11 +74,11 @@ StorytellerComp_RimMindDirector.MakeIntervalIncidents
   ├── target不是Map_PlayerHome → skip
   ├── 有pending结果 → yield return FiringIncident
   ├── 检查: API配置/enableIntervalTrigger/ShouldSkipStorytellerIncident/MTB随机触发
-  └── 发起AI请求
+  └── StorytellerRequestCoordinator发起AI请求
       ├── ConsumeReactions(20) — 消费玩家反应
-      ├── ContextRequest(NpcId, Scenario=Storyteller, Budget, MaxTokens=400, T=0.8)
-      ├── RimMindAPI.RequestStructured(request, SchemaRegistry.IncidentOutput, callback)
-      └── OnAIResponse → ParseResponse → RecordChainStep → RegisterEventNotification
+      ├── LlmRequestEnvelope(Scenario=Storyteller, MaxTokens=400, T=0.8)
+      ├── RimMindAPI.Request.Send(envelope, callback)
+      └── OnResponseReceived → ParseResponse → Publish → RecordChainStep → StorytellerNotificationService
 ```
 
 ## IncidentResponse DTO
@@ -91,7 +107,7 @@ StorytellerComp_RimMindDirector.MakeIntervalIncidents
 | storyteller_context | L1_Baseline | 0.85 | 难度+威胁+张力+近期事件+活跃链 |
 | storyteller_reactions | L1_Baseline | 0.8 | 玩家情感反应(ConsumedReactionsText) |
 | storyteller_dialogue | L3_State | 0.5 | 近期对话摘要 |
-| storyteller_recent_incidents | L4_History | 0.7 | Memory模组近期叙述(反射读取) |
+| storyteller_recent_incidents | L4_History | 0.7 | Memory模组近期叙述(`RimMindAPI.Memory`) |
 
 所有注册均包含 `if (ContextKeyRegistry.CurrentScenario != ScenarioIds.Storyteller) return new List<ContextEntry>();` 守卫。
 
@@ -107,25 +123,24 @@ ContextEngine.BuildContext(Scenario=Storyteller)
   └── L4_History: storyteller_recent_incidents (Memory叙述) + Core自动注入 (NarrativeMemory)
 ```
 
-## Memory 反射桥接（统一入口）
+## 跨模组 Memory 路径
 
-| 方法 | 方向 | 位置 |
-|------|------|------|
-| `StorytellerMemoryBridge.TryPushNarratorEntry` | 写入 | `Source/Extensions/StorytellerMemoryBridge.cs` |
-| `StorytellerMemoryBridge.GetRecentNarrations` | 读取 | `Source/Extensions/StorytellerMemoryBridge.cs` |
+| 方向 | 公共入口 | 调用方 |
+|------|----------|--------|
+| 写入叙述记忆 | `RimMindAPI.Memory.AddNarratorMemory` | `Window_StorytellerDialogue` |
+| 读取近期叙述 | `RimMindAPI.Memory.GetRecentNarrations` | `RimMindStorytellerMod` Context Provider |
 
-调用方：
-- `Window_StorytellerDialogue.TryPushToMemoryMod` → `StorytellerMemoryBridge.TryPushNarratorEntry`
-- `RimMindStorytellerMod.GetRecentNarrationsFromMemory` → `StorytellerMemoryBridge.GetRecentNarrations`
+Storyteller 不访问 Memory 的具体 Store、WorldComponent 或设置单例。
 
-⚠️ `IMemoryBridge` Core 接口仍待实施（见 `.trae/specs/clean-arch-compliance-audit/tasks.md` Task 10）。当前 `StorytellerMemoryBridge` 是 Storyteller 侧的统一封装，反射目标：`RimMind.Memory.Data.NarratorMemoryStore`（类名不可变，见 Memory mod 约束）。
-
-## 代码约定
+## Invariants
 
 - StorytellerComp通过XML `StorytellerDef` 注册(非GameComponent)
 - 翻译键前缀: `RimMind.Storyteller.*`
 - Harmony ID: `mcocdaa.RimMindStoryteller`
 - `mtbDays` 运行时以Settings为准(覆盖Def)
+- 间隔检查顺序保持为 target → maintenance → pending result → pending request → API → setting → skip check → MTB
+- 过期请求Token必须忽略；成功/失败Tick只由 `StorytellerRequestState` 更新
+- `StorytellerMemory` 持有事件历史、对话、反应、张力和事件链的持久状态
 - 所有ContextKey注册必须包含场景守卫
 - 禁止使用 `[Obsolete]` 的 `RegisterPawnContextProvider` / `RegisterStaticProvider`
 - 禁止直接访问 `Core.Internal` 命名空间
@@ -133,21 +148,6 @@ ContextEngine.BuildContext(Scenario=Storyteller)
 ## 已知问题
 
 1. `IncidentHistoryRecord` 兼容字段 `_compat1`/`_compat2` 反序列化后未读取（存档兼容，可保留）
-2. `IMemoryBridge` Core 接口未实施 — 当前由 `StorytellerMemoryBridge` 在 Storyteller 侧统一封装反射，待 Core 提供 `IMemoryBridge` 后切换（见 `.trae/specs/clean-arch-compliance-audit/tasks.md` Task 10）
-
-## 已修复（2026-07-08）
-
-| # | 问题 | 修复 | 提交 |
-|---|------|------|------|
-| 1 | 张力双重衰减 Bug | 张力衰减唯一入口收敛到 `ApplyDecayAndCleanup()`，内部委托 `TensionMath.ComputeDecay` | 09435b3 |
-| 2 | 缺失翻译键（误报） | `RimMind.Storyteller.Prompt.PlayerReactions` 和 `RimMind.Storyteller.Prompt.RecentIncidents` 已在 English/ChineseSimplified XML 中定义（原 AGENTS.md 标注错误） | — |
-| 3 | Memory 反射脆弱，2 条路径 | 抽取 `StorytellerMemoryBridge` 统一写入/读取入口 | 9343bad |
-| 4 | JSON 修复双路径 | 统一到 `StorytellerResponseParserPure`，`RimMindIncidentSelector.ParseResponse` 仅委托 | e1494d1 |
-| 5 | 死代码 `StorytellerIncidentExecutedListener` 空实现 | 删除空实现与注册 | c218cb3 |
-| 6 | `budget` 未使用赋值 | 移除 3 处未使用赋值 | 5ed0fbb |
-| 7 | `PawnLookup` 重复 | 提取 `PawnLookup.FindPawnById` 去重 4 处 | 61dffb7 |
-| 8 | `StorytellerContextBuilder` 缺失 | 提取 6 个 helper 方法（3 个纯逻辑可单测） | fd9d054 |
-| 9 | `CustomSystemPrompt` 未注入 | 接入 `storyteller_task` ContextKey | 6612b1a |
 
 ## 操作边界
 
