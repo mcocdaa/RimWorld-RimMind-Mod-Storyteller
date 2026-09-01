@@ -11,6 +11,10 @@ Start with `StorytellerComp_RimMindDirector.cs`. It is the RimWorld adapter and 
 5. `StorytellerNotificationService.cs` — player reaction request and tension callback.
 6. `../Memory/StorytellerMemory.cs` — persistent incidents, dialogue, reactions, tension, and chains.
 
+## Context Provider path
+
+Start at `../RimMindStorytellerMod.cs` to see the module composition entry. It delegates all five Context Provider registrations to `StorytellerContextProviderRegistrar.cs`. When you need provider details, read `StorytellerContextProviderRegistrar.cs`, then `../Extensions/StorytellerContextPolicy.cs`, `../Extensions/StorytellerContextBuilder.cs`, `../Memory/StorytellerMemory.cs`, and `RimMindAPI.Memory` in that order. The Mod entry composes the module; it does not own provider content.
+
 ## Automatic flow
 
 ```text

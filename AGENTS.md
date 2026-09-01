@@ -6,7 +6,8 @@ AI叙事者模块，替换RimWorld Storyteller系统，LLM决定事件选择。
 
 - 事件请求：`Source/Storyteller/README.md`
 - 事件历史、对话、反应、张力和事件链：`Source/Memory/StorytellerMemory.cs`
-- Context Provider 与模组注册：`Source/RimMindStorytellerMod.cs`
+- 模组组合入口：`Source/RimMindStorytellerMod.cs`
+- Context Provider 注册：`Source/Storyteller/StorytellerContextProviderRegistrar.cs`
 - 祭坛对话：`Source/UI/Window_StorytellerDialogue.cs`
 - 调试操作：`Source/Debug/StorytellerDebugActions.cs`
 
@@ -33,10 +34,11 @@ AI叙事者模块，替换RimWorld Storyteller系统，LLM决定事件选择。
 
 ```
 Source/
-├── RimMindStorytellerMod.cs                                    Mod入口 + ContextKey注册(5个)
+├── RimMindStorytellerMod.cs                                    Mod组合入口
 ├── Agent/StorytellerAgentController.cs                         Storyteller-owned Agent 控制器
 ├── Storyteller/
-│   ├── README.md                                                事件请求切片阅读地图
+│   ├── README.md                                                事件请求与 Context Provider 阅读地图
+│   ├── StorytellerContextProviderRegistrar.cs                  5个 Context Provider 注册
 │   ├── StorytellerComp_RimMindDirector.cs                      RimWorld入口 + 间隔触发门控
 │   ├── StorytellerRequestCoordinator.cs                        请求派发、回调终态与事件链记录
 │   ├── StorytellerRequestState.cs                              Token、pending请求和pending结果状态
@@ -128,7 +130,7 @@ ContextEngine.BuildContext(Scenario=Storyteller)
 | 方向 | 公共入口 | 调用方 |
 |------|----------|--------|
 | 写入叙述记忆 | `RimMindAPI.Memory.AddNarratorMemory` | `Window_StorytellerDialogue` |
-| 读取近期叙述 | `RimMindAPI.Memory.GetRecentNarrations` | `RimMindStorytellerMod` Context Provider |
+| 读取近期叙述 | `RimMindAPI.Memory.GetRecentNarrations` | `StorytellerContextProviderRegistrar` |
 
 Storyteller 不访问 Memory 的具体 Store、WorldComponent 或设置单例。
 
