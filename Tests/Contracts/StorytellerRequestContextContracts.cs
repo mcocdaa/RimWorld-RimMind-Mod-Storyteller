@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using RimMind.Storyteller.Extensions;
 using RimMind.Storyteller.Memory;
 using RimMind.Testing;
@@ -13,7 +15,8 @@ namespace RimMind.Storyteller.Tests.Contracts
             ContractCaseRunner.Run(
                 ("tension clamps decay and day conversion stay deterministic", TensionMathRemainsDeterministic),
                 ("all context providers are storyteller scenario scoped", ContextProvidersRemainScenarioScoped),
-                ("requests and agent control use public Core APIs", RequestArchitectureRemainsCoreOnly));
+                ("requests and agent control use public Core APIs", RequestArchitectureRemainsCoreOnly),
+                ("context providers stay behind the composition entry", ContextProvidersAreIsolated));
         }
 
         private static void TensionMathRemainsDeterministic()
@@ -65,6 +68,54 @@ namespace RimMind.Storyteller.Tests.Contracts
             Assert.True(state.TryTake(out string? incident));
             Assert.Equal("incident", incident);
             Assert.False(state.TryTake(out _));
+        }
+
+        private static void ContextProvidersAreIsolated()
+        {
+            string entry = ReadStorytellerSource("RimMindStorytellerMod.cs");
+            string registrar = ReadStorytellerSource("Storyteller/StorytellerContextProviderRegistrar.cs");
+
+            Assert.Contains(
+                "StorytellerContextProviderRegistrar.RegisterAll();",
+                entry,
+                StringComparison.Ordinal);
+            Assert.DoesNotContain("ContextProviderDef", entry, StringComparison.Ordinal);
+            Assert.Contains(
+                "internal static class StorytellerContextProviderRegistrar",
+                registrar,
+                StringComparison.Ordinal);
+
+            string[] providerIds =
+            {
+                "storyteller_dialogue",
+                "storyteller_task",
+                "storyteller_context",
+                "storyteller_reactions",
+                "storyteller_recent_incidents"
+            };
+            int previousIndex = -1;
+            foreach (string providerId in providerIds)
+            {
+                int index = registrar.IndexOf($"\"{providerId}\"", StringComparison.Ordinal);
+                Assert.True(index >= 0, $"Missing provider id: {providerId}");
+                Assert.True(index > previousIndex, $"Provider id is out of order: {providerId}");
+                Assert.DoesNotContain($"\"{providerId}\"", entry, StringComparison.Ordinal);
+                previousIndex = index;
+            }
+        }
+
+        private static string ReadStorytellerSource(string relativePath)
+        {
+            DirectoryInfo? directory = new DirectoryInfo(AppContext.BaseDirectory);
+            while (directory != null && !Directory.Exists(Path.Combine(directory.FullName, "RimMind-Storyteller")))
+                directory = directory.Parent;
+
+            Assert.NotNull(directory);
+            return File.ReadAllText(Path.Combine(
+                directory!.FullName,
+                "RimMind-Storyteller",
+                "Source",
+                relativePath.Replace('/', Path.DirectorySeparatorChar)));
         }
 
     }
