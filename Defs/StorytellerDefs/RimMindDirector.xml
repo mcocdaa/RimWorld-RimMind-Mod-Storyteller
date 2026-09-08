@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <Defs>
-
   <StorytellerDef ParentName="BaseStoryteller">
     <defName>RimMindDirector</defName>
     <label>RimMind Director</label>
@@ -10,9 +9,9 @@
     <listOrder>50</listOrder>
     <comps>
       <!-- AI 事件选择器（主要逻辑） -->
-      <li Class="RimMind.Storyteller.StorytellerCompProperties_RimMindDirector" />
+      <li Class="RimMind.Storyteller.StorytellerCompProperties_RimMindDirector"/>
       <!-- Fallback：AI 不可用时接管 -->
-      <li Class="RimMind.Storyteller.StorytellerCompProperties_RimMindFallback" />
+      <li Class="RimMind.Storyteller.StorytellerCompProperties_RimMindFallback"/>
       <!-- 疾病 -->
       <li Class="StorytellerCompProperties_Disease">
         <category>DiseaseHuman</category>
@@ -25,7 +24,9 @@
       <!-- 小事件 -->
       <li Class="StorytellerCompProperties_CategoryMTB">
         <category>Misc</category>
-        <allowedTargetTags><li>Map_PlayerHome</li></allowedTargetTags>
+        <allowedTargetTags>
+          <li>Map_PlayerHome</li>
+        </allowedTargetTags>
         <minDaysPassed>5</minDaysPassed>
         <mtbDays>6</mtbDays>
       </li>
@@ -36,5 +37,4 @@
       </li>
     </comps>
   </StorytellerDef>
-
 </Defs>

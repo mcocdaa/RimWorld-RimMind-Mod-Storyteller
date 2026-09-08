@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using RimMind.Core;
+using RimMind.Presentation.Api;
 using RimMind.Storyteller.Settings;
 using RimWorld;
 using Verse;
@@ -73,7 +73,7 @@ namespace RimMind.Storyteller
                     : IncidentCategoryDefOf.ThreatSmall,
                 FallbackMode.Randy => Rand.Value < 0.3f
                     ? IncidentCategoryDefOf.ThreatBig
-                    : Rand.Value < 0.6f
+                    : Rand.Value < 0.4286f
                         ? IncidentCategoryDefOf.ThreatSmall
                         : IncidentCategoryDefOf.Misc,
                 _ => IncidentCategoryDefOf.ThreatBig,

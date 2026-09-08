@@ -1,9 +1,13 @@
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using RimMind.Core;
-using RimMind.Core.Client;
-using RimMind.Core.Prompt;
+using RimMind.Application.Common.Models.Context;
+using RimMind.Application.Features.Llm;
+using RimMind.Domain.Llm;
+using RimMind.Domain.ValueObjects;
+using RimMind.Presentation.Api;
+using RimMind.Storyteller;
 using RimMind.Storyteller.Memory;
 using RimMind.Storyteller.Settings;
 using RimWorld;
@@ -20,6 +24,7 @@ namespace RimMind.Storyteller.UI
         private bool _waitingForResponse;
         private Vector2 _scrollPos = Vector2.zero;
         private bool _autoScroll = true;
+        private readonly ConcurrentQueue<(string role, string content)> _responseQueue = new ConcurrentQueue<(string, string)>();
         private const int MaxHistoryRounds = 6;
         private const float Padding = 8f;
         private const float InputHeight = 36f;
@@ -58,6 +63,15 @@ namespace RimMind.Storyteller.UI
 
         public override void DoWindowContents(Rect inRect)
         {
+            while (_responseQueue.TryDequeue(out var resp))
+            {
+                _waitingForResponse = false;
+                if (resp.role == "system") continue;
+                _messages.Add(resp);
+                _autoScroll = true;
+                RecordDialogueToMemory(resp.role, resp.content);
+            }
+
             Text.Font = GameFont.Small;
 
             float statusH = _waitingForResponse ? StatusHeight + Padding : 0f;
@@ -171,42 +185,29 @@ namespace RimMind.Storyteller.UI
 
             _waitingForResponse = true;
 
-            string systemPrompt = BuildSystemPrompt();
-            string userPrompt = BuildUserPrompt(userMsg);
+            var envelope = LlmRequestEnvelopeBuilder
+                .ForNpc("NPC-storyteller", gameStateInfo: new GameStateInfo().AddSection("dialogue_input", userMsg))
+                .ForScenarioId(ScenarioIds.Storyteller)
+                .WithModId("RimMind.Storyteller")
+                .WithMaxTokens(400)
+                .WithTemperature(0.9f)
+                .Build();
 
-            var request = new AIRequest
+            RimMindAPI.Request.Send(envelope, result =>
             {
-                SystemPrompt = systemPrompt,
-                UserPrompt = userPrompt,
-                MaxTokens = 300,
-                Temperature = 0.9f,
-                RequestId = $"Storyteller_Altar_{Find.TickManager.TicksGame}",
-                ModId = "Storyteller",
-                ExpireAtTicks = Find.TickManager.TicksGame + 6000,
-                UseJsonMode = false,
-                Priority = AIRequestPriority.High,
-            };
-
-            RimMindAPI.RequestImmediate(request, response =>
-            {
-                _waitingForResponse = false;
-                if (!response.Success) return;
-                string assistantMsg = response.Content?.Trim() ?? "";
-                _messages.Add(("assistant", assistantMsg));
-                _autoScroll = true;
-                RecordDialogueToMemory("assistant", assistantMsg);
+                if (result.IsErr)
+                {
+                    _responseQueue.Enqueue(("system", ""));
+                    return;
+                }
+                string assistantMsg = result.Value.Content?.Trim() ?? "";
+                if (assistantMsg.NullOrEmpty())
+                {
+                    _responseQueue.Enqueue(("system", ""));
+                    return;
+                }
+                _responseQueue.Enqueue(("assistant", assistantMsg));
             });
-        }
-
-        private string BuildSystemPrompt()
-        {
-            return StorytellerPromptBuilder.BuildDialogueSystemPrompt();
-        }
-
-        private string BuildUserPrompt(string userMsg)
-        {
-            var memory = StorytellerMemory.Instance ?? new StorytellerMemory(Find.World);
-            return StorytellerPromptBuilder.BuildDialogueUserPrompt(_map, memory, userMsg, _messages);
         }
 
         private float CalcMessagesHeight(float width)
@@ -229,13 +230,6 @@ namespace RimMind.Storyteller.UI
             var memory = StorytellerMemory.Instance;
             if (memory == null) return;
 
-            var settings = RimMind.Storyteller.RimMindStorytellerMod.Settings;
-            if (settings != null)
-            {
-                memory.MaxDialogueRecords = settings.maxDialogueRecords;
-                memory.MaxRecords = settings.maxEventRecords;
-            }
-
             int tick = Find.TickManager.TicksGame;
             memory.RecordDialogue(role, content, tick);
 
@@ -244,75 +238,11 @@ namespace RimMind.Storyteller.UI
 
         private static void TryPushToMemoryMod(string role, string content, int tick)
         {
-            try
-            {
-                var memoryAssembly = System.AppDomain.CurrentDomain.GetAssemblies()
-                    .FirstOrDefault(a => a.GetName().Name == "RimMindMemory");
-                if (memoryAssembly == null) return;
+            string prefix = role == "user"
+                ? "RimMind.Storyteller.Prompt.RolePlayer".Translate()
+                : "RimMind.Storyteller.Prompt.RoleNarrator".Translate();
 
-                var worldCompType = memoryAssembly.GetType("RimMind.Memory.Data.RimMindMemoryWorldComponent");
-                if (worldCompType == null) return;
-
-                var instanceProp = worldCompType.GetProperty("Instance",
-                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                if (instanceProp == null) return;
-
-                var worldComp = instanceProp.GetValue(null);
-                if (worldComp == null) return;
-
-                var narratorStoreProp = worldCompType.GetProperty("NarratorStore");
-                if (narratorStoreProp == null) return;
-
-                var narratorStore = narratorStoreProp.GetValue(worldComp);
-                if (narratorStore == null) return;
-
-                var settingsType = memoryAssembly.GetType("RimMind.Memory.RimMindMemoryMod");
-                if (settingsType == null) return;
-
-                var settingsProp = settingsType.GetProperty("Settings",
-                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                var memSettings = settingsProp?.GetValue(null);
-
-                bool enableMemory = true;
-                int narratorMaxActive = 30;
-                int narratorMaxArchive = 10;
-
-                if (memSettings != null)
-                {
-                    var enableField = memSettings.GetType().GetField("enableMemory");
-                    if (enableField != null) enableMemory = (bool)enableField.GetValue(memSettings);
-
-                    var maxActiveField = memSettings.GetType().GetField("narratorMaxActive");
-                    if (maxActiveField != null) narratorMaxActive = (int)maxActiveField.GetValue(memSettings);
-
-                    var maxArchiveField = memSettings.GetType().GetField("narratorMaxArchive");
-                    if (maxArchiveField != null) narratorMaxArchive = (int)maxArchiveField.GetValue(memSettings);
-                }
-
-                if (!enableMemory) return;
-
-                var entryType = memoryAssembly.GetType("RimMind.Memory.Data.MemoryEntry");
-                if (entryType == null) return;
-
-                var createMethod = entryType.GetMethod("Create",
-                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                if (createMethod == null) return;
-
-                var memoryTypeEnum = memoryAssembly.GetType("RimMind.Memory.Data.MemoryType");
-                if (memoryTypeEnum == null) return;
-
-                var eventType = System.Enum.Parse(memoryTypeEnum, "Event");
-
-                string prefix = role == "user"
-                    ? "RimMind.Storyteller.Prompt.RolePlayer".Translate()
-                    : "RimMind.Storyteller.Prompt.RoleNarrator".Translate();
-                object entry = createMethod.Invoke(null, new object[] { $"{prefix}: {content}", eventType, tick, 0.3f, null! })!;
-
-                var addActiveMethod = narratorStore.GetType().GetMethod("AddActive");
-                if (addActiveMethod != null && entry != null)
-                    addActiveMethod.Invoke(narratorStore, new object[] { entry, narratorMaxActive, narratorMaxArchive });
-            }
-            catch { }
+            RimMindAPI.Memory.AddNarratorMemory($"{prefix}: {content}", tick, 0.3f);
         }
     }
 }

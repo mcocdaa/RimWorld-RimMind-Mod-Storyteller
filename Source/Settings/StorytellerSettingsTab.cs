@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using RimMind.Core.UI;
+using RimMind.Presentation.UI;
 using RimMind.Storyteller.Memory;
 using UnityEngine;
 using Verse;
@@ -16,8 +16,8 @@ namespace RimMind.Storyteller.Settings
         {
             LoadPromptOnce();
 
-            Rect contentArea = SettingsUIHelper.SplitContentArea(inRect);
-            Rect bottomBar  = SettingsUIHelper.SplitBottomBar(inRect);
+            Rect contentArea = SettingsUIDrawer.SplitContentArea(inRect);
+            Rect bottomBar = SettingsUIDrawer.SplitBottomBar(inRect);
 
             float contentH = EstimateHeight();
             Rect viewRect = new Rect(0f, 0f, contentArea.width - 16f, contentH);
@@ -28,19 +28,13 @@ namespace RimMind.Storyteller.Settings
 
             var settings = RimMindStorytellerMod.Settings;
 
-            SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.TriggerSources".Translate());
+            SettingsUIDrawer.DrawSectionHeader(listing, "RimMind.Storyteller.UI.TriggerSources".Translate());
             listing.CheckboxLabeled("RimMind.Storyteller.UI.EnableIntervalTrigger".Translate(), ref settings.enableIntervalTrigger,
                 "RimMind.Storyteller.UI.EnableIntervalTrigger.Desc".Translate());
             listing.CheckboxLabeled("RimMind.Storyteller.UI.EnableEventNotification".Translate(), ref settings.enableEventNotification,
                 "RimMind.Storyteller.UI.EnableEventNotification.Desc".Translate());
 
-            listing.Label("RimMind.Storyteller.UI.MaxCandidates".Translate(settings.maxCandidates));
-            GUI.color = Color.gray;
-            listing.Label("  " + "RimMind.Storyteller.UI.MaxCandidatesDesc".Translate());
-            GUI.color = Color.white;
-            settings.maxCandidates = (int)listing.Slider(settings.maxCandidates, 5f, 25f);
-
-            SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Fallback".Translate());
+            SettingsUIDrawer.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Fallback".Translate());
             listing.Label("RimMind.Storyteller.UI.FallbackModeLabel".Translate(settings.fallbackMode.ToString()));
             GUI.color = Color.gray;
             listing.Label("  " + "RimMind.Storyteller.UI.FallbackModeDesc".Translate());
@@ -58,12 +52,12 @@ namespace RimMind.Storyteller.Settings
                 settings.fallbackMode = modes[(idx + 1) % modes.Count];
             }
 
-            SettingsUIHelper.DrawCustomPromptSection(listing,
+            SettingsUIDrawer.DrawCustomPromptSection(listing,
                 "RimMind.Storyteller.UI.StylePromptLabel".Translate(),
-                ref _promptText);
+                ref _promptText, 3f);
             SavePrompt();
 
-            SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Request".Translate());
+            SettingsUIDrawer.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Request".Translate());
             listing.Label("RimMind.Storyteller.UI.MTBDays".Translate($"{settings.mtbDays:F1}"));
             GUI.color = Color.gray;
             listing.Label("  " + "RimMind.Storyteller.UI.MTBDays.Desc".Translate());
@@ -78,11 +72,11 @@ namespace RimMind.Storyteller.Settings
             settings.requestExpireTicks = (int)listing.Slider(settings.requestExpireTicks, 3600f, 120000f);
             settings.requestExpireTicks = (settings.requestExpireTicks / 1500) * 1500;
 
-            SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Debug".Translate());
+            SettingsUIDrawer.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Debug".Translate());
             listing.CheckboxLabeled("RimMind.Storyteller.UI.DebugLogging".Translate(), ref settings.debugLogging,
                 "RimMind.Storyteller.UI.DebugLogging.Desc".Translate());
 
-            SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Memory".Translate());
+            SettingsUIDrawer.DrawSectionHeader(listing, "RimMind.Storyteller.UI.Section.Memory".Translate());
             listing.Label("RimMind.Storyteller.UI.MaxEventRecords".Translate(settings.maxEventRecords));
             GUI.color = Color.gray;
             listing.Label("  " + "RimMind.Storyteller.UI.MaxEventRecords.Desc".Translate());
@@ -94,7 +88,27 @@ namespace RimMind.Storyteller.Settings
             GUI.color = Color.white;
             settings.maxDialogueRecords = (int)listing.Slider(settings.maxDialogueRecords, 5f, 60f);
 
-            SettingsUIHelper.DrawSectionHeader(listing, "RimMind.Storyteller.UI.MemoryTitle".Translate());
+            listing.Label("RimMind.Storyteller.UI.MaxPlayerReactions".Translate(settings.maxPlayerReactions));
+            GUI.color = Color.gray;
+            listing.Label("  " + "RimMind.Storyteller.UI.MaxPlayerReactions.Desc".Translate());
+            GUI.color = Color.white;
+            settings.maxPlayerReactions = (int)listing.Slider(settings.maxPlayerReactions, 5f, 50f);
+
+            listing.Label("RimMind.Storyteller.UI.ChainExpireDays".Translate($"{settings.chainExpireDays:F1}"));
+            GUI.color = Color.gray;
+            listing.Label("  " + "RimMind.Storyteller.UI.ChainExpireDays.Desc".Translate());
+            GUI.color = Color.white;
+            settings.chainExpireDays = listing.Slider(settings.chainExpireDays, 3f, 30f);
+            settings.chainExpireDays = (float)System.Math.Round(settings.chainExpireDays * 2f) / 2f;
+
+            listing.Label("RimMind.Storyteller.UI.TensionDecayPerDay".Translate($"{settings.tensionDecayPerDay:F3}"));
+            GUI.color = Color.gray;
+            listing.Label("  " + "RimMind.Storyteller.UI.TensionDecayPerDay.Desc".Translate());
+            GUI.color = Color.white;
+            settings.tensionDecayPerDay = listing.Slider(settings.tensionDecayPerDay, 0.01f, 0.10f);
+            settings.tensionDecayPerDay = (float)System.Math.Round(settings.tensionDecayPerDay * 200f) / 200f;
+
+            SettingsUIDrawer.DrawSectionHeader(listing, "RimMind.Storyteller.UI.MemoryTitle".Translate());
             var memory = StorytellerMemory.Instance;
             if (memory == null)
             {
@@ -108,7 +122,7 @@ namespace RimMind.Storyteller.Settings
                 for (int i = memory.Records.Count - 1; i >= 0 && i >= memory.Records.Count - 10; i--)
                 {
                     var r = memory.Records[i];
-                    int day = r.TriggeredTick / 60000 + 1;
+                    int day = TensionMath.TicksToDay(r.TriggeredTick);
                     listing.Label("RimMind.Storyteller.UI.MemoryDayEntry".Translate(day, r.Label, r.MapName));
                 }
                 if (Widgets.ButtonText(listing.GetRect(30f), "RimMind.Storyteller.UI.ClearMemory".Translate()))
@@ -121,17 +135,19 @@ namespace RimMind.Storyteller.Settings
             listing.End();
             Widgets.EndScrollView();
 
-            SettingsUIHelper.DrawBottomBar(bottomBar, () =>
+            SettingsUIDrawer.DrawBottomBar(bottomBar, () =>
             {
                 settings.enableIntervalTrigger = true;
                 settings.fallbackMode = FallbackMode.Cassandra;
                 settings.mtbDays = 1.5f;
-                settings.maxCandidates = 15;
                 settings.debugLogging = false;
                 settings.requestExpireTicks = 30000;
                 settings.maxEventRecords = 50;
                 settings.maxDialogueRecords = 30;
                 settings.enableEventNotification = true;
+                settings.maxPlayerReactions = 20;
+                settings.chainExpireDays = 10.0f;
+                settings.tensionDecayPerDay = 0.03f;
                 _promptText = string.Empty;
                 SavePrompt();
             });
@@ -169,6 +185,7 @@ namespace RimMind.Storyteller.Settings
             h += 24f;
 
             h += 24f + 24f + 32f + 24f + 32f;
+            h += 24f + 24f + 32f + 24f + 32f + 24f + 32f;
 
             var memory = StorytellerMemory.Instance;
             if (memory != null)
